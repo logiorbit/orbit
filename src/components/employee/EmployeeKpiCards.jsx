@@ -1,0 +1,123 @@
+import { useEffect, useState } from "react";
+import { useMsal } from "@azure/msal-react";
+import { getAccessToken } from "../../auth/authService";
+import { useUserContext } from "../../context/UserContext";
+import {
+  getSelfMembers,
+  getTeamTasksForPeriod,
+} from "../../services/sharePointService";
+
+import "./managerDashboard.css";
+
+export default function EmployeeKpiCards() {
+  const { instance, accounts } = useMsal();
+  const { employeeHierarchy, userProfile } = useUserContext();
+
+  const [kpis, setKpis] = useState(null);
+
+  useEffect(() => {
+    if (!employeeHierarchy || !userProfile || !accounts?.length) return;
+
+    async function load() {
+      const token = await getAccessToken(instance, accounts[0]);
+
+      // 🔹 Manager team resolution
+      const teamMembers = getSelfMembers(employeeHierarchy, userProfile.email);
+
+      const teamSize = teamMembers.length;
+      const capacityPerDay = teamSize * 9;
+
+      console.log(teamSize);
+      console.log(capacityPerDay);
+
+      const today = await getTeamTasksForPeriod(token, "today", teamMembers);
+
+      const week = await getTeamTasksForPeriod(token, "week", teamMembers);
+
+      const month = await getTeamTasksForPeriod(token, "month", teamMembers);
+
+      // console.log("teamMembers", teamMembers);
+      //  console.log(teamSize);
+      //  console.log(capacityPerDay);
+      //  console.log(today);
+      //  console.log(week);
+      //  console.log(month);
+
+      setKpis({
+        capacityPerDay,
+        today,
+        week,
+        month,
+      });
+    }
+
+    load();
+  }, [employeeHierarchy, userProfile, accounts, instance]);
+
+  if (!kpis) return null;
+
+  return (
+    <div>
+      <div className="leave-card-grid">
+        <div className="kpikpi-card">
+          <ManagerKpi
+            title="Productive Today"
+            used={kpis.today.productive}
+            cap={kpis.capacityPerDay}
+          />
+        </div>
+        <div className="kpikpi-card">
+          <ManagerKpi
+            title="Productive This Week"
+            used={kpis.week.productive}
+            cap={kpis.capacityPerDay * 5}
+          />
+        </div>
+        <div className="kpikpi-card">
+          <ManagerKpi
+            title="Productive This Month"
+            used={kpis.month.productive}
+            cap={kpis.capacityPerDay * 22}
+          />
+        </div>
+      </div>
+      <div className="leave-card-grid">
+        <div className="kpikpi-card">
+          <ManagerKpi
+            title="Billed Today"
+            used={kpis.today.billed}
+            cap={kpis.capacityPerDay}
+          />
+        </div>
+        <div className="kpikpi-card">
+          <ManagerKpi
+            title="Billed This Week"
+            used={kpis.week.billed}
+            cap={kpis.capacityPerDay * 5}
+          />
+        </div>
+        <div className="kpikpi-card">
+          <ManagerKpi
+            title="Billed This Month"
+            used={kpis.month.billed}
+            cap={kpis.capacityPerDay * 22}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ManagerKpi({ title, used, cap }) {
+  const percent = cap > 0 ? Math.round((used / cap) * 100) : 0;
+
+  return (
+    <div className="manager-kpi-card">
+      <div className="manager-kpi-title">{title}</div>
+      <div className="manager-kpi-value">
+        {used} / {cap} hrs
+      </div>
+      <div className="manager-kpi-percent">{percent}%</div>
+    </div>
+  );
+}

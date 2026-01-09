@@ -1,0 +1,78 @@
+/* =========================
+   MANAGER KPI GRID
+   ========================= */
+
+.manager-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* --- KPI ROW (6 cards in single row) --- */
+.manager-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* FORCE single row */
+  gap: 16px;
+  margin: 16px 0 16px 0;
+  width: 100%;
+}
+
+.manager-kpi-card {
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 16px 18px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.manager-kpi-title {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.manager-kpi-value {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 6px;
+  color: #111827;
+}
+
+/* =========================
+   GRID HELPERS (MATCH TL)
+   ========================= */
+
+.manager-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.manager-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.manager-full-width {
+  width: 100%;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 1200px) {
+  .manager-kpi-row {
+    overflow-x: auto;
+    grid-template-columns: repeat(6, minmax(180px, 1fr));
+  }
+
+  .manager-grid-3,
+  .manager-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}

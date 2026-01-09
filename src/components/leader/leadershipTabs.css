@@ -1,0 +1,47 @@
+.leadership-tabs-card {
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+/* Tabs header */
+.leadership-tabs-header {
+  display: flex;
+  gap: 28px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+}
+
+/* Individual tab */
+.leadership-tab {
+  background: none;
+  border: none;
+  padding: 10px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: black;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Active tab */
+.leadership-tab.active {
+  color: #bef264;
+  background-color: black;
+}
+
+.leadership-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 2px;
+  background: #bef264;
+}
+
+/* Content */
+.leadership-tab-content {
+  font-size: 14px;
+  color: black;
+  padding-top: 8px;
+}

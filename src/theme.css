@@ -1,0 +1,18 @@
+button,
+.btn,
+.primary-btn {
+  background-color: #d9f99d;
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover,
+.btn:hover,
+.primary-btn {
+  background-color: #bef264;
+}
