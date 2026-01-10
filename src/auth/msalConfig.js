@@ -5,7 +5,7 @@ export const msalConfig = {
     clientId: "6a93a9ee-3c0c-4901-a70a-2dabddabebcc",
     authority:
       "https://login.microsoftonline.com/460c4715-8401-4095-928e-7978fe5b59e7",
-    redirectUri: "http://localhost:5173",
+    redirectUri: "https://orbit-ten-lake.vercel.app/",
   },
   cache: {
     cacheLocation: "sessionStorage",
