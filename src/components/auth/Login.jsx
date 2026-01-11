@@ -2,7 +2,7 @@ import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../../auth/authConfig";
 import "./landing.css";
 
-export default function LandingPage() {
+export default function Login() {
   const { instance } = useMsal();
 
   const signIn = () => {
