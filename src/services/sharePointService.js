@@ -762,8 +762,23 @@ export async function getTasksByClientAndDate(accessToken, clientId, date) {
 }
 
 export async function getTasksForDate(accessToken, date) {
-  const start = `${date}T00:00:00Z`;
-  const end = `${date}T23:59:59Z`;
+  if (!clientId || !date) {
+    console.warn("getTasksForDate: missing clientId or date");
+    return [];
+  }
+
+  const baseDate = new Date(date);
+
+  if (isNaN(baseDate.getTime())) {
+    console.warn("getTasksForDate: invalid date", date);
+    return [];
+  }
+
+  const start = new Date(baseDate);
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(baseDate);
+  end.setHours(23, 59, 59, 999);
 
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Task_Records')/items` +
