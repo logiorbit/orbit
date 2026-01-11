@@ -57,9 +57,7 @@
 .data-table tbody tr {
   display: table;
   table-layout: auto;
-  white-space: nowrap;
   width: 100%;
-  max-width: none;
 }
 
 .data-table th {
@@ -69,6 +67,9 @@
   padding: 8px;
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+  width: auto;
+  max-width: none;
 }
 
 .data-table td {
