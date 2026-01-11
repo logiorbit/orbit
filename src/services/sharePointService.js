@@ -761,7 +761,7 @@ export async function getTasksByClientAndDate(accessToken, clientId, date) {
   return res.data.value || [];
 }
 
-export async function getTasksForDate(accessToken, date) {
+export async function getTasksForDate2(accessToken, date) {
   if (!date) {
     console.warn("getTasksForDate: missing date");
     return [];
