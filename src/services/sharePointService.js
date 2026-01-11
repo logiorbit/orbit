@@ -21,6 +21,8 @@ export async function getEmployeeHierarchy(accessToken) {
     },
   });
 
+  console.log(response.data.value);
+
   return response.data.value;
 }
 
