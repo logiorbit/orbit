@@ -68,7 +68,6 @@
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
   white-space: nowrap;
-  width: auto;
   max-width: none;
 }
 
@@ -77,7 +76,6 @@
   border-top: 1px solid #f1f5f9;
   font-size: 12px;
   white-space: nowrap;
-  width: auto;
   max-width: none;
 }
 
