@@ -5,16 +5,19 @@ const SITE_URL = "https://logivention.sharepoint.com/sites/LogiOrbit";
 //console.log("sharePointService.js LOADED");
 
 export async function getEmployeeHierarchy(accessToken) {
-  //console.log("getEmployeeHierarchy CALLED");
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Employee_Hierarchy')/items` +
-    `?$select=Id,Employee/EMail,Employee/Id,Employee/Title,TL/EMail,ATL/EMail,GTL/EMail,Manager/EMail,Status,TotalExp,RelevantExp,LegalName,PersonalEmail,PrimarySkills,SecondarySkills,CurrentClient,PastClients,Position` +
-    `&$expand=Employee,TL,ATL,GTL,Manager,PrimarySkills,SecondarySkills,CurrentClient,PastClients`;
+    `?$select=` +
+    `Id,Status,TotalExp,RelevantExp,LegalName,PersonalEmail,Position,Mobile,` +
+    `Employee/Id,Employee/Title,Employee/EMail,` +
+    `TL/EMail,ATL/EMail,GTL/EMail,Manager/EMail,` +
+    `PrimarySkillsId,SecondarySkillsId,PastClientsId,CurrentClient/Title` +
+    `&$expand=Employee,TL,ATL,GTL,Manager,CurrentClient`;
 
   const response = await axios.get(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
-      Accept: "application/json;odata=nometadata",
+      Accept: "application/json;odata=minimalmetadata",
     },
   });
 
