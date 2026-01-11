@@ -28,7 +28,6 @@
 }
 
 .data-table {
-  table-layout: auto;
   width: 100%;
   border-collapse: collapse;
 }
@@ -49,15 +48,15 @@
   max-height: 260px;
 
   overflow-y: auto;
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 /* Keep column alignment */
 .data-table thead,
 .data-table tbody tr {
   display: table;
-  table-layout: auto;
   width: 100%;
+  table-layout: fixed;
 }
 
 .data-table th {
