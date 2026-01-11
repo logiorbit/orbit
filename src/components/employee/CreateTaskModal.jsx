@@ -18,7 +18,7 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
     title: "",
     clientId: "",
     typeId: "",
-    date: new Date().toISOString().split("T")[0],
+    date: "",
     status: "Draft",
     estimated: "",
     productive: "",
@@ -80,6 +80,15 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
         />
+
+        <div className="form-group">
+          <label>Start Date</label>
+          <input
+            type="date"
+            value={form.date}
+            onChange={(e) => setForm({ ...form, date: e.target.value })}
+          />
+        </div>
 
         <label>Select Client</label>
         <select

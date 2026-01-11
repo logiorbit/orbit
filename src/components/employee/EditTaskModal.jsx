@@ -95,6 +95,13 @@ export default function EditTaskModal({ task, onClose, onSuccess }) {
           onChange={(e) => setForm({ ...form, title: e.target.value })}
         />
 
+        <label>Task Date</label>
+        <input
+          type="date"
+          value={form.date}
+          onChange={(e) => setForm({ ...form, date: e.target.value })}
+        />
+
         <label>Select Client</label>
         <select
           value={form.clientId}
