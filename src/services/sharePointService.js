@@ -797,5 +797,7 @@ export async function getTasksForDate2(accessToken, date) {
     },
   });
 
+  console.log(res.data.value);
+
   return res.data.value;
 }
