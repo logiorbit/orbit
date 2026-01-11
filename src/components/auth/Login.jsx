@@ -1,14 +1,52 @@
 import { useMsal } from "@azure/msal-react";
-import { loginRequest } from "../../auth/msalConfig";
+import { loginRequest } from "../../auth/authConfig";
+import "./landing.css";
 
-export default function Login() {
+export default function LandingPage() {
   const { instance } = useMsal();
 
+  const signIn = () => {
+    instance.loginRedirect(loginRequest);
+  };
+
   return (
-    <div className="login-page">
-      <button onClick={() => instance.loginRedirect(loginRequest)}>
-        Sign in with Microsoft
-      </button>
+    <div className="landing-container">
+      <div className="landing-content">
+        {/* LEFT CONTENT */}
+        <div className="landing-text">
+          <h1>
+            Logi<span>Orbit</span>
+          </h1>
+
+          <p>
+            LogiOrbit is a modern workforce intelligence platform designed to
+            bring clarity, accountability, and visibility into how teams work
+            every day.
+          </p>
+
+          <p>
+            Track tasks, manage leaves, monitor productivity, and analyze
+            billable performance — all in one unified system.
+          </p>
+
+          <p>
+            Built for Employees, Team Leads, Managers, and Leadership, LogiOrbit
+            enables data-driven decisions with real-time insights across the
+            organization.
+          </p>
+
+          <p>Simplify operations. Improve utilization. Lead with confidence.</p>
+
+          <button className="ms-login-btn" onClick={signIn}>
+            Sign in with Microsoft
+          </button>
+        </div>
+
+        {/* RIGHT IMAGE */}
+        <div className="landing-image">
+          <img src="/landing-hero.png" alt="LogiOrbit Dashboard Preview" />
+        </div>
+      </div>
     </div>
   );
 }
