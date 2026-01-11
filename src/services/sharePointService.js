@@ -789,7 +789,6 @@ export async function getTasksForDate2(accessToken, date) {
     `TaskType/Id,TaskType/Title` +
     `&$expand=Employee,Client,TaskType` +
     `&$filter=` +
-    `Client/Id eq ${clientId} ` +
     `and TaskDate ge datetime'${start.toISOString()}' ` +
     `and TaskDate le datetime'${end.toISOString()}'`;
 
