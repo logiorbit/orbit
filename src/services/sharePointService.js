@@ -13,7 +13,7 @@ export async function getEmployeeHierarchy(accessToken) {
     `TL/EMail,ATL/EMail,GTL/EMail,Manager/EMail,` +
     `PrimarySkillsId,SecondarySkillsId,PastClientsId,CurrentClient/Title` +
     `&$expand=Employee,TL,ATL,GTL,Manager,CurrentClient`;
-
+  //
   const response = await axios.get(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
