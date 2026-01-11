@@ -28,7 +28,8 @@ export default function TLTeamTasksTable() {
         .filter(
           (h) =>
             h.TL?.EMail?.toLowerCase() === myEmail ||
-            h.ATL?.EMail?.toLowerCase() === myEmail
+            h.ATL?.EMail?.toLowerCase() === myEmail ||
+            h.GTL?.EMail?.toLowerCase() === myEmail
         )
         .map((h) => h.Employee?.EMail?.toLowerCase());
 

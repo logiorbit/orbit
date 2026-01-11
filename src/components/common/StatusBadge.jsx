@@ -4,7 +4,7 @@ export default function StatusBadge({ status }) {
     "TL Approved": "blue",
     Approved: "green",
     Rejected: "red",
-    "Work In Progress": "blue",
+    WIP: "blue",
     Draft: "yellow",
     Complete: "green",
   };
