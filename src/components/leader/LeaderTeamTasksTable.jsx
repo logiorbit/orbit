@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMsal } from "@azure/msal-react";
 import { getAccessToken } from "../../auth/authService";
-import { getTasksForDate2 } from "../../services/sharePointService";
+import { getTasksForDate } from "../../services/sharePointService";
 import { useUserContext } from "../../context/UserContext";
 import DataTable from "../common/DataTable";
 import "../common/tableHeader.css";
@@ -19,7 +19,7 @@ export default function LeaderTeamTasksTable() {
 
     async function load() {
       const token = await getAccessToken(instance, accounts[0]);
-      const tasks = await getTasksForDate2(token, date);
+      const tasks = await getTasksForDate(token, date);
 
       let filtered = tasks;
 
