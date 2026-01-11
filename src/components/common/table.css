@@ -49,15 +49,17 @@
   max-height: 260px;
 
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 /* Keep column alignment */
 .data-table thead,
 .data-table tbody tr {
   display: table;
-  width: 100%;
-  table-layout: fixed;
+  table-layout: auto;
+  white-space: nowrap;
+  width: auto;
+  max-width: none;
 }
 
 .data-table th {
