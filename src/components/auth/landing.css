@@ -22,7 +22,7 @@
 }
 
 .landing-text h1 span {
-  color: #4f46e5;
+  color: #bef264;
 }
 
 .landing-text p {
@@ -30,12 +30,13 @@
   color: #374151;
   margin-bottom: 12px;
   line-height: 1.6;
+  justify-content: center;
 }
 
 .ms-login-btn {
   margin-top: 28px;
   padding: 14px 26px;
-  background: #4f46e5;
+  background: #bef264;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -46,7 +47,7 @@
 }
 
 .ms-login-btn:hover {
-  background: #4338ca;
+  background: #bef264;
 }
 
 .landing-image img {

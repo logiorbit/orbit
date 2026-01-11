@@ -44,7 +44,7 @@ export default function Login() {
 
         {/* RIGHT IMAGE */}
         <div className="landing-image">
-          <img src="/landing-hero.png" alt="LogiOrbit Dashboard Preview" />
+          <img src="/landing-hero.png.jpg" alt="LogiOrbit Workforce Preview" />
         </div>
       </div>
     </div>
