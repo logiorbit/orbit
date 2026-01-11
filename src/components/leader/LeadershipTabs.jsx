@@ -4,6 +4,8 @@ import LeaderUnderAllocatedTable from "./LeaderUnderAllocatedTable";
 import LeaderTasksByClientDate from "./LeaderTasksByClientDate";
 import LeaderTeamMembersTable from "./LeaderTeamMembersTable";
 import LeaderBillingMatrix from "./LeaderBillingMatrix";
+import LeaderTeamTasksTable from "./LeaderTeamTasksTable";
+
 import "./leadershipTabs.css";
 
 export default function LeadershipTabs() {
@@ -55,6 +57,10 @@ export default function LeadershipTabs() {
               <h2> </h2>
             </div>
             <LeaderTasksByClientDate />
+            <div>
+              <h2></h2>
+            </div>
+            <LeaderTeamTasksTable />
           </div>
         )}
         {activeTab === "three" && (

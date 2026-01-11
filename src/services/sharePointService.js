@@ -760,3 +760,27 @@ export async function getTasksByClientAndDate(accessToken, clientId, date) {
 
   return res.data.value || [];
 }
+
+export async function getTasksForDate(accessToken, date) {
+  const start = `${date}T00:00:00Z`;
+  const end = `${date}T23:59:59Z`;
+
+  const url =
+    `${SITE_URL}/_api/web/lists/getbytitle('Task_Records')/items` +
+    `?$select=` +
+    `Id,TaskDate,EstimatedHours,BillableHours,Status,` +
+    `Employee/Title,Employee/EMail,` +
+    `TaskType/Title,` +
+    `Client/Title` +
+    `&$expand=Employee,TaskType,Client` +
+    `&$filter=TaskDate ge datetime'${start}' and TaskDate le datetime'${end}'`;
+
+  const res = await axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json;odata=nometadata",
+    },
+  });
+
+  return res.data.value;
+}

@@ -5,6 +5,7 @@ import TLUnderAllocatedTable from "./TLUnderAllocatedTable";
 import TLMembersOnLeave from "./TLMembersOnLeave";
 import TLBilledHoursMatrix from "./TLBilledHoursMatrix";
 import TLTasksByClientDate from "./TLTasksByClientDate";
+import TLTeamTasksTable from "./TLTeamTasksTable";
 
 import "./tlDashboard.css";
 
@@ -43,7 +44,9 @@ export default function TLDashboard() {
           <TLTasksByClientDate />
         </div>
 
-        <div className="card"></div>
+        <div className="card">
+          <TLTeamTasksTable />
+        </div>
       </div>
 
       {/* ===== FULL WIDTH ===== */}

@@ -5,6 +5,7 @@ import ManagerUnderAllocatedTable from "./ManagerUnderAllocatedTable";
 import ManagerMembersOnLeave from "./ManagerMembersOnLeave";
 import ManagerTasksByClientDate from "./ManagerTasksByClientDate";
 import ManagerBillingMatrix from "./ManagerBillingMatrix";
+import ManagerTeamTasksTable from "./ManagerTeamTasksTable";
 
 import "./managerDashboard.css";
 
@@ -44,7 +45,9 @@ export default function ManagerDashboard() {
             <ManagerTasksByClientDate />
           </div>
 
-          <div className="card"></div>
+          <div className="card">
+            <ManagerTeamTasksTable />
+          </div>
         </div>
 
         {/* ===== FULL WIDTH ===== */}
