@@ -25,7 +25,7 @@ export default function LeaderTeamMembersTable() {
       TotalExp: h.TotalExp,
       RelevantExp: h.RelevantExp,
       PersonalEmail: h.PersonalEmail,
-      CurrentClient: h.CurrentClient.Title,
+      CurrentClient: h.CurrentClient,
       EndClient: h.EndClients,
       Mobile: h.Mobile,
       Role: h.Manager?.EMail?.toLowerCase() === myEmail ? "Manager" : "",
