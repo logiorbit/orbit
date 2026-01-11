@@ -782,13 +782,9 @@ export async function getTasksForDate2(accessToken, date) {
 
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Task_Records')/items` +
-    `?$select=` +
-    `Id,TaskDate,EstimatedHours,BillableHours,Status,` +
-    `Employee/Title,Employee/EMail,` +
-    `TaskType/Title,` +
-    `Client/Title` +
-    `&$expand=Employee,TaskType,Client` +
-    `&$filter=TaskDate ge datetime'${start}' and TaskDate le datetime'${end}'`;
+    `?$select=Id,Title,TaskDate,EstimatedHours,BillableHours,ProductiveHours,Status,Client/Title,TaskType/Title` +
+    `&$expand=Client,TaskType` +
+    `&$filter=TaskDate eq '${date}'`;
 
   const res = await axios.get(url, {
     headers: {
