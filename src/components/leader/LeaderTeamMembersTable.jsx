@@ -28,7 +28,6 @@ export default function LeaderTeamMembersTable() {
       CurrentClient: h.CurrentClient?.Title || "-",
       EndClient: h.EndClients,
       Mobile: h.Mobile,
-      Role: h.Manager?.EMail?.toLowerCase() === myEmail ? "Manager" : "",
     }));
     //
     setRows(mapped);
@@ -45,7 +44,6 @@ export default function LeaderTeamMembersTable() {
     { key: "EndClient", label: "End Clients" },
     { key: "PersonalEmail", label: "PersonalEmail" },
     { key: "Mobile", label: "Mobile" },
-    { key: "Role", label: "Reporting As" },
   ];
 
   return <DataTable columns={columns} data={rows} />;
