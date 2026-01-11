@@ -7,6 +7,11 @@ export default function StatusBadge({ status }) {
     WIP: "blue",
     Draft: "yellow",
     Complete: "green",
+    "On Project": "green",
+    "On Bench - On Target": "yellow",
+    "Non Productive": "gray",
+    "On Bench": "red",
+    "In Training": "blue",
   };
 
   return (

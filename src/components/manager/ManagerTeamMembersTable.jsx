@@ -23,6 +23,8 @@ export default function ManagerTeamMembersTable() {
       Id: h.Employee.Id,
       Name: h.Employee.Title,
       Email: h.Employee.EMail,
+      Status: h.Status,
+      Position: h.Position,
       Role: h.Manager?.EMail?.toLowerCase() === myEmail ? "Manager" : "",
     }));
 
@@ -32,6 +34,8 @@ export default function ManagerTeamMembersTable() {
   const columns = [
     { key: "Name", label: "Employee Name" },
     { key: "Email", label: "Email" },
+    { key: "Status", label: "Status" },
+    { key: "Position", label: "Position" },
     { key: "Role", label: "Reporting As" },
   ];
 

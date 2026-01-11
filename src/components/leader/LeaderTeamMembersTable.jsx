@@ -20,6 +20,14 @@ export default function LeaderTeamMembersTable() {
       Id: h.Employee.Id,
       Name: h.Employee.Title,
       Email: h.Employee.EMail,
+      Status: h.Status,
+      Position: h.Position,
+      TotalExp: h.TotalExp,
+      RelevantExp: h.RelevantExp,
+      PersonalEmail: h.PersonalEmail,
+      CurrentClient: h.CurrentClient,
+      EndClient: h.EndClients,
+      Mobile: h.Mobile,
       Role: h.Manager?.EMail?.toLowerCase() === myEmail ? "Manager" : "",
     }));
 
@@ -29,6 +37,14 @@ export default function LeaderTeamMembersTable() {
   const columns = [
     { key: "Name", label: "Employee Name" },
     { key: "Email", label: "Email" },
+    { key: "Status", label: "Status" },
+    { key: "Position", label: "Position" },
+    { key: "Total Exp", label: "Total Exp" },
+    { key: "Relevant Exp", label: "Relevant Exp" },
+    { key: "Current Client", label: "Current Client" },
+    { key: "End Client", label: "End Clients" },
+    { key: "Personal Email", label: "PersonalEmail" },
+    { key: "Mobile", label: "Mobile" },
     { key: "Role", label: "Reporting As" },
   ];
 

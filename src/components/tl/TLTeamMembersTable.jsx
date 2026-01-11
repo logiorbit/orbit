@@ -24,6 +24,8 @@ export default function TLTeamMembersTable() {
       Id: h.Employee.Id,
       Name: h.Employee.Title,
       Email: h.Employee.EMail,
+      Status: h.Status,
+      Position: h.Position,
       Role:
         h.TL?.EMail?.toLowerCase() === myEmail
           ? "TL"
@@ -40,6 +42,8 @@ export default function TLTeamMembersTable() {
   const columns = [
     { key: "Name", label: "Employee Name" },
     { key: "Email", label: "Email" },
+    { key: "Status", label: "Status" },
+    { key: "Position", label: "Position" },
     { key: "Role", label: "Reporting As" },
   ];
 

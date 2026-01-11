@@ -8,8 +8,8 @@ export async function getEmployeeHierarchy(accessToken) {
   //console.log("getEmployeeHierarchy CALLED");
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Employee_Hierarchy')/items` +
-    `?$select=Id,Employee/EMail,Employee/Id,Employee/Title,TL/EMail,ATL/EMail,GTL/EMail,Manager/EMail` +
-    `&$expand=Employee,TL,ATL,GTL,Manager`;
+    `?$select=Id,Employee/EMail,Employee/Id,Employee/Title,TL/EMail,ATL/EMail,GTL/EMail,Manager/EMail,Status,TotalExp,RelevantExp,LegalName,PersonalEmail,PrimarySkills,SecondarySkills,CurrentClient,PastClients,Position` +
+    `&$expand=Employee,TL,ATL,GTL,Manager,PrimarySkills,SecondarySkills,CurrentClient,PastClients`;
 
   const response = await axios.get(url, {
     headers: {
