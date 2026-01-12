@@ -825,17 +825,31 @@ export async function getTasksForDate2(accessToken, date) {
 }
 
 export async function getMyEmployeeHierarchyRecord(accessToken, email) {
+  const encodedEmail = encodeURIComponent(email);
+
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Employee_Hierarchy')/items` +
-    `?$select=Id,Employee/Title,Employee/EMail,ATL/Title,TL/Title,Manager/Title,` +
-    `IsActive,EffectiveFrom,EffectiveTo,GTL,Status,Position,` +
-    `TotalExp,RelevantExp,LegalName,PersonalEmail,Mobile,` +
+    `?$select=` +
+    `Id,` +
+    `Employee/Title,Employee/EMail,` +
+    `ATL/Title,TL/Title,Manager/Title,` +
+    `IsActive,` +
+    `GTL,Status,Position,` +
+    `TotalExp,` +
+    `RelevantExp,` +
+    `LegalName,` +
+    `PersonalEmail,` +
+    `Mobile,` +
     `PrimarySkills/Id,PrimarySkills/Title,` +
     `SecondarySkills/Id,SecondarySkills/Title,` +
     `CurrentClient/Id,CurrentClient/Title,` +
-    `PastClients/Id,PastClients/Title` +
-    `&$expand=Employee,ATL,TL,Manager,PrimarySkills,SecondarySkills,CurrentClient,PastClients` +
-    `&$filter=Employee/EMail eq '${email}'`;
+    `PastClients/Id,PasClients/Title,` +
+    `EndClients` +
+    `&$expand=` +
+    `Employee,ATL,TL,Manager,` +
+    `PrimarySkills,SecondarySkills,` +
+    `CurrentClient,PastClients` +
+    `&$filter=Employee/EMail eq '${encodedEmail}'`;
 
   const res = await axios.get(url, {
     headers: {
@@ -847,7 +861,20 @@ export async function getMyEmployeeHierarchyRecord(accessToken, email) {
   return res.data.value[0];
 }
 
-export async function updateEmployeeHierarchy(accessToken, itemId, payload) {
+export async function updateEmployeeHierarchy(accessToken, itemId, form) {
+  const payload = {
+    TotalExp: Number(form.totalExp),
+    RelevantExp: Number(form.relevantExp),
+    LegalName: form.legalName,
+    PersonalEmail: form.personalEmail,
+    Mobile: form.mobile,
+    CurrentClientId: form.currentClient || null,
+    PrimarySkillsId: { results: form.primarySkills },
+    SecondarySkillsId: { results: form.secondarySkills },
+    PastClientsId: { results: form.pastClients },
+    EndClients: form.endClients,
+  };
+
   const url = `${SITE_URL}/_api/web/lists/getbytitle('Employee_Hierarchy')/items(${itemId})`;
 
   await axios.patch(url, payload, {
