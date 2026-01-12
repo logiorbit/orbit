@@ -843,7 +843,7 @@ export async function getMyEmployeeHierarchyRecord(accessToken, email) {
     `PrimarySkills/Id,PrimarySkills/Title,` +
     `SecondarySkills/Id,SecondarySkills/Title,` +
     `CurrentClient/Id,CurrentClient/Title,` +
-    `PastClients/Id,PasClients/Title,` +
+    `PastClients/Id,PastClients/Title,` +
     `EndClients` +
     `&$expand=` +
     `Employee,ATL,TL,Manager,` +
