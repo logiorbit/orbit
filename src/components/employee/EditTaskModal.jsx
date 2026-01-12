@@ -134,7 +134,7 @@ export default function EditTaskModal({ task, onClose, onSuccess }) {
           onChange={(e) => setForm({ ...form, status: e.target.value })}
         >
           <option>Draft</option>
-          <option>Work In Progress</option>
+          <option>WIP</option>
           <option>Complete</option>
         </select>
 
