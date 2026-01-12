@@ -56,10 +56,10 @@ export default function EditEmployeeProfileModal({ onClose, onSuccess }) {
       LegalName: form.legalName,
       PersonalEmail: form.personalEmail,
       Mobile: form.mobile,
-      CurrentClientId: form.currentClient,
-      PrimarySkillsId: { results: form.primarySkills },
-      SecondarySkillsId: { results: form.secondarySkills },
-      PastClientsId: { results: form.pastClients },
+      CurrentClient: form.currentClient,
+      PrimarySkills: { results: form.primarySkills },
+      SecondarySkills: { results: form.secondarySkills },
+      PastClients: { results: form.pastClients },
       EndClients: form.endClients,
     });
 
@@ -84,12 +84,12 @@ export default function EditEmployeeProfileModal({ onClose, onSuccess }) {
             {/* READ ONLY */}
             <div className="form-group">
               <label>Employee</label>
-              <input value={employee.Employee.Title} disabled />
+              <input value={form.Employee.Title} disabled />
             </div>
 
             <div className="form-group">
               <label>Employee Email</label>
-              <input value={employee.Employee.EMail} disabled />
+              <input value={form.Employee.EMail} disabled />
             </div>
 
             {/* EDITABLE */}
