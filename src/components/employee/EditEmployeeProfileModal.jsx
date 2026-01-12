@@ -69,6 +69,28 @@ export default function EditEmployeeProfileModal({ onClose, onSuccess }) {
     onClose();
   }
 
+  function handlePrimarySkillsChange(e) {
+    const values = Array.from(e.target.selectedOptions).map((opt) =>
+      Number(opt.value)
+    );
+
+    setForm((prev) => ({
+      ...prev,
+      PrimarySkills: values,
+    }));
+  }
+
+  function handleSecondarySkillsChange(e) {
+    const values = Array.from(e.target.selectedOptions).map((opt) =>
+      Number(opt.value)
+    );
+
+    setForm((prev) => ({
+      ...prev,
+      SecondarySkills: values,
+    }));
+  }
+
   return (
     <div className="modal-overlay">
       <div className="modal-card profile-modal">
