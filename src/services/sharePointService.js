@@ -808,3 +808,39 @@ export async function getTasksForDate2(accessToken, date) {
 
   return res.data.value;
 }
+
+export async function getMyEmployeeHierarchyRecord(accessToken, email) {
+  const url =
+    `${SITE_URL}/_api/web/lists/getbytitle('Employee_Hierarchy')/items` +
+    `?$select=Id,Employee/Title,Employee/EMail,ATL/Title,TL/Title,Manager/Title,` +
+    `IsActive,EffectiveFrom,EffectiveTo,GTL,Status,Position,` +
+    `TotalExp,RelevantExp,LegalName,PersonalEmail,Mobile,` +
+    `PrimarySkills/Id,PrimarySkills/Title,` +
+    `SecondarySkills/Id,SecondarySkills/Title,` +
+    `CurrentClient/Id,CurrentClient/Title,` +
+    `PastClients/Id,PastClients/Title` +
+    `&$expand=Employee,ATL,TL,Manager,PrimarySkills,SecondarySkills,CurrentClient,PastClients` +
+    `&$filter=Employee/EMail eq '${email}'`;
+
+  const res = await axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json;odata=nometadata",
+    },
+  });
+
+  return res.data.value[0];
+}
+
+export async function updateEmployeeHierarchy(accessToken, itemId, payload) {
+  const url = `${SITE_URL}/_api/web/lists/getbytitle('Employee_Hierarchy')/items(${itemId})`;
+
+  await axios.patch(url, payload, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json;odata=nometadata",
+      "Content-Type": "application/json",
+      "IF-MATCH": "*",
+    },
+  });
+}

@@ -13,6 +13,7 @@ import CreateTaskModal from "../employee/CreateTaskModal";
 import EmployeeTaskCards from "../employee/EmployeeTaskCards";
 import EmployeeKpiCards from "../employee/EmployeeKpiCards";
 import MyTasksTable from "../employee/MyTasksTable";
+import EditEmployeeProfileModal from "../employee/EditEmployeeProfileModal";
 
 import TLDashboard from "../tl/TLDashboard";
 import ManagerDashboard from "../manager/ManagerDashboard";
@@ -78,6 +79,7 @@ function EmployeeDashboard() {
 
   const [leaves, setLeaves] = useState([]);
   const [holidays, setHolidays] = useState([]);
+  const [showProfile, setShowProfile] = useState(false);
 
   const [showApply, setShowApply] = useState(false);
   const [showCreateTask, setShowCreateTask] = useState(false);
@@ -121,6 +123,10 @@ function EmployeeDashboard() {
           <button className="primary-btn" onClick={() => setShowHoliday(true)}>
             Holiday List
           </button>
+
+          <button className="primary-btn" onClick={() => setShowProfile(true)}>
+            Edit Profile
+          </button>
         </div>
       </div>
 
@@ -152,6 +158,13 @@ function EmployeeDashboard() {
 
       {/* MODALS */}
       {showApply && <ApplyLeaveModal onClose={() => setShowApply(false)} />}
+
+      {showProfile && (
+        <EditEmployeeProfileModal
+          onClose={() => setShowProfile(false)}
+          onSuccess={() => setShowProfile(false)}
+        />
+      )}
 
       {showCreateTask && (
         <CreateTaskModal
