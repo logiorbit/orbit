@@ -10,8 +10,13 @@ import {
 
 import "./managerDashboard.css";
 
-export default function EditEmployeeProfileModal({ onClose, onSuccess }) {
+export default function EditEmployeeProfileModal({
+  recordId,
+  onClose,
+  onSuccess,
+}) {
   const { instance, accounts } = useMsal();
+  const [loading, setLoading] = useState(false);
   const [record, setRecord] = useState(null);
   const [clients, setClients] = useState([]);
   const [skills, setSkills] = useState([]);
@@ -89,6 +94,45 @@ export default function EditEmployeeProfileModal({ onClose, onSuccess }) {
       ...prev,
       SecondarySkills: values,
     }));
+  }
+
+  async function handleSave() {
+    try {
+      setLoading(true);
+
+      const token = await getAccessToken(instance, accounts[0]);
+
+      const payload = {
+        TotalExp: Number(form.TotalExp),
+        RelevantExp: Number(form.RelevantExp),
+        LegalName: form.LegalName,
+        PersonalEmail: form.PersonalEmail,
+        Mobile: form.Mobile,
+
+        // 🔹 Lookups
+        CurrentClientId: form.CurrentClientId
+          ? Number(form.CurrentClientId)
+          : null,
+
+        PrimarySkillsId: {
+          results: form.PrimarySkills,
+        },
+
+        SecondarySkillsId: {
+          results: form.SecondarySkills,
+        },
+      };
+
+      await updateEmployeeHierarchy(token, recordId, payload);
+
+      onSuccess();
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update profile");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
