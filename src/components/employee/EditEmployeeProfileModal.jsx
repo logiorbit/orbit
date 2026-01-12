@@ -165,7 +165,7 @@ export default function EditEmployeeProfileModal({
               <label>Total Experience (Years)</label>
               <input
                 type="number"
-                value={form.TotalExp}
+                value={form.totalExp}
                 onChange={(e) => setForm({ ...form, TotalExp: e.target.value })}
               />
             </div>
@@ -174,7 +174,7 @@ export default function EditEmployeeProfileModal({
               <label>Relevant Experience (Years)</label>
               <input
                 type="number"
-                value={form.RelevantExp}
+                value={form.relevantExp}
                 onChange={(e) =>
                   setForm({ ...form, RelevantExp: e.target.value })
                 }
@@ -184,7 +184,7 @@ export default function EditEmployeeProfileModal({
             <div className="form-group">
               <label>Legal Name</label>
               <input
-                value={form.LegalName}
+                value={form.legalName}
                 onChange={(e) =>
                   setForm({ ...form, LegalName: e.target.value })
                 }
@@ -194,7 +194,7 @@ export default function EditEmployeeProfileModal({
             <div className="form-group">
               <label>Personal Email</label>
               <input
-                value={form.PersonalEmail}
+                value={form.personalEmail}
                 onChange={(e) =>
                   setForm({ ...form, PersonalEmail: e.target.value })
                 }
@@ -205,7 +205,7 @@ export default function EditEmployeeProfileModal({
               <label>Mobile</label>
               <input
                 type="tel"
-                value={form.Mobile}
+                value={form.mobile}
                 onChange={(e) => setForm({ ...form, Mobile: e.target.value })}
               />
             </div>
@@ -231,7 +231,7 @@ export default function EditEmployeeProfileModal({
               <label>Primary Skills</label>
               <select
                 multiple
-                value={form.PrimarySkills}
+                value={form.primarySkills}
                 onChange={handlePrimarySkillsChange}
               >
                 {skills.map((s) => (
@@ -246,7 +246,7 @@ export default function EditEmployeeProfileModal({
               <label>Secondary Skills</label>
               <select
                 multiple
-                value={form.SecondarySkills}
+                value={form.secondarySkills}
                 onChange={handleSecondarySkillsChange}
               >
                 {skills.map((s) => (
