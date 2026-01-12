@@ -832,9 +832,9 @@ export async function getMyEmployeeHierarchyRecord(accessToken, email) {
     `?$select=` +
     `Id,` +
     `Employee/Title,Employee/EMail,` +
-    `ATL/Title,TL/Title,Manager/Title,` +
+    `ATL/Title,TL/Title,Manager/Title,GTL/Title,` +
     `IsActive,` +
-    `GTL,Status,Position,` +
+    `Status,Position,` +
     `TotalExp,` +
     `RelevantExp,` +
     `LegalName,` +
@@ -846,7 +846,7 @@ export async function getMyEmployeeHierarchyRecord(accessToken, email) {
     `PastClients/Id,PastClients/Title,` +
     `EndClients` +
     `&$expand=` +
-    `Employee,ATL,TL,Manager,` +
+    `Employee,ATL,TL,GTL,Manager,` +
     `PrimarySkills,SecondarySkills,` +
     `CurrentClient,PastClients` +
     `&$filter=Employee/EMail eq '${encodedEmail}'`;
