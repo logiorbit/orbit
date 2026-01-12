@@ -26,6 +26,8 @@ export default function EditEmployeeProfileModal({ onClose, onSuccess }) {
       setRecord(data);
 
       setForm({
+        employee: data.Employee.Title || "",
+        empemail: data.Employee.EMail || "",
         totalExp: data.TotalExp || "",
         relevantExp: data.RelevantExp || "",
         legalName: data.LegalName || "",
@@ -84,12 +86,12 @@ export default function EditEmployeeProfileModal({ onClose, onSuccess }) {
             {/* READ ONLY */}
             <div className="form-group">
               <label>Employee</label>
-              <input value={form.Employee.Title} disabled />
+              <input value={form.employee} disabled />
             </div>
 
             <div className="form-group">
               <label>Employee Email</label>
-              <input value={form.Employee.EMail} disabled />
+              <input value={form.empemail} disabled />
             </div>
 
             {/* EDITABLE */}
