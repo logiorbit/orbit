@@ -328,6 +328,21 @@ export async function getClients(accessToken) {
   return (await res.json()).value;
 }
 
+export async function getSkills(accessToken) {
+  const url =
+    `${SITE_URL}/_api/web/lists/getbytitle('Skills')/items` +
+    `?$select=Id,Title`;
+
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json;odata=nometadata",
+    },
+  });
+
+  return (await res.json()).value;
+}
+
 export async function getTaskTypes(accessToken) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Task_Types')/items` +
