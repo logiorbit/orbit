@@ -77,3 +77,49 @@
     grid-template-columns: 1fr;
   }
 }
+
+.profile-modal {
+  width: 820px;
+  max-width: 95vw;
+}
+
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full-width {
+  grid-column: span 2;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #374151;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+.form-group select[multiple] {
+  min-height: 110px;
+}
+
+.modal-body {
+  max-height: 65vh;
+  overflow-y: auto;
+  padding-right: 6px;
+}

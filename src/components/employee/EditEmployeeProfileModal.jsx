@@ -8,6 +8,8 @@ import {
   updateEmployeeHierarchy,
 } from "../../services/sharePointService";
 
+import "./managerDashboard.css";
+
 export default function EditEmployeeProfileModal({ onClose, onSuccess }) {
   const { instance, accounts } = useMsal();
   const [record, setRecord] = useState(null);
@@ -67,7 +69,8 @@ export default function EditEmployeeProfileModal({ onClose, onSuccess }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-card premium-modal">
+      <div className="modal-card profile-modal">
+        {/* Header */}
         <div className="modal-header">
           <h3>Edit Profile</h3>
           <button className="icon-btn" onClick={onClose}>
@@ -75,78 +78,78 @@ export default function EditEmployeeProfileModal({ onClose, onSuccess }) {
           </button>
         </div>
 
+        {/* Body */}
         <div className="modal-body">
           <div className="profile-form-grid">
-            <div>
+            {/* READ ONLY */}
+            <div className="form-group">
               <label>Employee</label>
-              <input disabled value={record.Employee.Title} />
+              <input value={employee.Employee.Title} disabled />
             </div>
 
-            <div>
+            <div className="form-group">
               <label>Employee Email</label>
-              <input disabled value={record.Employee.EMail} />
+              <input value={employee.Employee.EMail} disabled />
             </div>
 
-            <div>
-              <label>Total Experience</label>
+            {/* EDITABLE */}
+            <div className="form-group">
+              <label>Total Experience (Years)</label>
               <input
                 type="number"
-                step="0.1"
-                value={form.totalExp}
-                onChange={(e) => setForm({ ...form, totalExp: e.target.value })}
+                value={form.TotalExp}
+                onChange={(e) => setForm({ ...form, TotalExp: e.target.value })}
               />
             </div>
 
-            <div>
-              <label>Relevant Experience</label>
+            <div className="form-group">
+              <label>Relevant Experience (Years)</label>
               <input
                 type="number"
-                step="0.1"
-                value={form.relevantExp}
+                value={form.RelevantExp}
                 onChange={(e) =>
-                  setForm({ ...form, relevantExp: e.target.value })
+                  setForm({ ...form, RelevantExp: e.target.value })
                 }
               />
             </div>
 
-            <div>
+            <div className="form-group">
               <label>Legal Name</label>
               <input
-                value={form.legalName}
+                value={form.LegalName}
                 onChange={(e) =>
-                  setForm({ ...form, legalName: e.target.value })
+                  setForm({ ...form, LegalName: e.target.value })
                 }
               />
             </div>
 
-            <div>
+            <div className="form-group">
               <label>Personal Email</label>
               <input
-                type="email"
-                value={form.personalEmail}
+                value={form.PersonalEmail}
                 onChange={(e) =>
-                  setForm({ ...form, personalEmail: e.target.value })
+                  setForm({ ...form, PersonalEmail: e.target.value })
                 }
               />
             </div>
 
-            <div>
+            <div className="form-group">
               <label>Mobile</label>
               <input
-                value={form.mobile}
-                onChange={(e) => setForm({ ...form, mobile: e.target.value })}
+                type="tel"
+                value={form.Mobile}
+                onChange={(e) => setForm({ ...form, Mobile: e.target.value })}
               />
             </div>
 
-            <div>
+            <div className="form-group">
               <label>Current Client</label>
               <select
-                value={form.currentClient}
+                value={form.CurrentClientId}
                 onChange={(e) =>
-                  setForm({ ...form, currentClient: e.target.value })
+                  setForm({ ...form, CurrentClientId: e.target.value })
                 }
               >
-                <option value="">Select</option>
                 {clients.map((c) => (
                   <option key={c.Id} value={c.Id}>
                     {c.Title}
@@ -155,20 +158,28 @@ export default function EditEmployeeProfileModal({ onClose, onSuccess }) {
               </select>
             </div>
 
-            <div className="full-width">
+            {/* MULTI SELECT – FULL WIDTH */}
+            <div className="form-group full-width">
               <label>Primary Skills</label>
               <select
                 multiple
-                value={form.primarySkills}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    primarySkills: Array.from(
-                      e.target.selectedOptions,
-                      (o) => +o.value
-                    ),
-                  })
-                }
+                value={form.PrimarySkills}
+                onChange={handlePrimarySkillsChange}
+              >
+                {skills.map((s) => (
+                  <option key={s.Id} value={s.Id}>
+                    {s.Title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group full-width">
+              <label>Secondary Skills</label>
+              <select
+                multiple
+                value={form.SecondarySkills}
+                onChange={handleSecondarySkillsChange}
               >
                 {skills.map((s) => (
                   <option key={s.Id} value={s.Id}>
@@ -180,11 +191,12 @@ export default function EditEmployeeProfileModal({ onClose, onSuccess }) {
           </div>
         </div>
 
+        {/* Footer */}
         <div className="modal-footer">
           <button className="btn-secondary" onClick={onClose}>
             Cancel
           </button>
-          <button className="btn-primary" onClick={save}>
+          <button className="btn-primary" onClick={handleSave}>
             Save
           </button>
         </div>
