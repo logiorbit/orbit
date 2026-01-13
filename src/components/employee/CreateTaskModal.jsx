@@ -8,6 +8,8 @@ import {
   getCurrentUser,
 } from "../../services/sharePointService";
 
+import "./managerDashboard.css"; // uses existing modal + grid styles
+
 export default function CreateTaskModal({ onClose, onSuccess }) {
   const { instance, accounts } = useMsal();
 
@@ -32,11 +34,17 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
       setTypes(await getTaskTypes(token));
     }
     load();
-  }, []);
+  }, [instance, accounts]);
 
   async function submit() {
-    if (!form.title || !form.clientId || !form.typeId || !form.estimated) {
-      alert("Please fill all required fields");
+    if (
+      !form.title ||
+      !form.clientId ||
+      !form.typeId ||
+      !form.date ||
+      !form.estimated
+    ) {
+      alert("Please fill all mandatory fields");
       return;
     }
 
@@ -53,8 +61,8 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
       TaskDate: form.date,
       Status: form.status,
       EstimatedHours: Number(form.estimated),
-      BillableHours: form.billable ? Number(form.billable) : null,
       ProductiveHours: form.productive ? Number(form.productive) : null,
+      BillableHours: form.billable ? Number(form.billable) : null,
       ClientId: Number(form.clientId),
       TaskTypeId: Number(form.typeId),
       EmployeeId: user.Id,
@@ -67,7 +75,8 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-card">
+      <div className="modal-card profile-modal">
+        {/* HEADER */}
         <div className="modal-header">
           <h3>Create Task</h3>
           <button className="icon-btn" onClick={onClose}>
@@ -75,99 +84,120 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
           </button>
         </div>
 
-        <div className="profile-form-grid">
-          <label>Task Title</label>
-          <input
-            placeholder="Task Title"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            required
-          />
+        {/* BODY */}
+        <div className="modal-body">
+          <div className="profile-form-grid">
+            {/* ROW 1 */}
+            <div className="form-group">
+              <label>Task Title *</label>
+              <input
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                required
+              />
+            </div>
 
-          <div className="form-group">
-            <label>Date</label>
-            <input
-              type="date"
-              value={form.date}
-              onChange={(e) => setForm({ ...form, date: e.target.value })}
-              required
-            />
+            <div className="form-group">
+              <label>Date *</label>
+              <input
+                type="date"
+                value={form.date}
+                onChange={(e) => setForm({ ...form, date: e.target.value })}
+                required
+              />
+            </div>
+
+            {/* ROW 2 */}
+            <div className="form-group">
+              <label>Client *</label>
+              <select
+                value={form.clientId}
+                onChange={(e) => setForm({ ...form, clientId: e.target.value })}
+                required
+              >
+                <option value="">Select Client</option>
+                {clients.map((c) => (
+                  <option key={c.Id} value={c.Id}>
+                    {c.Title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Task Type *</label>
+              <select
+                value={form.typeId}
+                onChange={(e) => setForm({ ...form, typeId: e.target.value })}
+                required
+              >
+                <option value="">Select Task Type</option>
+                {types.map((t) => (
+                  <option key={t.Id} value={t.Id}>
+                    {t.Title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* ROW 3 */}
+            <div className="form-group">
+              <label>Status *</label>
+              <select
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: e.target.value })}
+              >
+                <option value="Draft">Draft</option>
+                <option value="WIP">WIP</option>
+                <option value="Complete">Complete</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Estimated Hours *</label>
+              <input
+                type="number"
+                step="0.1"
+                value={form.estimated}
+                onChange={(e) =>
+                  setForm({ ...form, estimated: e.target.value })
+                }
+                required
+              />
+            </div>
+
+            {/* ROW 4 */}
+            <div className="form-group">
+              <label>Productive Hours</label>
+              <input
+                type="number"
+                step="0.1"
+                value={form.productive}
+                onChange={(e) =>
+                  setForm({ ...form, productive: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Billed Hours</label>
+              <input
+                type="number"
+                step="0.1"
+                value={form.billable}
+                onChange={(e) => setForm({ ...form, billable: e.target.value })}
+              />
+            </div>
           </div>
-
-          <label>Select Client</label>
-          <select
-            value={form.clientId}
-            onChange={(e) => setForm({ ...form, clientId: e.target.value })}
-            required
-          >
-            <option value="">Select Client</option>
-            {clients.map((c) => (
-              <option key={c.Id} value={c.Id}>
-                {c.Title}
-              </option>
-            ))}
-          </select>
-
-          <label>Select Task Type</label>
-          <select
-            value={form.typeId}
-            onChange={(e) => setForm({ ...form, typeId: e.target.value })}
-            required
-          >
-            <option value="">Select Task Type</option>
-            {types.map((t) => (
-              <option key={t.Id} value={t.Id}>
-                {t.Title}
-              </option>
-            ))}
-          </select>
-
-          <label>Status</label>
-          <select
-            value={form.status}
-            onChange={(e) => setForm({ ...form, status: e.target.value })}
-            required
-          >
-            <option>Draft</option>
-            <option>WIP</option>
-            <option>Complete</option>
-          </select>
-
-          <label>Estimated Hours</label>
-          <input
-            type="number"
-            step="0.1"
-            placeholder="Estimated Hours"
-            value={form.estimated}
-            onChange={(e) => setForm({ ...form, estimated: e.target.value })}
-            required
-          />
-
-          <label>Productive Hours</label>
-          <input
-            type="number"
-            step="0.1"
-            placeholder="Productive Hours"
-            value={form.productive}
-            onChange={(e) => setForm({ ...form, productive: e.target.value })}
-          />
-
-          <label>Billed Hours</label>
-          <input
-            type="number"
-            step="0.1"
-            placeholder="Billable Hours"
-            value={form.billable}
-            onChange={(e) => setForm({ ...form, billable: e.target.value })}
-          />
         </div>
 
-        <div className="modal-actions">
-          <button className="primary-btn" onClick={submit}>
-            Save
-          </button>
-          <button className="secondary-btn" onClick={onClose}>
+        {/* FOOTER */}
+        <div className="modal-footer">
+          <button className="btn-secondary" onClick={onClose}>
             Cancel
+          </button>
+          <button className="btn-primary" onClick={submit}>
+            Save
           </button>
         </div>
       </div>
