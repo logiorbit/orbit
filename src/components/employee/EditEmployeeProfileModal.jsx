@@ -54,82 +54,44 @@ export default function EditEmployeeProfileModal({
 
   if (!record) return null;
 
-  async function save() {
-    const token = await getAccessToken(instance, accounts[0]);
-
-    await updateEmployeeHierarchy(token, record.Id, {
-      TotalExp: Number(form.totalExp),
-      RelevantExp: Number(form.relevantExp),
-      LegalName: form.legalName,
-      PersonalEmail: form.personalEmail,
-      Mobile: form.mobile,
-      CurrentClient: form.currentClient,
-      PrimarySkills: { results: form.primarySkills },
-      SecondarySkills: { results: form.secondarySkills },
-      PastClients: { results: form.pastClients },
-      EndClients: form.endClients,
-    });
-
-    onSuccess();
-    onClose();
-  }
-
   function handlePrimarySkillsChange(e) {
-    const values = Array.from(e.target.selectedOptions).map((opt) =>
-      Number(opt.value)
+    const values = Array.from(e.target.selectedOptions).map((o) =>
+      Number(o.value)
     );
-
-    setForm((prev) => ({
-      ...prev,
-      PrimarySkills: values,
-    }));
+    setForm((prev) => ({ ...prev, primarySkills: values }));
   }
 
   function handleSecondarySkillsChange(e) {
-    const values = Array.from(e.target.selectedOptions).map((opt) =>
-      Number(opt.value)
+    const values = Array.from(e.target.selectedOptions).map((o) =>
+      Number(o.value)
     );
-
-    setForm((prev) => ({
-      ...prev,
-      SecondarySkills: values,
-    }));
+    setForm((prev) => ({ ...prev, secondarySkills: values }));
   }
 
   async function handleSave() {
     try {
       setLoading(true);
-
       const token = await getAccessToken(instance, accounts[0]);
 
       const payload = {
-        TotalExp: Number(form.TotalExp),
-        RelevantExp: Number(form.RelevantExp),
-        LegalName: form.LegalName,
-        PersonalEmail: form.PersonalEmail,
-        Mobile: form.Mobile,
+        TotalExp: Number(form.totalExp),
+        RelevantExp: Number(form.relevantExp),
+        LegalName: form.legalName,
+        PersonalEmail: form.personalEmail,
+        Mobile: form.mobile,
 
-        // 🔹 Lookups
-        CurrentClientId: form.CurrentClientId
-          ? Number(form.CurrentClientId)
-          : null,
+        CurrentClientId: form.currentClient ? Number(form.currentClient) : null,
 
-        PrimarySkillsId: {
-          results: form.PrimarySkills,
-        },
-
-        SecondarySkillsId: {
-          results: form.SecondarySkills,
-        },
+        PrimarySkillsId: { results: form.primarySkills },
+        SecondarySkillsId: { results: form.secondarySkills },
+        PastClientsId: { results: form.pastClients || [] },
+        EndClients: form.endClients || "",
       };
 
-      await updateEmployeeHierarchy(token, recordId, payload);
+      await updateEmployeeHierarchy(token, record.Id, payload);
 
       onSuccess();
       onClose();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -166,7 +128,7 @@ export default function EditEmployeeProfileModal({
               <input
                 type="number"
                 value={form.totalExp}
-                onChange={(e) => setForm({ ...form, TotalExp: e.target.value })}
+                onChange={(e) => setForm({ ...form, totalExp: e.target.value })}
               />
             </div>
 
@@ -176,7 +138,7 @@ export default function EditEmployeeProfileModal({
                 type="number"
                 value={form.relevantExp}
                 onChange={(e) =>
-                  setForm({ ...form, RelevantExp: e.target.value })
+                  setForm({ ...form, relevantExp: e.target.value })
                 }
               />
             </div>
@@ -186,7 +148,7 @@ export default function EditEmployeeProfileModal({
               <input
                 value={form.legalName}
                 onChange={(e) =>
-                  setForm({ ...form, LegalName: e.target.value })
+                  setForm({ ...form, legalName: e.target.value })
                 }
               />
             </div>
@@ -196,7 +158,7 @@ export default function EditEmployeeProfileModal({
               <input
                 value={form.personalEmail}
                 onChange={(e) =>
-                  setForm({ ...form, PersonalEmail: e.target.value })
+                  setForm({ ...form, personalEmail: e.target.value })
                 }
               />
             </div>
@@ -206,16 +168,16 @@ export default function EditEmployeeProfileModal({
               <input
                 type="tel"
                 value={form.mobile}
-                onChange={(e) => setForm({ ...form, Mobile: e.target.value })}
+                onChange={(e) => setForm({ ...form, mobile: e.target.value })}
               />
             </div>
 
             <div className="form-group">
               <label>Current Client</label>
               <select
-                value={form.CurrentClientId}
+                value={form.currentClient}
                 onChange={(e) =>
-                  setForm({ ...form, CurrentClientId: e.target.value })
+                  setForm({ ...form, currentClient: e.target.value })
                 }
               >
                 {clients.map((c) => (
