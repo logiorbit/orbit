@@ -73,25 +73,54 @@ export default function EditEmployeeProfileModal({
       setLoading(true);
       const token = await getAccessToken(instance, accounts[0]);
 
-      const payload = {
-        TotalExp: Number(form.totalExp),
-        RelevantExp: Number(form.relevantExp),
-        LegalName: form.legalName,
-        PersonalEmail: form.personalEmail,
-        Mobile: form.mobile,
+      const payload = {};
 
-        CurrentClientId: form.currentClient ? Number(form.currentClient) : null,
+      // 🔹 Numbers
+      if (form.totalExp !== "") {
+        payload.TotalExp = Number(form.totalExp);
+      }
 
-        PrimarySkillsId: { results: form.primarySkills },
-        SecondarySkillsId: { results: form.secondarySkills },
-        PastClientsId: { results: form.pastClients || [] },
-        EndClients: form.endClients || "",
-      };
+      if (form.relevantExp !== "") {
+        payload.RelevantExp = Number(form.relevantExp);
+      }
+
+      // 🔹 Text
+      if (form.legalName) payload.LegalName = form.legalName;
+      if (form.personalEmail) payload.PersonalEmail = form.personalEmail;
+      if (form.mobile) payload.Mobile = form.mobile;
+
+      // 🔹 Single lookup
+      if (form.currentClient) {
+        payload.CurrentClientId = Number(form.currentClient);
+      }
+
+      // 🔹 Multi lookups (ONLY if array has values)
+      if (form.primarySkills?.length > 0) {
+        payload.PrimarySkillsId = { results: form.primarySkills };
+      }
+
+      if (form.secondarySkills?.length > 0) {
+        payload.SecondarySkillsId = { results: form.secondarySkills };
+      }
+
+      if (form.pastClients?.length > 0) {
+        payload.PastClientsId = { results: form.pastClients };
+      }
+
+      // 🔹 Single line text
+      if (form.endClients) {
+        payload.EndClients = form.endClients;
+      }
+
+      console.log("PATCH payload →", payload);
 
       await updateEmployeeHierarchy(token, record.Id, payload);
 
       onSuccess();
       onClose();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update profile");
     } finally {
       setLoading(false);
     }

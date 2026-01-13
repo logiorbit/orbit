@@ -7,6 +7,8 @@ import {
   updateTask,
 } from "../../services/sharePointService";
 
+import "./managerDashboard.css";
+
 export default function EditTaskModal({ task, onClose, onSuccess }) {
   const { instance, accounts } = useMsal();
 
@@ -18,13 +20,13 @@ export default function EditTaskModal({ task, onClose, onSuccess }) {
     clientId: "",
     typeId: "",
     date: "",
-    status: "",
+    status: "Draft",
     estimated: "",
     productive: "",
     billable: "",
   });
 
-  // 🔑 Load dropdown data
+  /* 🔹 Load dropdown values */
   useEffect(() => {
     async function loadLists() {
       const token = await getAccessToken(instance, accounts[0]);
@@ -32,9 +34,9 @@ export default function EditTaskModal({ task, onClose, onSuccess }) {
       setTypes(await getTaskTypes(token));
     }
     loadLists();
-  }, []);
+  }, [instance, accounts]);
 
-  // 🔑 Pre-fill form when task arrives
+  /* 🔹 Pre-fill form */
   useEffect(() => {
     if (!task) return;
 
@@ -42,17 +44,23 @@ export default function EditTaskModal({ task, onClose, onSuccess }) {
       title: task.Title || "",
       clientId: task.Client?.Id || "",
       typeId: task.TaskType?.Id || "",
-      date: task.TaskDate?.split("T")[0],
-      status: task.Status,
-      estimated: task.EstimatedHours,
-      billable: task.BillableHours ?? "",
+      date: task.TaskDate?.split("T")[0] || "",
+      status: task.Status || "Draft",
+      estimated: task.EstimatedHours ?? "",
       productive: task.ProductiveHours ?? "",
+      billable: task.BillableHours ?? "",
     });
   }, [task]);
 
   async function submit() {
-    if (!form.title || !form.clientId || !form.typeId || !form.estimated) {
-      alert("Please fill all required fields");
+    if (
+      !form.title ||
+      !form.clientId ||
+      !form.typeId ||
+      !form.date ||
+      !form.estimated
+    ) {
+      alert("Please fill all mandatory fields");
       return;
     }
 
@@ -68,8 +76,8 @@ export default function EditTaskModal({ task, onClose, onSuccess }) {
       TaskDate: form.date,
       Status: form.status,
       EstimatedHours: Number(form.estimated),
-      BillableHours: form.billable ? Number(form.billable) : null,
       ProductiveHours: form.productive ? Number(form.productive) : null,
+      BillableHours: form.billable ? Number(form.billable) : null,
       ClientId: Number(form.clientId),
       TaskTypeId: Number(form.typeId),
     });
@@ -81,104 +89,129 @@ export default function EditTaskModal({ task, onClose, onSuccess }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-card">
+      <div className="modal-card profile-modal">
+        {/* HEADER */}
         <div className="modal-header">
           <h3>Edit Task</h3>
           <button className="icon-btn" onClick={onClose}>
             ✕
           </button>
         </div>
-        <div className="profile-form-grid">
-          <label>Task Title</label>
-          <input
-            placeholder="Task Title"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            required
-          />
 
-          <label>Task Date</label>
-          <input
-            type="date"
-            value={form.date}
-            onChange={(e) => setForm({ ...form, date: e.target.value })}
-            required
-          />
+        {/* BODY */}
+        <div className="modal-body">
+          <div className="profile-form-grid">
+            {/* ROW 1 */}
+            <div className="form-group">
+              <label>Task Title *</label>
+              <input
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                required
+              />
+            </div>
 
-          <label>Select Client</label>
-          <select
-            value={form.clientId}
-            onChange={(e) => setForm({ ...form, clientId: e.target.value })}
-            required
-          >
-            <option value="">Select Client</option>
-            {clients.map((c) => (
-              <option key={c.Id} value={c.Id}>
-                {c.Title}
-              </option>
-            ))}
-          </select>
+            <div className="form-group">
+              <label>Date *</label>
+              <input
+                type="date"
+                value={form.date}
+                onChange={(e) => setForm({ ...form, date: e.target.value })}
+                required
+              />
+            </div>
 
-          <label>Select Task Type</label>
-          <select
-            value={form.typeId}
-            onChange={(e) => setForm({ ...form, typeId: e.target.value })}
-            required
-          >
-            <option value="">Select Task Type</option>
-            {types.map((t) => (
-              <option key={t.Id} value={t.Id}>
-                {t.Title}
-              </option>
-            ))}
-          </select>
+            {/* ROW 2 */}
+            <div className="form-group">
+              <label>Client *</label>
+              <select
+                value={form.clientId}
+                onChange={(e) => setForm({ ...form, clientId: e.target.value })}
+                required
+              >
+                <option value="">Select Client</option>
+                {clients.map((c) => (
+                  <option key={c.Id} value={c.Id}>
+                    {c.Title}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <label>Status</label>
-          <select
-            value={form.status}
-            onChange={(e) => setForm({ ...form, status: e.target.value })}
-            required
-          >
-            <option>Draft</option>
-            <option>WIP</option>
-            <option>Complete</option>
-          </select>
+            <div className="form-group">
+              <label>Task Type *</label>
+              <select
+                value={form.typeId}
+                onChange={(e) => setForm({ ...form, typeId: e.target.value })}
+                required
+              >
+                <option value="">Select Task Type</option>
+                {types.map((t) => (
+                  <option key={t.Id} value={t.Id}>
+                    {t.Title}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <label>Estimated Hours</label>
-          <input
-            type="number"
-            step="0.1"
-            placeholder="Estimated Hours"
-            value={form.estimated}
-            onChange={(e) => setForm({ ...form, estimated: e.target.value })}
-            required
-          />
+            {/* ROW 3 */}
+            <div className="form-group">
+              <label>Status *</label>
+              <select
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: e.target.value })}
+              >
+                <option value="Draft">Draft</option>
+                <option value="WIP">WIP</option>
+                <option value="Complete">Complete</option>
+              </select>
+            </div>
 
-          <label>Productive Hours</label>
-          <input
-            type="number"
-            step="0.1"
-            placeholder="Productive Hours"
-            value={form.productive}
-            onChange={(e) => setForm({ ...form, productive: e.target.value })}
-          />
+            <div className="form-group">
+              <label>Estimated Hours *</label>
+              <input
+                type="number"
+                step="0.1"
+                value={form.estimated}
+                onChange={(e) =>
+                  setForm({ ...form, estimated: e.target.value })
+                }
+                required
+              />
+            </div>
 
-          <label>Billable Hours</label>
-          <input
-            type="number"
-            step="0.1"
-            placeholder="Billable Hours"
-            value={form.billable}
-            onChange={(e) => setForm({ ...form, billable: e.target.value })}
-          />
+            {/* ROW 4 */}
+            <div className="form-group">
+              <label>Productive Hours</label>
+              <input
+                type="number"
+                step="0.1"
+                value={form.productive}
+                onChange={(e) =>
+                  setForm({ ...form, productive: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Billed Hours</label>
+              <input
+                type="number"
+                step="0.1"
+                value={form.billable}
+                onChange={(e) => setForm({ ...form, billable: e.target.value })}
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="modal-actions">
-          <button className="primary-btn" onClick={submit}>
-            Update Task
-          </button>
-          <button className="secondary-btn" onClick={onClose}>
+        {/* FOOTER */}
+        <div className="modal-footer">
+          <button className="btn-secondary" onClick={onClose}>
             Cancel
+          </button>
+          <button className="btn-primary" onClick={submit}>
+            Update Task
           </button>
         </div>
       </div>
