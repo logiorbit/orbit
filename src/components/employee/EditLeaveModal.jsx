@@ -37,6 +37,7 @@ export default function EditLeaveModal({ leave, onClose, onSuccess }) {
     });
 
     onSuccess();
+    window.location.reload();
   }
 
   return (
@@ -50,6 +51,7 @@ export default function EditLeaveModal({ leave, onClose, onSuccess }) {
           <select
             value={form.leaveType}
             onChange={(e) => setForm({ ...form, leaveType: e.target.value })}
+            required
           >
             <option value="">Select</option>
             <option>PTO</option>
@@ -67,6 +69,7 @@ export default function EditLeaveModal({ leave, onClose, onSuccess }) {
             type="date"
             value={form.startDate}
             onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+            required
           />
         </div>
 
@@ -76,6 +79,7 @@ export default function EditLeaveModal({ leave, onClose, onSuccess }) {
             type="date"
             value={form.endDate}
             onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+            required
           />
         </div>
 
@@ -84,6 +88,7 @@ export default function EditLeaveModal({ leave, onClose, onSuccess }) {
           <textarea
             value={form.reason}
             onChange={(e) => setForm({ ...form, reason: e.target.value })}
+            required
           />
         </div>
 

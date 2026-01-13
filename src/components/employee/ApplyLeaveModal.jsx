@@ -195,6 +195,7 @@ export default function ApplyLeaveModal({ onClose }) {
 
     setLoading(false);
     onClose();
+    window.location.reload();
   };
 
   function isOverlapping(start1, end1, start2, end2) {
@@ -227,6 +228,7 @@ export default function ApplyLeaveModal({ onClose }) {
                 onChange={(e) =>
                   setForm({ ...form, leaveType: e.target.value })
                 }
+                required
               >
                 <option value="">Select</option>
                 <option>PTO</option>
@@ -243,6 +245,7 @@ export default function ApplyLeaveModal({ onClose }) {
               <select
                 value={form.halfDay}
                 onChange={(e) => setForm({ ...form, halfDay: e.target.value })}
+                required
               >
                 <option value="FULL">Full Day</option>
                 <option value="FIRST_HALF">First Half</option>
@@ -258,6 +261,7 @@ export default function ApplyLeaveModal({ onClose }) {
                 onChange={(e) =>
                   setForm({ ...form, startDate: e.target.value })
                 }
+                required
               />
             </div>
 
@@ -267,6 +271,7 @@ export default function ApplyLeaveModal({ onClose }) {
                 type="date"
                 value={form.endDate}
                 onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+                required
               />
             </div>
 
@@ -276,6 +281,7 @@ export default function ApplyLeaveModal({ onClose }) {
                 rows="3"
                 value={form.reason}
                 onChange={(e) => setForm({ ...form, reason: e.target.value })}
+                required
               />
             </div>
           </div>
