@@ -861,28 +861,24 @@ export async function getMyEmployeeHierarchyRecord(accessToken, email) {
   return res.data.value[0];
 }
 
-export async function updateEmployeeHierarchy(accessToken, itemId, form) {
-  const payload = {
-    TotalExp: Number(form.totalExp),
-    RelevantExp: Number(form.relevantExp),
-    LegalName: form.legalName,
-    PersonalEmail: form.personalEmail,
-    Mobile: form.mobile,
-    CurrentClientId: form.currentClient || null,
-    PrimarySkillsId: { results: form.primarySkills },
-    SecondarySkillsId: { results: form.secondarySkills },
-    PastClientsId: { results: form.pastClients },
-    EndClients: form.endClients,
-  };
-
+export async function updateEmployeeHierarchy(token, itemId, payload) {
   const url = `${SITE_URL}/_api/web/lists/getbytitle('Employee_Hierarchy')/items(${itemId})`;
 
-  await axios.patch(url, payload, {
+  console.log("PATCH →", url);
+  console.log("Payload →", payload);
+
+  return axios({
+    method: "PATCH",
+    url,
     headers: {
-      Authorization: `Bearer ${accessToken}`,
       Accept: "application/json;odata=nometadata",
-      "Content-Type": "application/json",
+      "Content-Type": "application/json;odata=nometadata",
+      Authorization: `Bearer ${token}`,
+
+      // 🔑 REQUIRED for SharePoint PATCH
       "IF-MATCH": "*",
+      "X-HTTP-Method": "MERGE",
     },
+    data: JSON.stringify(payload),
   });
 }

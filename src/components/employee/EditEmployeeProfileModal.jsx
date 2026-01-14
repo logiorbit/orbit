@@ -16,12 +16,29 @@ export default function EditEmployeeProfileModal({
   onSuccess,
 }) {
   const { instance, accounts } = useMsal();
+
   const [loading, setLoading] = useState(false);
   const [record, setRecord] = useState(null);
   const [clients, setClients] = useState([]);
   const [skills, setSkills] = useState([]);
-  const [form, setForm] = useState({});
 
+  // ✅ Single, normalized form state
+  const [form, setForm] = useState({
+    employee: "",
+    empemail: "",
+    totalExp: "",
+    relevantExp: "",
+    legalName: "",
+    personalEmail: "",
+    mobile: "",
+    currentClientId: "",
+    primarySkillsIds: [],
+    secondarySkillsIds: [],
+    pastClientsIds: [],
+    endClients: "",
+  });
+
+  // 🔹 Load data
   useEffect(() => {
     async function load() {
       const token = await getAccessToken(instance, accounts[0]);
@@ -31,17 +48,17 @@ export default function EditEmployeeProfileModal({
       setRecord(data);
 
       setForm({
-        employee: data.Employee.Title || "",
-        empemail: data.Employee.EMail || "",
-        totalExp: data.TotalExp || "",
-        relevantExp: data.RelevantExp || "",
+        employee: data.Employee?.Title || "",
+        empemail: data.Employee?.EMail || "",
+        totalExp: data.TotalExp ?? "",
+        relevantExp: data.RelevantExp ?? "",
         legalName: data.LegalName || "",
         personalEmail: data.PersonalEmail || "",
         mobile: data.Mobile || "",
-        primarySkills: data.PrimarySkills?.map((s) => s.Id) || [],
-        secondarySkills: data.SecondarySkills?.map((s) => s.Id) || [],
-        currentClient: data.CurrentClient?.Id || "",
-        pastClients: data.PastClients?.map((c) => c.Id) || [],
+        currentClientId: data.CurrentClient?.Id || "",
+        primarySkillsIds: data.PrimarySkills?.map((s) => s.Id) || [],
+        secondarySkillsIds: data.SecondarySkills?.map((s) => s.Id) || [],
+        pastClientsIds: data.PastClients?.map((c) => c.Id) || [],
         endClients: data.EndClients || "",
       });
 
@@ -50,66 +67,61 @@ export default function EditEmployeeProfileModal({
     }
 
     load();
-  }, []);
+  }, [instance, accounts]);
 
   if (!record) return null;
 
-  function handlePrimarySkillsChange(e) {
+  // 🔹 Multi-select handlers
+  const handlePrimarySkillsChange = (e) => {
     const values = Array.from(e.target.selectedOptions).map((o) =>
       Number(o.value)
     );
-    setForm((prev) => ({ ...prev, primarySkills: values }));
-  }
+    setForm((prev) => ({ ...prev, primarySkillsIds: values }));
+  };
 
-  function handleSecondarySkillsChange(e) {
+  const handleSecondarySkillsChange = (e) => {
     const values = Array.from(e.target.selectedOptions).map((o) =>
       Number(o.value)
     );
-    setForm((prev) => ({ ...prev, secondarySkills: values }));
-  }
+    setForm((prev) => ({ ...prev, secondarySkillsIds: values }));
+  };
 
+  // 🔹 SAVE
   async function handleSave() {
     try {
       setLoading(true);
       const token = await getAccessToken(instance, accounts[0]);
 
-      const payload = {};
+      // ✅ Explicit mapping layer (THIS FIXES YOUR 400 ERRORS)
+      const payload = {
+        TotalExp: Number(form.totalExp),
+        RelevantExp: Number(form.relevantExp),
+        LegalName: form.legalName,
+        PersonalEmail: form.personalEmail,
+        Mobile: form.mobile,
+        EndClients: form.endClients,
+      };
 
-      // 🔹 Numbers
-      if (form.totalExp !== "") {
-        payload.TotalExp = Number(form.totalExp);
+      if (form.currentClientId) {
+        payload.CurrentClientId = Number(form.currentClientId);
       }
 
-      if (form.relevantExp !== "") {
-        payload.RelevantExp = Number(form.relevantExp);
+      if (form.primarySkillsIds.length > 0) {
+        payload.PrimarySkillsId = {
+          results: form.primarySkillsIds.map(Number),
+        };
       }
 
-      // 🔹 Text
-      if (form.legalName) payload.LegalName = form.legalName;
-      if (form.personalEmail) payload.PersonalEmail = form.personalEmail;
-      if (form.mobile) payload.Mobile = form.mobile;
-
-      // 🔹 Single lookup
-      if (form.currentClient) {
-        payload.CurrentClientId = Number(form.currentClient);
+      if (form.secondarySkillsIds.length > 0) {
+        payload.SecondarySkillsId = {
+          results: form.secondarySkillsIds.map(Number),
+        };
       }
 
-      // 🔹 Multi lookups (ONLY if array has values)
-      if (form.primarySkills?.length > 0) {
-        payload.PrimarySkillsId = { results: form.primarySkills };
-      }
-
-      if (form.secondarySkills?.length > 0) {
-        payload.SecondarySkillsId = { results: form.secondarySkills };
-      }
-
-      if (form.pastClients?.length > 0) {
-        payload.PastClientsId = { results: form.pastClients };
-      }
-
-      // 🔹 Single line text
-      if (form.endClients) {
-        payload.EndClients = form.endClients;
+      if (form.pastClientsIds.length > 0) {
+        payload.PastClientsId = {
+          results: form.pastClientsIds.map(Number),
+        };
       }
 
       console.log("PATCH payload →", payload);
@@ -118,6 +130,7 @@ export default function EditEmployeeProfileModal({
 
       onSuccess();
       onClose();
+      window.location.reload();
     } catch (err) {
       console.error(err);
       alert("Failed to update profile");
@@ -195,7 +208,6 @@ export default function EditEmployeeProfileModal({
             <div className="form-group">
               <label>Mobile</label>
               <input
-                type="tel"
                 value={form.mobile}
                 onChange={(e) => setForm({ ...form, mobile: e.target.value })}
               />
@@ -204,11 +216,12 @@ export default function EditEmployeeProfileModal({
             <div className="form-group">
               <label>Current Client</label>
               <select
-                value={form.currentClient}
+                value={form.currentClientId}
                 onChange={(e) =>
-                  setForm({ ...form, currentClient: e.target.value })
+                  setForm({ ...form, currentClientId: e.target.value })
                 }
               >
+                <option value="">Select</option>
                 {clients.map((c) => (
                   <option key={c.Id} value={c.Id}>
                     {c.Title}
@@ -217,12 +230,12 @@ export default function EditEmployeeProfileModal({
               </select>
             </div>
 
-            {/* MULTI SELECT – FULL WIDTH */}
+            {/* MULTI SELECT */}
             <div className="form-group full-width">
               <label>Primary Skills</label>
               <select
                 multiple
-                value={form.primarySkills}
+                value={form.primarySkillsIds}
                 onChange={handlePrimarySkillsChange}
               >
                 {skills.map((s) => (
@@ -237,7 +250,7 @@ export default function EditEmployeeProfileModal({
               <label>Secondary Skills</label>
               <select
                 multiple
-                value={form.secondarySkills}
+                value={form.secondarySkillsIds}
                 onChange={handleSecondarySkillsChange}
               >
                 {skills.map((s) => (
@@ -255,8 +268,12 @@ export default function EditEmployeeProfileModal({
           <button className="btn-secondary" onClick={onClose}>
             Cancel
           </button>
-          <button className="btn-primary" onClick={handleSave}>
-            Save
+          <button
+            className="btn-primary"
+            onClick={handleSave}
+            disabled={loading}
+          >
+            {loading ? "Saving..." : "Save"}
           </button>
         </div>
       </div>
