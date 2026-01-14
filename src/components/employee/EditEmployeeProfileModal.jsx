@@ -22,7 +22,6 @@ export default function EditEmployeeProfileModal({
   const [clients, setClients] = useState([]);
   const [skills, setSkills] = useState([]);
 
-  // ✅ Single, normalized form state
   const [form, setForm] = useState({
     employee: "",
     empemail: "",
@@ -38,7 +37,7 @@ export default function EditEmployeeProfileModal({
     endClients: "",
   });
 
-  // 🔹 Load data
+  /* ===================== LOAD DATA ===================== */
   useEffect(() => {
     async function load() {
       const token = await getAccessToken(instance, accounts[0]);
@@ -71,7 +70,7 @@ export default function EditEmployeeProfileModal({
 
   if (!record) return null;
 
-  // 🔹 Multi-select handlers
+  /* ===================== MULTI SELECT HANDLERS ===================== */
   const handlePrimarySkillsChange = (e) => {
     const values = Array.from(e.target.selectedOptions).map((o) =>
       Number(o.value)
@@ -86,47 +85,57 @@ export default function EditEmployeeProfileModal({
     setForm((prev) => ({ ...prev, secondarySkillsIds: values }));
   };
 
-  // 🔹 SAVE
+  /* ===================== SAVE (SPLIT PATCHES) ===================== */
   async function handleSave() {
     try {
       setLoading(true);
       const token = await getAccessToken(instance, accounts[0]);
+      const id = record.Id;
 
-      // ✅ Explicit mapping layer (THIS FIXES YOUR 400 ERRORS)
-      const payload = {
+      /* ---------- 1️⃣ SCALAR FIELDS ---------- */
+      const scalarPayload = {
         TotalExp: Number(form.totalExp),
         RelevantExp: Number(form.relevantExp),
         LegalName: form.legalName,
         PersonalEmail: form.personalEmail,
-        Mobile: form.mobile,
+        Mobile: form.mobile, // TEXT column
         EndClients: form.endClients,
       };
 
       if (form.currentClientId) {
-        payload.CurrentClientId = Number(form.currentClientId);
+        scalarPayload.CurrentClientId = Number(form.currentClientId);
       }
 
+      await updateEmployeeHierarchy(token, id, scalarPayload);
+
+      /* ---------- 2️⃣ PRIMARY SKILLS ---------- */
       if (form.primarySkillsIds.length > 0) {
-        payload.PrimarySkillsId = {
-          results: form.primarySkillsIds.map(Number),
-        };
+        await updateEmployeeHierarchy(token, id, {
+          PrimarySkillsId: {
+            results: form.primarySkillsIds.map(Number),
+          },
+        });
       }
 
+      /* ---------- 3️⃣ SECONDARY SKILLS ---------- */
       if (form.secondarySkillsIds.length > 0) {
-        payload.SecondarySkillsId = {
-          results: form.secondarySkillsIds.map(Number),
-        };
+        await updateEmployeeHierarchy(token, id, {
+          SecondarySkillsId: {
+            results: form.secondarySkillsIds.map(Number),
+          },
+        });
       }
 
-      /*   if (form.pastClientsIds.length > 0) {
-        payload.PastClientsId = {
-          results: form.pastClientsIds.map(Number),
-        };
+      /* ---------- 4️⃣ PAST CLIENTS (OPTIONAL) ---------- */
+      /*
+      if (form.pastClientsIds.length > 0) {
+        await updateEmployeeHierarchy(token, id, {
+          PastClientsId: {
+            results: form.pastClientsIds.map(Number),
+          },
+        });
       }
-*/
-      console.log("PATCH payload →", payload);
-
-      await updateEmployeeHierarchy(token, record.Id, payload);
+      */
 
       onSuccess();
       onClose();
@@ -139,10 +148,10 @@ export default function EditEmployeeProfileModal({
     }
   }
 
+  /* ===================== UI ===================== */
   return (
     <div className="modal-overlay">
       <div className="modal-card profile-modal">
-        {/* Header */}
         <div className="modal-header">
           <h3>Edit Profile</h3>
           <button className="icon-btn" onClick={onClose}>
@@ -150,10 +159,8 @@ export default function EditEmployeeProfileModal({
           </button>
         </div>
 
-        {/* Body */}
         <div className="modal-body">
           <div className="profile-form-grid">
-            {/* READ ONLY */}
             <div className="form-group">
               <label>Employee</label>
               <input value={form.employee} disabled />
@@ -164,9 +171,8 @@ export default function EditEmployeeProfileModal({
               <input value={form.empemail} disabled />
             </div>
 
-            {/* EDITABLE */}
             <div className="form-group">
-              <label>Total Experience (Years)</label>
+              <label>Total Experience</label>
               <input
                 type="number"
                 value={form.totalExp}
@@ -175,7 +181,7 @@ export default function EditEmployeeProfileModal({
             </div>
 
             <div className="form-group">
-              <label>Relevant Experience (Years)</label>
+              <label>Relevant Experience</label>
               <input
                 type="number"
                 value={form.relevantExp}
@@ -230,7 +236,6 @@ export default function EditEmployeeProfileModal({
               </select>
             </div>
 
-            {/* MULTI SELECT */}
             <div className="form-group full-width">
               <label>Primary Skills</label>
               <select
@@ -263,7 +268,6 @@ export default function EditEmployeeProfileModal({
           </div>
         </div>
 
-        {/* Footer */}
         <div className="modal-footer">
           <button className="btn-secondary" onClick={onClose}>
             Cancel
