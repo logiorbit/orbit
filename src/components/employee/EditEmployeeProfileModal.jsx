@@ -91,20 +91,20 @@ export default function EditEmployeeProfileModal({
 
       // 🔹 Single lookup
       if (form.currentClient) {
-        payload.currentClientIds = Number(form.currentClient);
+        payload.currentClientId = Number(form.currentClient);
       }
 
       // 🔹 Multi lookups (ONLY if array has values)
       if (form.primarySkills?.length > 0) {
-        payload.primarySkillsIds = { results: form.primarySkills };
+        payload.primarySkillsId = { results: form.primarySkills };
       }
 
       if (form.secondarySkills?.length > 0) {
-        payload.secondarySkillsIds = { results: form.secondarySkills };
+        payload.secondarySkillsId = { results: form.secondarySkills };
       }
 
       if (form.pastClients?.length > 0) {
-        payload.pastClientsIds = { results: form.pastClients };
+        payload.pastClientsId = { results: form.pastClients };
       }
 
       // 🔹 Single line text
