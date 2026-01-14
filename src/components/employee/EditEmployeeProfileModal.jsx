@@ -118,12 +118,12 @@ export default function EditEmployeeProfileModal({
         };
       }
 
-      if (form.pastClientsIds.length > 0) {
+      /*   if (form.pastClientsIds.length > 0) {
         payload.PastClientsId = {
           results: form.pastClientsIds.map(Number),
         };
       }
-
+*/
       console.log("PATCH payload →", payload);
 
       await updateEmployeeHierarchy(token, record.Id, payload);
