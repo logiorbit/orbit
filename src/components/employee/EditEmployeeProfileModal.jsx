@@ -33,7 +33,6 @@ export default function EditEmployeeProfileModal({
     currentClientId: "",
     primarySkillsIds: [],
     secondarySkillsIds: [],
-    pastClientsIds: [],
     endClients: "",
   });
 
@@ -57,7 +56,6 @@ export default function EditEmployeeProfileModal({
         currentClientId: data.CurrentClient?.Id || "",
         primarySkillsIds: data.PrimarySkills?.map((s) => s.Id) || [],
         secondarySkillsIds: data.SecondarySkills?.map((s) => s.Id) || [],
-        pastClientsIds: data.PastClients?.map((c) => c.Id) || [],
         endClients: data.EndClients || "",
       });
 
@@ -85,7 +83,7 @@ export default function EditEmployeeProfileModal({
     setForm((prev) => ({ ...prev, secondarySkillsIds: values }));
   };
 
-  /* ===================== SAVE (SPLIT PATCHES) ===================== */
+  /* ===================== SAVE (SAFE SPLIT PATCH) ===================== */
   async function handleSave() {
     try {
       setLoading(true);
@@ -93,22 +91,29 @@ export default function EditEmployeeProfileModal({
       const id = record.Id;
 
       /* ---------- 1️⃣ SCALAR FIELDS ---------- */
-      const scalarPayload = {
+      await updateEmployeeHierarchy(token, id, {
         TotalExp: Number(form.totalExp),
         RelevantExp: Number(form.relevantExp),
         LegalName: form.legalName,
         PersonalEmail: form.personalEmail,
-        Mobile: form.mobile, // TEXT column
+        Mobile: form.mobile, // text column
         EndClients: form.endClients,
-      };
+      });
 
+      /* ---------- 2️⃣ SINGLE LOOKUP ---------- */
       if (form.currentClientId) {
-        scalarPayload.CurrentClientId = Number(form.currentClientId);
+        await updateEmployeeHierarchy(token, id, {
+          CurrentClientId: Number(form.currentClientId),
+        });
       }
 
-      await updateEmployeeHierarchy(token, id, scalarPayload);
+      /* ---------- 3️⃣ CLEAR MULTI LOOKUPS ---------- */
+      await updateEmployeeHierarchy(token, id, {
+        PrimarySkillsId: { results: [] },
+        SecondarySkillsId: { results: [] },
+      });
 
-      /* ---------- 2️⃣ PRIMARY SKILLS ---------- */
+      /* ---------- 4️⃣ SET MULTI LOOKUPS ---------- */
       if (form.primarySkillsIds.length > 0) {
         await updateEmployeeHierarchy(token, id, {
           PrimarySkillsId: {
@@ -117,7 +122,6 @@ export default function EditEmployeeProfileModal({
         });
       }
 
-      /* ---------- 3️⃣ SECONDARY SKILLS ---------- */
       if (form.secondarySkillsIds.length > 0) {
         await updateEmployeeHierarchy(token, id, {
           SecondarySkillsId: {
@@ -126,22 +130,11 @@ export default function EditEmployeeProfileModal({
         });
       }
 
-      /* ---------- 4️⃣ PAST CLIENTS (OPTIONAL) ---------- */
-      /*
-      if (form.pastClientsIds.length > 0) {
-        await updateEmployeeHierarchy(token, id, {
-          PastClientsId: {
-            results: form.pastClientsIds.map(Number),
-          },
-        });
-      }
-      */
-
       onSuccess();
       onClose();
       window.location.reload();
     } catch (err) {
-      console.error(err);
+      console.error("Update failed:", err);
       alert("Failed to update profile");
     } finally {
       setLoading(false);
