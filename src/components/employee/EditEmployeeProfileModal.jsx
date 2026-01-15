@@ -92,49 +92,55 @@ export default function EditEmployeeProfileModal({
       const token = await getAccessToken(instance, accounts[0]);
       const id = record.Id;
 
-      // Get current item first to get ETag and metadata type
-      const currentItem = await getMyEmployeeHierarchyRecord(
-        token,
-        accounts[0].username
-      );
-      const etag = currentItem.__metadata?.etag || "*";
-      const listItemType = "SP.Data.Employee_x0020_HierarchyListItem"; // Adjust based on your list name
-
-      const payload = {
-        __metadata: { type: listItemType },
+      // 1. Update simple fields FIRST
+      await updateEmployeeHierarchy(token, id, {
         TotalExp: Number(form.totalExp) || 0,
         RelevantExp: Number(form.relevantExp) || 0,
         LegalName: form.legalName || "",
         PersonalEmail: form.personalEmail || "",
         Mobile: form.mobile || "",
         EndClients: form.endClients || "",
-        // Single lookup
-        CurrentClientId: form.currentClientId
-          ? Number(form.currentClientId)
-          : 0,
-        // Multi lookups - use exact internal names from SharePoint
-        PrimarySkillsId: {
-          results:
-            form.primarySkillsIds.length > 0
-              ? form.primarySkillsIds.map(Number)
-              : [],
-        },
-        SecondarySkillsId: {
-          results:
-            form.secondarySkillsIds.length > 0
-              ? form.secondarySkillsIds.map(Number)
-              : [],
-        },
-      };
+      });
 
-      await updateEmployeeHierarchy(token, id, payload, etag);
+      // 2. Update CurrentClient (single lookup)
+      if (form.currentClientId) {
+        await updateEmployeeHierarchy(token, id, {
+          CurrentClientId: Number(form.currentClientId),
+        });
+      } else {
+        await updateEmployeeHierarchy(token, id, { CurrentClientId: 0 });
+      }
 
-      alert("Profile updated successfully!");
+      // 3. Clear Primary Skills
+      await updateEmployeeHierarchy(token, id, {
+        PrimarySkillsId: { results: [] },
+      });
+
+      // 4. Set Primary Skills if any selected
+      if (form.primarySkillsIds.length > 0) {
+        await updateEmployeeHierarchy(token, id, {
+          PrimarySkillsId: { results: form.primarySkillsIds },
+        });
+      }
+
+      // 5. Clear Secondary Skills
+      await updateEmployeeHierarchy(token, id, {
+        SecondarySkillsId: { results: [] },
+      });
+
+      // 6. Set Secondary Skills if any selected
+      if (form.secondarySkillsIds.length > 0) {
+        await updateEmployeeHierarchy(token, id, {
+          SecondarySkillsId: { results: form.secondarySkillsIds },
+        });
+      }
+
+      alert("✅ Profile updated successfully!");
       onSuccess();
       onClose();
     } catch (err) {
       console.error("Update failed:", err);
-      alert("Failed: " + (err.response?.data?.error?.message || err.message));
+      alert("Failed: " + err.response?.data?.error?.message || err.message);
     } finally {
       setLoading(false);
     }

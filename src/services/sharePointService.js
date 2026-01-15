@@ -907,23 +907,17 @@ export async function updateEmployeeHierarchy(token, itemId, payload) {
 }
 */
 
-export async function updateEmployeeHierarchy(
-  token,
-  itemId,
-  payload,
-  etag = "*"
-) {
+export async function updateEmployeeHierarchy(token, itemId, payload) {
   return axios.patch(
     `https://logivention.sharepoint.com/sites/LogiOrbit/_api/web/lists/getbytitle('Employee_Hierarchy')/items(${itemId})`,
     payload,
     {
       headers: {
         Authorization: `Bearer ${token}`,
-        Accept: "application/json;odata=verbose",
-        "Content-Type": "application/json;odata=verbose", // 👈 Changed to verbose
-        "IF-MATCH": etag,
+        Accept: "application/json;odata=nometadata",
+        "Content-Type": "application/json;odata=nometadata",
+        "IF-MATCH": "*",
         "X-HTTP-Method": "MERGE",
-        "X-RequestDigest": "0", // SharePoint handles this
       },
     }
   );
