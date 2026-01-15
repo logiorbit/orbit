@@ -874,7 +874,7 @@ export async function updateEmployeeHierarchy(token, itemId, payload) {
       },
     }
   );
-} */
+} 
 
 export async function updateEmployeeHierarchy(token, itemId, payload) {
   return axios.patch(
@@ -890,7 +890,7 @@ export async function updateEmployeeHierarchy(token, itemId, payload) {
       },
     }
   );
-}
+} */
 
 /*
 export async function updateEmployeeHierarchy(token, itemId, payload) {
@@ -906,3 +906,25 @@ export async function updateEmployeeHierarchy(token, itemId, payload) {
   );
 }
 */
+
+export async function updateEmployeeHierarchy(
+  token,
+  itemId,
+  payload,
+  etag = "*"
+) {
+  return axios.patch(
+    `https://logivention.sharepoint.com/sites/LogiOrbit/_api/web/lists/getbytitle('Employee_Hierarchy')/items(${itemId})`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json;odata=verbose",
+        "Content-Type": "application/json;odata=verbose", // 👈 Changed to verbose
+        "IF-MATCH": etag,
+        "X-HTTP-Method": "MERGE",
+        "X-RequestDigest": "0", // SharePoint handles this
+      },
+    }
+  );
+}

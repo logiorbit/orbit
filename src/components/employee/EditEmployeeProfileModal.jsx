@@ -92,23 +92,42 @@ export default function EditEmployeeProfileModal({
       const token = await getAccessToken(instance, accounts[0]);
       const id = record.Id;
 
+      // Get current item first to get ETag and metadata type
+      const currentItem = await getMyEmployeeHierarchyRecord(
+        token,
+        accounts[0].username
+      );
+      const etag = currentItem.__metadata?.etag || "*";
+      const listItemType = "SP.Data.Employee_x0020_HierarchyListItem"; // Adjust based on your list name
+
       const payload = {
+        __metadata: { type: listItemType },
         TotalExp: Number(form.totalExp) || 0,
         RelevantExp: Number(form.relevantExp) || 0,
-        LegalName: form.legalName,
-        PersonalEmail: form.personalEmail,
-        Mobile: form.mobile,
-        EndClients: form.endClients,
-        // Single lookup (null clears it)
+        LegalName: form.legalName || "",
+        PersonalEmail: form.personalEmail || "",
+        Mobile: form.mobile || "",
+        EndClients: form.endClients || "",
+        // Single lookup
         CurrentClientId: form.currentClientId
           ? Number(form.currentClientId)
-          : null,
-        // Multi lookups (empty arrays clear them)
-        PrimarySkillsId: { results: form.primarySkillsIds.map(Number) },
-        SecondarySkillsId: { results: form.secondarySkillsIds.map(Number) },
+          : 0,
+        // Multi lookups - use exact internal names from SharePoint
+        PrimarySkillsId: {
+          results:
+            form.primarySkillsIds.length > 0
+              ? form.primarySkillsIds.map(Number)
+              : [],
+        },
+        SecondarySkillsId: {
+          results:
+            form.secondarySkillsIds.length > 0
+              ? form.secondarySkillsIds.map(Number)
+              : [],
+        },
       };
 
-      await updateEmployeeHierarchy(token, id, payload);
+      await updateEmployeeHierarchy(token, id, payload, etag);
 
       alert("Profile updated successfully!");
       onSuccess();
