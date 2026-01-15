@@ -84,58 +84,38 @@ export default function EditEmployeeProfileModal({
   };
 
   /* ===================== SAVE (SAFE SPLIT PATCH) ===================== */
+  // ... your existing imports and state ...
+
   async function handleSave() {
     try {
       setLoading(true);
       const token = await getAccessToken(instance, accounts[0]);
       const id = record.Id;
 
-      /* ---------- 1️⃣ SCALAR FIELDS ---------- */
-      await updateEmployeeHierarchy(token, id, {
-        TotalExp: Number(form.totalExp),
-        RelevantExp: Number(form.relevantExp),
+      const payload = {
+        TotalExp: Number(form.totalExp) || 0,
+        RelevantExp: Number(form.relevantExp) || 0,
         LegalName: form.legalName,
         PersonalEmail: form.personalEmail,
-        Mobile: form.mobile, // text column
+        Mobile: form.mobile,
         EndClients: form.endClients,
-      });
+        // Single lookup (null clears it)
+        CurrentClientId: form.currentClientId
+          ? Number(form.currentClientId)
+          : null,
+        // Multi lookups (empty arrays clear them)
+        PrimarySkillsId: { results: form.primarySkillsIds.map(Number) },
+        SecondarySkillsId: { results: form.secondarySkillsIds.map(Number) },
+      };
 
-      /* ---------- 2️⃣ SINGLE LOOKUP ---------- */
-      if (form.currentClientId) {
-        await updateEmployeeHierarchy(token, id, {
-          CurrentClientId: Number(form.currentClientId),
-        });
-      }
+      await updateEmployeeHierarchy(token, id, payload);
 
-      /* ---------- 3️⃣ CLEAR MULTI LOOKUPS ---------- */
-      await updateEmployeeHierarchy(token, id, {
-        PrimarySkillsId: { results: [] },
-        SecondarySkillsId: { results: [] },
-      });
-
-      /* ---------- 4️⃣ SET MULTI LOOKUPS ---------- */
-      if (form.primarySkillsIds.length > 0) {
-        await updateEmployeeHierarchy(token, id, {
-          PrimarySkillsId: {
-            results: form.primarySkillsIds.map(Number),
-          },
-        });
-      }
-
-      if (form.secondarySkillsIds.length > 0) {
-        await updateEmployeeHierarchy(token, id, {
-          SecondarySkillsId: {
-            results: form.secondarySkillsIds.map(Number),
-          },
-        });
-      }
-
+      alert("Profile updated successfully!");
       onSuccess();
       onClose();
-      window.location.reload();
     } catch (err) {
       console.error("Update failed:", err);
-      alert("Failed to update profile");
+      alert("Failed: " + (err.response?.data?.error?.message || err.message));
     } finally {
       setLoading(false);
     }

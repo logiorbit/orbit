@@ -860,6 +860,21 @@ export async function getMyEmployeeHierarchyRecord(accessToken, email) {
 
   return res.data.value[0];
 }
+/*
+export async function updateEmployeeHierarchy(token, itemId, payload) {
+  return axios.patch(
+    `https://logivention.sharepoint.com/sites/LogiOrbit/_api/web/lists/getbytitle('Employee_Hierarchy')/items(${itemId})`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json;odata=nometadata",
+        "Content-Type": "application/json;odata=nometadata",
+        "IF-MATCH": "*",
+      },
+    }
+  );
+} */
 
 export async function updateEmployeeHierarchy(token, itemId, payload) {
   return axios.patch(
@@ -871,6 +886,7 @@ export async function updateEmployeeHierarchy(token, itemId, payload) {
         Accept: "application/json;odata=nometadata",
         "Content-Type": "application/json;odata=nometadata",
         "IF-MATCH": "*",
+        "X-HTTP-Method": "MERGE", // 👈 CRITICAL for updates
       },
     }
   );
