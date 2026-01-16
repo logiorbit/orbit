@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMsal } from "@azure/msal-react";
 import { getAccessToken } from "../../auth/authService";
 import {
