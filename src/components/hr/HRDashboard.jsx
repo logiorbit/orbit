@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import SubmitTimesheet from "./SubmitTimesheetModal";
 import TimesheetStatusTable from "./TimesheetStatusTable";
+import { getAccessToken } from "../../auth/authService";
 import {
   getEmployeeHierarchy,
   getTimesheetsForMonth,
@@ -19,10 +20,11 @@ export default function HRDashboard() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
+      const token = await getAccessToken(instance, accounts[0]);
 
       const [hierarchy, ts] = await Promise.all([
-        getEmployeeHierarchy(accessToken),
-        getTimesheetsForMonth(accessToken, month, year),
+        getEmployeeHierarchy(token),
+        getTimesheetsForMonth(token, month, year),
       ]);
 
       setEmployees(hierarchy);
@@ -31,7 +33,7 @@ export default function HRDashboard() {
     }
 
     loadData();
-  }, [accessToken, month, year]);
+  }, [token, month, year]);
 
   if (loading) {
     return <div className="hr-card">Loading Timesheet Status…</div>;
