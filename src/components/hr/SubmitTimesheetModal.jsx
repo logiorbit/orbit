@@ -34,8 +34,8 @@ export default function SubmitTimesheetModal({ onClose }) {
      SUBMIT
      ========================= */
   const submit = async () => {
-    if (!form.title || !form.client || !form.month || !form.year) {
-      alert("Title, Client, Month and Year are mandatory.");
+    if (!form.client || !form.month || !form.year) {
+      alert("Client, Month and Year are mandatory.");
       return;
     }
 
