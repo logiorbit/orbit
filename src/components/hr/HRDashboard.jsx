@@ -1,15 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SubmitTimesheet from "./SubmitTimesheetModal";
 import TimesheetStatusTable from "./TimesheetStatusTable";
+import {
+  getEmployeeHierarchy,
+  getTimesheetsForMonth,
+} from "../../services/sharePointService";
+
 import "./HRDashboard.css";
 
 export default function HRDashboard() {
   const [showSubmitTimesheet, setShowSubmitTimesheet] = useState(false);
-  const [month, setMonth] = useState("Jan");
+  const [employees, setEmployees] = useState([]);
+  const [timesheets, setTimesheets] = useState([]);
+  const [month, setMonth] = useState("January");
   const [year, setYear] = useState(new Date().getFullYear());
+  const [loading, setLoading] = useState(true);
 
-  const employees = window.employeeHierarchyData;
-  const timesheets = window.timesheetData;
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+
+      const [hierarchy, ts] = await Promise.all([
+        getEmployeeHierarchy(accessToken),
+        getTimesheetsForMonth(accessToken, month, year),
+      ]);
+
+      setEmployees(hierarchy);
+      setTimesheets(ts);
+      setLoading(false);
+    }
+
+    loadData();
+  }, [accessToken, month, year]);
+
+  if (loading) {
+    return <div className="hr-card">Loading Timesheet Status…</div>;
+  }
 
   return (
     <>
@@ -29,8 +55,8 @@ export default function HRDashboard() {
             <TimesheetStatusTable
               employees={employees}
               timesheets={timesheets}
-              selectedMonth={month}
-              selectedYear={year}
+              month={month}
+              year={year}
               onMonthChange={setMonth}
               onYearChange={setYear}
             />

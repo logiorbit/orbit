@@ -976,3 +976,21 @@ export async function uploadTimesheetAttachments(accessToken, itemId, files) {
     });
   }
 }
+
+export async function getTimesheetsForMonth(accessToken, month, year) {
+  const url =
+    `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items` +
+    `?$select=` +
+    `Id,Month,Year,Status,Employee/Id,Employee/EMail` +
+    `&$expand=Employee` +
+    `&$filter=Month eq '${month}' and Year eq ${year}`;
+
+  const response = await axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json;odata=nometadata",
+    },
+  });
+
+  return response.data.value;
+}

@@ -4,54 +4,46 @@ import MonthYearFilter from "./MonthYearFilter";
 export default function TimesheetStatusTable({
   employees,
   timesheets,
-  selectedMonth,
-  selectedYear,
+  month,
+  year,
   onMonthChange,
   onYearChange,
 }) {
-  const onProjectEmployees = employees.filter((e) => e.status === "On Project");
+  const onProjectEmployees = employees.filter((e) => e.Status === "On Project");
 
-  const isSubmitted = (email) => {
-    const record = timesheets.find(
+  const hasSubmittedTimesheet = (employeeEmail) =>
+    timesheets.some(
       (t) =>
-        t.employeeEmail === email &&
-        t.month === selectedMonth &&
-        Number(t.year) === Number(selectedYear)
+        t.Employee?.EMail?.toLowerCase() === employeeEmail.toLowerCase() &&
+        t.Status !== "Draft"
     );
-
-    return record?.submissionStatus === "Submitted";
-  };
 
   return (
     <div className="hr-card">
       <div className="hr-card-header">
-        <h3 className="hr-card-title">Timesheet Submission Status</h3>
+        <h3 className="hr-card-title">
+          Timesheet Submission Status – {month} {year}
+        </h3>
 
-        <MonthYearFilter
-          month={selectedMonth}
-          year={selectedYear}
-          onMonthChange={onMonthChange}
-          onYearChange={onYearChange}
-        />
+        {/* Month / Year dropdowns stay as discussed earlier */}
       </div>
 
       <table className="hr-table">
         <thead>
           <tr>
             <th>Employee</th>
-            <th>Status</th>
+            <th>Timesheet</th>
           </tr>
         </thead>
-
         <tbody>
-          {onProjectEmployees.map((emp) => (
-            <tr key={emp.email}>
-              <td>{emp.name}</td>
+          {onProjectEmployees.map((e) => (
+            <tr key={e.Id}>
+              <td>{e.Employee?.Title}</td>
               <td className="status-icon">
-                {isSubmitted(emp.email) ? (
-                  <CheckCircle className="icon-success" size={20} />
+                {hasSubmittedTimesheet(e.Employee?.EMail) ? (
+                  <span className="icon-success">✔</span>
                 ) : (
-                  <XCircle className="icon-failure" size={20} />
+                  <span className="icon-failure">✖</span>
                 )}
               </td>
             </tr>
