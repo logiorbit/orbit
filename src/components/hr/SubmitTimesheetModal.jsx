@@ -26,7 +26,7 @@ export default function SubmitTimesheetModal({ onClose }) {
     holidayDates: "",
     totalBillingDays: "",
     totalBillingHours: "",
-    status: "Not Submitted", // EXACT Choice
+    status: "Submitted", // EXACT Choice
   });
 
   const [files, setFiles] = useState([]);
