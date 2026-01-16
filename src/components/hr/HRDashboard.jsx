@@ -1,13 +1,9 @@
-import { useState, useEffect } from "react";
-import { useMsal } from "@azure/msal-react";
-import { useUserContext } from "../../context/UserContext";
-import { getAccessToken } from "../../auth/authService";
-
-import submitTimesheet from "./submitTimesheet";
+import { useState } from "react";
+import SubmitTimesheet from "./SubmitTimesheetModal";
 import "./HRDashboard.css";
 
-export default function ManagerDashboard() {
-  const [submitTimesheet, setSubmitTimesheet] = useState(false);
+export default function HRDashboard() {
+  const [showSubmitTimesheet, setShowSubmitTimesheet] = useState(false);
 
   return (
     <>
@@ -15,16 +11,16 @@ export default function ManagerDashboard() {
         <div className="btn-div">
           <button
             className="primary-btn"
-            onClick={() => setSubmitTimesheet(true)}
+            onClick={() => setShowSubmitTimesheet(true)}
           >
-            + Apply Leave
+            + Submit Timesheet
           </button>
         </div>
       </div>
 
       {/* MODALS */}
-      {submitTimesheet && (
-        <submitTimesheet onClose={() => setSubmitTimesheet(false)} />
+      {showSubmitTimesheet && (
+        <SubmitTimesheet onClose={() => setShowSubmitTimesheet(false)} />
       )}
     </>
   );

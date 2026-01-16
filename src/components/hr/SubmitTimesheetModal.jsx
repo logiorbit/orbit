@@ -6,7 +6,7 @@ import {
   uploadTimesheetAttachments,
 } from "../../services/sharePointService";
 
-export default function CreateTimesheetModal({ onClose }) {
+export default function SubmitTimesheetModal({ onClose }) {
   const { instance, accounts } = useMsal();
 
   /* =========================
