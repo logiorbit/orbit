@@ -1,4 +1,4 @@
-import submitTimesheet from "../submitTimesheet";
+import submitTimesheet from "./submitTimesheet";
 import "./HRDashboard.css";
 
 export default function ManagerDashboard() {
