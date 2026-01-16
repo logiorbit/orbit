@@ -37,14 +37,14 @@ export default function HRDashboard() {
      2️⃣ Load SharePoint Data
      ============================ */
   useEffect(() => {
-    if (!accessToken) return;
+    if (!token) return;
 
     async function loadData() {
       setLoading(true);
 
       const [hierarchy, ts] = await Promise.all([
-        getEmployeeHierarchy(accessToken),
-        getTimesheetsForMonth(accessToken, month, year),
+        getEmployeeHierarchy(token),
+        getTimesheetsForMonth(token, month, year),
       ]);
 
       setEmployees(hierarchy);
@@ -53,7 +53,7 @@ export default function HRDashboard() {
     }
 
     loadData();
-  }, [accessToken, month, year]);
+  }, [token, month, year]);
 
   if (loading) {
     return <div className="hr-card">Loading Timesheet Status…</div>;
