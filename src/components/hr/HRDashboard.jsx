@@ -1,3 +1,8 @@
+import { useState, useEffect } from "react";
+import { useMsal } from "@azure/msal-react";
+import { useUserContext } from "../../context/UserContext";
+import { getAccessToken } from "../../auth/authService";
+
 import submitTimesheet from "./submitTimesheet";
 import "./HRDashboard.css";
 
