@@ -931,7 +931,7 @@ export async function submitTimesheet(accessToken, data) {
 
   const payload = {
     Title: data.title,
-    Client: data.client,
+    ClientId: data.cliendId,
     Month: data.month,
     Year: data.year,
     TotalWorkingDays: data.totalWorkingDays,

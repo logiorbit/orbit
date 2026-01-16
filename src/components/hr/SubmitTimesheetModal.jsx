@@ -56,6 +56,7 @@ export default function SubmitTimesheetModal({ onClose }) {
 
       const itemId = await submitTimesheet(token, {
         ...form,
+        cliendId: Number(form.clientId),
         year: String(form.year),
         totalWorkingDays: Number(form.totalWorkingDays),
         totalLeaves: Number(form.totalLeaves),
