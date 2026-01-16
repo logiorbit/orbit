@@ -1,3 +1,4 @@
+import { useMsal } from "@azure/msal-react";
 import { useEffect, useState } from "react";
 import SubmitTimesheet from "./SubmitTimesheetModal";
 import TimesheetStatusTable from "./TimesheetStatusTable";
@@ -10,6 +11,7 @@ import {
 import "./HRDashboard.css";
 
 export default function HRDashboard() {
+  const { instance, accounts } = useMsal();
   const [showSubmitTimesheet, setShowSubmitTimesheet] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [timesheets, setTimesheets] = useState([]);
@@ -17,14 +19,32 @@ export default function HRDashboard() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(true);
 
+  /* ============================
+     1️⃣ Acquire Access Token
+     ============================ */
   useEffect(() => {
+    async function acquireToken() {
+      if (!accounts || accounts.length === 0) return;
+
+      const token = await getAccessToken(instance, accounts[0]);
+      setAccessToken(token);
+    }
+
+    acquireToken();
+  }, [instance, accounts]);
+
+  /* ============================
+     2️⃣ Load SharePoint Data
+     ============================ */
+  useEffect(() => {
+    if (!accessToken) return;
+
     async function loadData() {
       setLoading(true);
-      const token = await getAccessToken(instance, accounts[0]);
 
       const [hierarchy, ts] = await Promise.all([
-        getEmployeeHierarchy(token),
-        getTimesheetsForMonth(token, month, year),
+        getEmployeeHierarchy(accessToken),
+        getTimesheetsForMonth(accessToken, month, year),
       ]);
 
       setEmployees(hierarchy);
@@ -33,7 +53,7 @@ export default function HRDashboard() {
     }
 
     loadData();
-  }, [token, month, year]);
+  }, [accessToken, month, year]);
 
   if (loading) {
     return <div className="hr-card">Loading Timesheet Status…</div>;
