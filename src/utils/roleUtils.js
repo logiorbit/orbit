@@ -5,6 +5,7 @@ export function calculateRoles(employeeHierarchy, leadershipList, userEmail) {
   let isTL = false;
   let isManager = false;
   let isLeadership = false;
+  let isHR = false;
 
   // Employee / TL / ATL / Manager roles
   employeeHierarchy.forEach((h) => {
@@ -33,13 +34,19 @@ export function calculateRoles(employeeHierarchy, leadershipList, userEmail) {
   leadershipList.forEach((l) => {
     if (l.Leader?.EMail?.toLowerCase() === email) {
       isLeadership = true;
+      isHR = true;
     }
   });
+
+  if (email === "kashmiram@logivention.in") {
+    isHR = true;
+  }
 
   return {
     isEmployee,
     isTL,
     isManager,
     isLeadership,
+    isHR,
   };
 }

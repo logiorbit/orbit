@@ -922,3 +922,57 @@ export async function updateEmployeeHierarchy(token, itemId, payload) {
     }
   );
 }
+
+/* ===============================
+   CREATE TIMESHEET ITEM
+   =============================== */
+export async function submitTimesheet(accessToken, data) {
+  const user = await getCurrentUser(accessToken);
+
+  const payload = {
+    Title: data.title,
+    Client: data.client,
+    Month: data.month,
+    Year: data.year,
+    TotalWorkingDays: data.totalWorkingDays,
+    TotalLeaves: data.totalLeaves,
+    TotalHolidays: data.totalHolidays,
+    LeaveDates: data.leaveDates,
+    HolidayDates: data.holidayDates,
+    TotalBillingDays: data.totalBillingDays,
+    TotalBillingHours: data.totalBillingHours,
+    Status: data.status, // MUST MATCH CHOICE
+    EmployeeId: user.Id, // Person field
+  };
+
+  const res = await axios.post(
+    `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json;odata=nometadata",
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return res.data.Id; // needed for attachments
+}
+
+/* =========================
+   UPLOAD ATTACHMENTS
+   ========================= */
+export async function uploadTimesheetAttachments(accessToken, itemId, files) {
+  for (const file of files) {
+    const url = `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items(${itemId})/AttachmentFiles/add(FileName='${file.name}')`;
+
+    await axios.post(url, file, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json;odata=nometadata",
+        "Content-Type": file.type,
+      },
+    });
+  }
+}

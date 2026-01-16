@@ -18,6 +18,7 @@ import EditEmployeeProfileModal from "../employee/EditEmployeeProfileModal";
 import TLDashboard from "../tl/TLDashboard";
 import ManagerDashboard from "../manager/ManagerDashboard";
 import LeaderDashboard from "../leader/LeaderDashboard";
+import HRDashboard from "../hr/HRDashboard";
 import { leaveTrendData } from "../../utils/chartData";
 import HolidayTable from "../employee/HolidayTable";
 import { getHolidaysForYear } from "../../services/sharePointService";
@@ -56,6 +57,15 @@ export default function Dashboard() {
           </button>
         )}
 
+        {(userRoles.isLeadership || userRoles.isHR) && (
+          <button
+            className={`tab-btn ${activeTab === "HR" ? "active" : ""}`}
+            onClick={() => setActiveTab("HR")}
+          >
+            HR
+          </button>
+        )}
+
         {userRoles.isLeadership && (
           <button
             className={`tab-btn ${activeTab === "LEADERSHIP" ? "active" : ""}`}
@@ -69,6 +79,7 @@ export default function Dashboard() {
       {activeTab === "EMPLOYEE" && <EmployeeDashboard />}
       {activeTab === "TL" && <TLDashboard />}
       {activeTab === "MANAGER" && <ManagerDashboard />}
+      {activeTab === "HR" && <HRDashboard />}
       {activeTab === "LEADERSHIP" && <LeaderDashboard />}
     </div>
   );
