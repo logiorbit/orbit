@@ -13,7 +13,7 @@ export default function SubmitTimesheetModal({ onClose }) {
      TIMESHEET STATE (CSV-ONLY)
      ========================= */
   const [form, setForm] = useState({
-    title: "",
+    title: "Timesheet",
     client: "",
     month: "",
     year: new Date().getFullYear(),
