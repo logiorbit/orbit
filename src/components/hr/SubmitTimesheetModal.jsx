@@ -2,12 +2,14 @@ import { useState } from "react";
 import { useMsal } from "@azure/msal-react";
 import { getAccessToken } from "../../auth/authService";
 import {
+  getClients,
   submitTimesheet,
   uploadTimesheetAttachments,
 } from "../../services/sharePointService";
 
 export default function SubmitTimesheetModal({ onClose }) {
   const { instance, accounts } = useMsal();
+  const [clients, setClients] = useState([]);
 
   /* =========================
      TIMESHEET STATE (CSV-ONLY)
@@ -30,6 +32,14 @@ export default function SubmitTimesheetModal({ onClose }) {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    async function load() {
+      const token = await getAccessToken(instance, accounts[0]);
+      setClients(await getClients(token));
+    }
+    load();
+  }, [instance, accounts]);
+
   /* =========================
      SUBMIT
      ========================= */
@@ -46,6 +56,7 @@ export default function SubmitTimesheetModal({ onClose }) {
 
       const itemId = await submitTimesheet(token, {
         ...form,
+        year: String(form.year),
         totalWorkingDays: Number(form.totalWorkingDays),
         totalLeaves: Number(form.totalLeaves),
         totalHolidays: Number(form.totalHolidays),
@@ -76,12 +87,19 @@ export default function SubmitTimesheetModal({ onClose }) {
         <h3>Create Timesheet</h3>
         <div className="form-grid">
           <div className="form-group">
-            <label>Choose Client</label>
-            <input
-              placeholder="Client"
-              value={form.client}
-              onChange={(e) => setForm({ ...form, client: e.target.value })}
-            />
+            <label>Client *</label>
+            <select
+              value={form.clientId}
+              onChange={(e) => setForm({ ...form, clientId: e.target.value })}
+              required
+            >
+              <option value="">Select Client</option>
+              {clients.map((c) => (
+                <option key={c.Id} value={c.Id}>
+                  {c.Title}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="form-group">
