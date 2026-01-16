@@ -1,4 +1,4 @@
-import SubmitTimesheetModal from "../SubmitTimesheetModal";
+import submitTimesheet from "../submitTimesheet";
 import "./HRDashboard.css";
 
 export default function ManagerDashboard() {
@@ -19,7 +19,7 @@ export default function ManagerDashboard() {
 
       {/* MODALS */}
       {submitTimesheet && (
-        <SubmitTimesheetModal onClose={() => setSubmitTimesheet(false)} />
+        <submitTimesheet onClose={() => setSubmitTimesheet(false)} />
       )}
     </>
   );
