@@ -994,3 +994,44 @@ export async function getTimesheetsForMonth(accessToken, month, year) {
 
   return response.data.value;
 }
+
+export async function updateTimesheetRecord(token, id, payload) {
+  return fetch(
+    `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items(${id})`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json;odata=nometadata",
+        "IF-MATCH": "*",
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+}
+
+export async function deleteTimesheetRecord(token, id) {
+  return fetch(
+    `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items(${id})`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "IF-MATCH": "*",
+      },
+    }
+  );
+}
+
+export async function getTimesheetAttachments(token, id) {
+  const res = await fetch(
+    `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items(${id})/AttachmentFiles`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  const json = await res.json();
+  return json.value;
+}

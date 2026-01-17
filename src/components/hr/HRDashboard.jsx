@@ -9,6 +9,7 @@ import { getAccessToken } from "../../auth/authService";
 import {
   getEmployeeHierarchy,
   getTimesheetsForMonth,
+  deleteTimesheetRecord,
 } from "../../services/sharePointService";
 
 import "./HRDashboard.css";
@@ -23,6 +24,7 @@ export default function HRDashboard() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState(null);
+  const [editingTimesheet, setEditingTimesheet] = useState(null);
 
   /* ============================
      1️⃣ Acquire Access Token
@@ -66,6 +68,32 @@ export default function HRDashboard() {
       });
   }, [token, month, year]);
 
+  async function handleDeleteTimesheet(timesheet) {
+    if (!timesheet || !timesheet.Id) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this timesheet?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteTimesheetRecord(token, timesheet.Id);
+
+      // Reload timesheets after delete
+      const updatedTimesheets = await getTimesheetsForMonth(token, month, year);
+
+      setTimesheets(
+        Array.isArray(updatedTimesheets)
+          ? updatedTimesheets
+          : updatedTimesheets?.value || []
+      );
+    } catch (error) {
+      console.error("Failed to delete timesheet:", error);
+      alert("Failed to delete timesheet record.");
+    }
+  }
+
   /* ============================
      3️⃣ Render (NO EARLY RETURN)
      ============================ */
@@ -100,6 +128,8 @@ export default function HRDashboard() {
                   timesheets={timesheets}
                   month={month}
                   year={year}
+                  onEdit={(ts) => setEditingTimesheet(ts)}
+                  onDelete={handleDeleteTimesheet}
                 />
               </div>
 
@@ -112,6 +142,18 @@ export default function HRDashboard() {
       {/* MODAL */}
       {showSubmitTimesheet && (
         <SubmitTimesheet onClose={() => setShowSubmitTimesheet(false)} />
+      )}
+
+      {editingTimesheet && (
+        <EditTimesheetModal
+          token={token}
+          timesheet={editingTimesheet}
+          onClose={() => setEditingTimesheet(null)}
+          onSaved={async () => {
+            const ts = await getTimesheetsForMonth(token, month, year);
+            setTimesheets(Array.isArray(ts) ? ts : ts?.value || []);
+          }}
+        />
       )}
     </>
   );

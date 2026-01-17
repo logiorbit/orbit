@@ -84,6 +84,10 @@ export default function TimesheetStatusTable({
             const flags = resolveStatus(timesheet?.Status);
 
             const canModify = flags.submitted;
+            const canDelete =
+              flags.submitted &&
+              (timesheet?.Status !== "HR Approved" ||
+                timesheet?.Status !== "Invoice Created");
 
             return (
               <tr key={email || name}>
@@ -108,7 +112,7 @@ export default function TimesheetStatusTable({
                     className={
                       canModify ? "action-icon edit" : "action-icon disabled"
                     }
-                    onClick={() => canModify && onEdit?.(timesheet)}
+                    onClick={() => canModify && onEdit(timesheet)}
                   />
                 </td>
 
@@ -117,9 +121,9 @@ export default function TimesheetStatusTable({
                   <Trash2
                     size={16}
                     className={
-                      canModify ? "action-icon delete" : "action-icon disabled"
+                      canDelete ? "action-icon delete" : "action-icon disabled"
                     }
-                    onClick={() => canModify && onDelete?.(timesheet)}
+                    onClick={() => canDelete && onDelete(timesheet)}
                   />
                 </td>
               </tr>
