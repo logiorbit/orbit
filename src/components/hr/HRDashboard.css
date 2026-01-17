@@ -149,3 +149,70 @@
   color: var(--text-color);
   font-size: 13px;
 }
+
+/* ============================
+   Timesheet Status Card
+   ============================ */
+
+.timesheet-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.timesheet-card-header {
+  margin-bottom: 12px;
+}
+
+.timesheet-card-header h4 {
+  margin: 0;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* ============================
+   Table Styling
+   ============================ */
+
+.timesheet-status-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.timesheet-status-table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.timesheet-status-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: center;
+}
+
+.timesheet-status-table td.employee-name {
+  text-align: left;
+  font-weight: 500;
+  color: #111827;
+}
+
+/* ============================
+   Status Icons
+   ============================ */
+
+.status-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.status-icon.done {
+  color: #16a34a; /* green */
+}
+
+.status-icon.not-done {
+  color: #dc2626; /* red */
+}
