@@ -103,14 +103,7 @@ export default function HRDashboard() {
                 />
               </div>
 
-              <div className="card">
-                <TimesheetStatusTable
-                  employees={employees}
-                  timesheets={timesheets}
-                  month={month}
-                  year={year}
-                />
-              </div>
+              <div className="card"></div>
             </div>
           </>
         )}
