@@ -33,7 +33,6 @@
    ============================ */
 
 .data-table {
-  width: max-content; /* 🔑 table can grow */
   min-width: 100%; /* at least container width */
   border-collapse: collapse;
   table-layout: fixed; /* stable layout */
