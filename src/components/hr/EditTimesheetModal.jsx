@@ -41,10 +41,10 @@ export default function EditTimesheetModal({
      PREFILL FROM SHAREPOINT
      ============================ */
   useEffect(() => {
-    if (!timesheet) return;
+    if (!timesheet || !token) return;
 
     setForm({
-      clientId: timesheet.Client?.Id || "",
+      clientId: timesheet.Client?.Id ? String(timesheet.Client.Id) : "",
       month: timesheet.Month || "",
       year: timesheet.Year || "",
       totalWorkingDays: timesheet.TotalWorkingDays || "",
@@ -57,9 +57,16 @@ export default function EditTimesheetModal({
       attachments: [],
     });
 
-    getTimesheetAttachments(token, timesheet.Id).then((files) => {
-      setExistingAttachments(Array.isArray(files) ? files : []);
-    });
+    getTimesheetAttachments(token, timesheet.Id)
+      .then((response) => {
+        // SharePoint REST API usually returns files in response.value or response.d.results
+        const files = response?.value || response?.d?.results || response || [];
+        setExistingAttachments(Array.isArray(files) ? files : []);
+      })
+      .catch((err) => {
+        console.error("Attachment fetch failed:", err);
+        setExistingAttachments([]);
+      });
   }, [timesheet, token]);
 
   function updateField(field, value) {
@@ -73,7 +80,7 @@ export default function EditTimesheetModal({
     setSaving(true);
     try {
       await updateTimesheetRecord(token, timesheet.Id, {
-        ClientId: form.clientId,
+        ClientId: form.clientId ? parseInt(form.clientId) : null,
         Month: form.month,
         Year: form.year,
         TotalWorkingDays: form.totalWorkingDays,

@@ -26,6 +26,7 @@ export default function HRDashboard() {
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState(null);
   const [editingTimesheet, setEditingTimesheet] = useState(null);
+  const [clients, setClients] = useState([]);
 
   /* ============================
      1️⃣ Acquire Access Token
@@ -52,12 +53,16 @@ export default function HRDashboard() {
     Promise.all([
       getEmployeeHierarchy(token),
       getTimesheetsForMonth(token, month, year),
+      getClients(token),
     ])
       .then(([hierarchy, ts]) => {
         setEmployees(
           Array.isArray(hierarchy) ? hierarchy : hierarchy?.value || []
         );
         setTimesheets(Array.isArray(ts) ? ts : ts?.value || []);
+        setClients(
+          Array.isArray(clientData) ? clientData : clientData?.value || []
+        );
       })
       .catch((error) => {
         console.error("Failed to load SharePoint data:", error);
@@ -149,6 +154,7 @@ export default function HRDashboard() {
         <EditTimesheetModal
           token={token}
           timesheet={editingTimesheet}
+          clients={clients}
           onClose={() => setEditingTimesheet(null)}
           onSaved={async () => {
             const ts = await getTimesheetsForMonth(token, month, year);
