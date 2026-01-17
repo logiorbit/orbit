@@ -267,10 +267,7 @@ export default function EditTimesheetModal({
                     title={f.FileName}
                   >
                     <span className="file-icon">📎</span>
-                    [cite_start]
-                    <span className="file-name">
-                      {f.FileName} [cite: 53, 54]
-                    </span>
+                    <span className="file-name">{f.FileName}</span>
                   </a>
                 </div>
               ))}
