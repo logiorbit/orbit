@@ -51,9 +51,10 @@ export default function HRDashboard() {
       getTimesheetsForMonth(token, month, year),
     ])
       .then(([hierarchy, ts]) => {
-        // ✅ CRITICAL: SharePoint REST returns { value: [] }
-        setEmployees(hierarchy?.value || []);
-        setTimesheets(ts?.value || []);
+        setEmployees(
+          Array.isArray(hierarchy) ? hierarchy : hierarchy?.value || []
+        );
+        setTimesheets(Array.isArray(ts) ? ts : ts?.value || []);
       })
       .catch((error) => {
         console.error("Failed to load SharePoint data:", error);
