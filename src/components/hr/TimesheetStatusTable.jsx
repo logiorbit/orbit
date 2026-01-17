@@ -59,12 +59,7 @@ export default function TimesheetStatusTable({
       {/* Table */}
       <table className="data-table">
         <colgroup>
-          <col style={{ width: "32%" }} />
-          <col style={{ width: "14%" }} />
-          <col style={{ width: "14%" }} />
-          <col style={{ width: "14%" }} />
-          <col style={{ width: "13%" }} />
-          <col style={{ width: "13%" }} />
+          <col style={{ width: "100%" }} />
         </colgroup>
 
         <thead>
