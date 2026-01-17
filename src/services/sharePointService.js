@@ -997,6 +997,7 @@ export async function getTimesheetsForMonth(accessToken, month, year) {
       "Client/Title",
       "Employee/Id",
       "Employee/EMail",
+      "Employee/Title",
     ].join(",") +
     `&$expand=Client,Employee` +
     `&$filter=Month eq '${month}' and Year eq ${year}`;
