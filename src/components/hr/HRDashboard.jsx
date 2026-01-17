@@ -1,93 +1,39 @@
-import { CheckCircle, XCircle } from "lucide-react";
+import { useMsal } from "@azure/msal-react";
+import { useEffect, useState } from "react";
 
-export default function TimesheetStatusTable({ employees, timesheets }) {
-  /* ============================
-     1️⃣ Filter On-Project Employees
-     ============================ */
-  const activeEmployees = employees.filter(
-    (emp) => emp.Status === "On Project"
-  );
+import TimesheetStatusTable from "./TimesheetStatusTable";
+import { getAccessToken } from "../../auth/authService";
+import {
+  getEmployeeHierarchy,
+  getTimesheetsForMonth,
+} from "../../services/sharePointService";
 
-  /* ============================
-     2️⃣ Build Timesheet Lookup by Email
-     ============================ */
-  const timesheetStatusByEmail = {};
+export default function HRDashboard() {
+  const { instance, accounts } = useMsal();
 
-  timesheets.forEach((ts) => {
-    const email = ts.Employee?.Email || ts.EmployeeEmail;
+  const [employees, setEmployees] = useState([]);
+  const [timesheets, setTimesheets] = useState([]);
+  const [month, setMonth] = useState("Jan");
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [token, setToken] = useState(null);
 
-    if (email) {
-      timesheetStatusByEmail[email.toLowerCase()] = ts.Status?.trim();
-    }
-  });
+  useEffect(() => {
+    if (!accounts?.length) return;
+    getAccessToken(instance, accounts[0]).then(setToken);
+  }, [instance, accounts]);
 
-  /* ============================
-     3️⃣ Cascading Status Logic
-     ============================ */
-  function resolveStatus(status) {
-    return {
-      submitted:
-        status === "Submitted" ||
-        status === "HR Approved" ||
-        status === "Invoice Created",
+  useEffect(() => {
+    if (!token) return;
 
-      hrApproved: status === "HR Approved" || status === "Invoice Created",
+    Promise.all([
+      getEmployeeHierarchy(token),
+      getTimesheetsForMonth(token, month, year),
+    ]).then(([hierarchy, ts]) => {
+      // ✅ CRITICAL: extract .value
+      setEmployees(hierarchy?.value ?? []);
+      setTimesheets(ts?.value ?? []);
+    });
+  }, [token, month, year]);
 
-      invoiceCreated: status === "Invoice Created",
-    };
-  }
-
-  function StatusIcon({ done }) {
-    return done ? (
-      <CheckCircle className="status-icon completed" />
-    ) : (
-      <XCircle className="status-icon pending" />
-    );
-  }
-
-  console.log("Hierarchy:", hierarchy);
-  console.log("Timesheets:", ts);
-  /* ============================
-     4️⃣ Render Table
-     ============================ */
-  return (
-    <div className="timesheet-status-wrapper">
-      <table className="timesheet-status-table">
-        <thead>
-          <tr>
-            <th>Employee</th>
-            <th>Submitted</th>
-            <th>HR Approved</th>
-            <th>Invoice Created</th>
-          </tr>
-        </thead>
-        <tbody>
-          {activeEmployees.map((emp) => {
-            const email = emp.Employee?.Email || emp.Email;
-
-            const displayName = emp.Employee?.Title || emp.Title || "Unknown";
-
-            const status = email && timesheetStatusByEmail[email.toLowerCase()];
-
-            const flags = resolveStatus(status);
-
-            return (
-              <tr key={email || displayName}>
-                <td>{displayName}</td>
-                <td>
-                  <StatusIcon done={flags.submitted} />
-                </td>
-                <td>
-                  <StatusIcon done={flags.hrApproved} />
-                </td>
-                <td>
-                  <StatusIcon done={flags.invoiceCreated} />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
+  return <TimesheetStatusTable employees={employees} timesheets={timesheets} />;
 }
