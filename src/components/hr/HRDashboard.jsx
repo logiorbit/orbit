@@ -1,7 +1,10 @@
 import { useMsal } from "@azure/msal-react";
 import { useEffect, useState } from "react";
+
 import SubmitTimesheet from "./SubmitTimesheetModal";
 import TimesheetStatusTable from "./TimesheetStatusTable";
+import MonthYearFilter from "../common/MonthYearFilter";
+
 import { getAccessToken } from "../../auth/authService";
 import {
   getEmployeeHierarchy,
@@ -12,13 +15,14 @@ import "./HRDashboard.css";
 
 export default function HRDashboard() {
   const { instance, accounts } = useMsal();
+
   const [showSubmitTimesheet, setShowSubmitTimesheet] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [timesheets, setTimesheets] = useState([]);
-  const [month, setMonth] = useState("January");
+  const [month, setMonth] = useState("Jan");
   const [year, setYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(null); // 👈 Added missing token state
+  const [token, setToken] = useState(null);
 
   /* ============================
      1️⃣ Acquire Access Token
@@ -28,8 +32,8 @@ export default function HRDashboard() {
       if (!accounts || accounts.length === 0) return;
 
       try {
-        const acquiredToken = await getAccessToken(instance, accounts[0]);
-        setToken(acquiredToken); // 👈 Use setToken instead of undefined setAccessToken
+        const accessToken = await getAccessToken(instance, accounts[0]);
+        setToken(accessToken);
       } catch (error) {
         console.error("Failed to acquire token:", error);
         setToken(null);
@@ -57,14 +61,14 @@ export default function HRDashboard() {
         setEmployees(hierarchy);
         setTimesheets(ts);
       } catch (error) {
-        console.error("Failed to load data:", error);
+        console.error("Failed to load SharePoint data:", error);
       } finally {
         setLoading(false);
       }
     }
 
     loadData();
-  }, [token, month, year]); // 👈 token now properly in deps
+  }, [token, month, year]);
 
   if (loading) {
     return <div className="hr-card">Loading Timesheet Status…</div>;
@@ -73,6 +77,14 @@ export default function HRDashboard() {
   return (
     <>
       <div className="manager-dashboard">
+        {/* FILTERS */}
+        <MonthYearFilter
+          month={month}
+          year={year}
+          onMonthChange={setMonth}
+          onYearChange={setYear}
+        />
+
         <div className="btn-div">
           <button
             className="primary-btn"
@@ -82,33 +94,11 @@ export default function HRDashboard() {
           </button>
         </div>
 
-        <div className="manager-dashboard two-column-layout">
-          {/* LEFT HALF */}
-          <div className="left-panel">
-            <TimesheetStatusTable
-              employees={employees}
-              timesheets={timesheets}
-              month={month}
-              year={year}
-              onMonthChange={setMonth}
-              onYearChange={setYear}
-            />
-          </div>
-          {/* RIGHT HALF */}
-          <div className="right-panel">
-            <div className="btn-div">
-              <button
-                className="primary-btn"
-                onClick={() => setShowSubmitTimesheet(true)}
-              >
-                + Submit Timesheet
-              </button>
-            </div>
-          </div>
-        </div>
+        {/* STATUS TABLE */}
+        <TimesheetStatusTable employees={employees} timesheets={timesheets} />
       </div>
 
-      {/* MODALS */}
+      {/* MODAL */}
       {showSubmitTimesheet && (
         <SubmitTimesheet onClose={() => setShowSubmitTimesheet(false)} />
       )}

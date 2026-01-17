@@ -1,53 +1,75 @@
 import { CheckCircle, XCircle } from "lucide-react";
-import MonthYearFilter from "./MonthYearFilter";
+//import "./HRDashboard.jsx";
 
-export default function TimesheetStatusTable({
-  employees,
-  timesheets,
-  month,
-  year,
-  onMonthChange,
-  onYearChange,
-}) {
-  const onProjectEmployees = employees.filter((e) => e.Status === "On Project");
+export default function TimesheetStatusTable({ employees, timesheets }) {
+  /* ============================
+     Filter Active Employees
+     ============================ */
+  const activeEmployees = employees.filter((e) => e.Status === "On Project");
 
-  const hasSubmittedTimesheet = (employeeEmail) =>
-    timesheets.some(
-      (t) =>
-        t.Employee?.EMail?.toLowerCase() === employeeEmail.toLowerCase() &&
-        t.Status !== "Draft"
+  /* ============================
+     Map Timesheets by Employee
+     ============================ */
+  const timesheetMap = {};
+  timesheets.forEach((ts) => {
+    timesheetMap[ts.EmployeeId] = ts.Status;
+  });
+
+  /* ============================
+     Cascading Status Logic
+     ============================ */
+  function resolveStatus(status) {
+    return {
+      submitted:
+        status === "Submitted" ||
+        status === "HR Approved" ||
+        status === "Invoice Created",
+
+      hrApproved: status === "HR Approved" || status === "Invoice Created",
+
+      invoiceCreated: status === "Invoice Created",
+    };
+  }
+
+  function StatusIcon({ done }) {
+    return done ? (
+      <CheckCircle className="status-icon done" />
+    ) : (
+      <XCircle className="status-icon not-done" />
     );
+  }
 
   return (
-    <div className="hr-card">
-      <div className="hr-card-header">
-        <h3 className="hr-card-title">
-          Timesheet Submission Status – {month} {year}
-        </h3>
-
-        {/* Month / Year dropdowns stay as discussed earlier */}
-      </div>
-
-      <table className="hr-table">
+    <div className="timesheet-table-card">
+      <table className="status-table">
         <thead>
           <tr>
             <th>Employee</th>
-            <th>Timesheet</th>
+            <th>Submitted</th>
+            <th>HR Approved</th>
+            <th>Invoice Created</th>
           </tr>
         </thead>
         <tbody>
-          {onProjectEmployees.map((e) => (
-            <tr key={e.Id}>
-              <td>{e.Employee?.Title}</td>
-              <td className="status-icon">
-                {hasSubmittedTimesheet(e.Employee?.EMail) ? (
-                  <span className="icon-success">✔</span>
-                ) : (
-                  <span className="icon-failure">✖</span>
-                )}
-              </td>
-            </tr>
-          ))}
+          {activeEmployees.map((emp) => {
+            const status = timesheetMap[emp.EmployeeId];
+            const flags = resolveStatus(status);
+
+            return (
+              <tr key={emp.EmployeeId}>
+                <td>{emp.EmployeeName}</td>
+                <td>
+                  <StatusIcon done={flags.submitted} />
+                </td>
+                <td>
+                  <StatusIcon done={flags.hrApproved} />
+                </td>
+                <td>
+                  <StatusIcon done={flags.invoiceCreated} />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
