@@ -41,7 +41,12 @@ export default function EditTimesheetModal({
      PREFILL FROM SHAREPOINT
      ============================ */
   useEffect(() => {
-    if (!timesheet || !token) return;
+    if (!timesheet || !token) {
+      console.warn(
+        "EditTimesheetModal: Waiting for token or timesheet data..."
+      );
+      return;
+    }
 
     setForm({
       clientId: timesheet.Client?.Id ? String(timesheet.Client.Id) : "",
@@ -57,14 +62,15 @@ export default function EditTimesheetModal({
       attachments: [],
     });
 
+    // Fetch Attachments
     getTimesheetAttachments(token, timesheet.Id)
-      .then((response) => {
-        // SharePoint REST API usually returns files in response.value or response.d.results
-        const files = response?.value || response?.d?.results || response || [];
+      .then((files) => {
+        console.log("Fetched Attachments:", files);
+        // Ensure we are setting an array [cite: 28, 195]
         setExistingAttachments(Array.isArray(files) ? files : []);
       })
       .catch((err) => {
-        console.error("Attachment fetch failed:", err);
+        console.error("Error fetching attachments:", err);
         setExistingAttachments([]);
       });
   }, [timesheet, token]);
@@ -246,16 +252,24 @@ export default function EditTimesheetModal({
         {/* EXISTING ATTACHMENTS VIEWER */}
         <div className="attachments">
           <h4>Existing Attachments</h4>
-          {existingAttachments.length === 0 && <p>No attachments</p>}
-          <ul>
-            {existingAttachments.map((f) => (
-              <li key={f.FileName}>
-                <a href={f.ServerRelativeUrl} target="_blank" rel="noreferrer">
-                  {f.FileName}
-                </a>
-              </li>
-            ))}
-          </ul>
+          {existingAttachments.length === 0 ? (
+            <p>No attachments found for this record.</p>
+          ) : (
+            <ul>
+              {existingAttachments.map((f, index) => (
+                <li key={f.FileName || index}>
+                  {/* SharePoint returns ServerRelativeUrl for the link [cite: 53] */}
+                  <a
+                    href={`https://logivention.sharepoint.com${f.ServerRelativeUrl}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {f.FileName}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="modal-footer">
