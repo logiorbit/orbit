@@ -7,9 +7,13 @@
   border-radius: 7px;
   padding: 16px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+
   height: 350px;
+
   display: flex;
   flex-direction: column;
+
+  /* 🔑 allow horizontal scroll instead of overlap */
   overflow-x: auto;
   overflow-y: hidden;
 }
@@ -24,22 +28,15 @@
   margin-bottom: 12px;
 }
 
-.table-toolbar select,
-.table-toolbar input {
-  padding: 8px 12px;
-  border-radius: 4px;
-  border: 1px solid #e5e7eb;
-  font-size: 14px;
-}
-
 /* ============================
    Table Core
    ============================ */
 
 .data-table {
-  width: 100%;
+  width: max-content; /* 🔑 table can grow */
+  min-width: 100%; /* at least container width */
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: fixed; /* stable layout */
 }
 
 /* Sticky header */
@@ -70,99 +67,67 @@
    Cell Styling
    ============================ */
 
-.data-table th {
-  text-align: left;
+.data-table th,
+.data-table td {
+  padding: 8px 10px;
   font-size: 12px;
-  font-weight: 600;
-  color: #6b7280;
-  padding: 8px;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
   white-space: nowrap;
+  border-bottom: 1px solid #e5e7eb;
 }
 
+/* Header */
+.data-table th {
+  font-weight: 600;
+  color: #6b7280;
+  text-align: left;
+  background: #ffffff;
+}
+
+/* Body */
 .data-table td {
-  padding: 8px;
   border-top: 1px solid #f1f5f9;
-  font-size: 12px;
-  white-space: nowrap;
   text-align: center;
 }
 
 /* ============================
-   Column Width Control
+   COLUMN WIDTHS (CRITICAL FIX)
    ============================ */
 
+/* Employee Name */
 .data-table th:nth-child(1),
 .data-table td:nth-child(1) {
-  min-width: 220px;
+  min-width: 240px;
   text-align: left;
 }
 
+/* Submitted */
 .data-table th:nth-child(2),
-.data-table td:nth-child(2),
+.data-table td:nth-child(2) {
+  min-width: 150px;
+}
+
+/* HR Approved */
 .data-table th:nth-child(3),
-.data-table td:nth-child(3),
+.data-table td:nth-child(3) {
+  min-width: 160px;
+}
+
+/* Invoice Created */
 .data-table th:nth-child(4),
 .data-table td:nth-child(4) {
-  min-width: 140px;
+  min-width: 170px;
 }
 
+/* Edit */
 .data-table th:nth-child(5),
-.data-table td:nth-child(5),
+.data-table td:nth-child(5) {
+  min-width: 100px;
+}
+
+/* Delete */
 .data-table th:nth-child(6),
 .data-table td:nth-child(6) {
-  min-width: 90px;
-}
-
-/* ============================
-   Status Badge (RESTORED)
-   ============================ */
-
-.status-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 5px;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-/* Colors */
-.status-badge.green {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.status-badge.yellow {
-  background: #fef9c3;
-  color: #854d0e;
-}
-
-.status-badge.blue {
-  background: #e0f2fe;
-  color: #075985;
-}
-
-.status-badge.red {
-  background: #fee2e2;
-  color: #7f1d1d;
-}
-
-.status-badge.gray {
-  background: #f3f4f6;
-  color: #374151;
-}
-
-.status-badge.orange {
-  background: #ffedd5;
-  color: #9a3412;
-}
-
-/* Ensure badges align properly inside table cells */
-.data-table td .status-badge {
-  margin: 0 auto;
+  min-width: 100px;
 }
 
 /* ============================
@@ -180,6 +145,41 @@
 
 .status-icon.not-done {
   color: #dc2626;
+}
+
+/* ============================
+   Status Badge (RESTORED)
+   ============================ */
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.status-badge.green {
+  background: #dcfce7;
+  color: #166534;
+}
+.status-badge.yellow {
+  background: #fef9c3;
+  color: #854d0e;
+}
+.status-badge.blue {
+  background: #e0f2fe;
+  color: #075985;
+}
+.status-badge.red {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+.status-badge.gray {
+  background: #f3f4f6;
+  color: #374151;
 }
 
 /* ============================
