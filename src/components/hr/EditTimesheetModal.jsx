@@ -15,7 +15,7 @@ export default function EditTimesheetModal({
   /* ============================
      SAME FORM MODEL AS SUBMIT
      ============================ */
-
+  console.log(timesheet);
   const [form, setForm] = useState(null);
 
   /*  const [form, setForm] = useState({
