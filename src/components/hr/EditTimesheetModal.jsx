@@ -122,11 +122,13 @@ export default function EditTimesheetModal({
   return (
     <div className="modal-overlay">
       <div className="modal-card">
-        <h2>Edit Timesheet</h2>
-        <span className="modal-subtitle">
-          {" "}
-          - {timesheet.Employee?.Title || "Unknown Employee"}
-        </span>
+        <h2>
+          Edit Timesheet
+          <span className="modal-subtitle">
+            {" "}
+            - {timesheet.Employee?.Title || "Unknown Employee"}
+          </span>
+        </h2>
 
         <div className="form-grid">
           <div>
