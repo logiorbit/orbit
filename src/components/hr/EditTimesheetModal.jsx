@@ -103,6 +103,9 @@ export default function EditTimesheetModal({
   /* ============================
      RENDER (CLONED FROM SUBMIT)
      ============================ */
+  if (!form) {
+    return null;
+  }
   return (
     <div className="modal-overlay">
       <div className="modal-content">

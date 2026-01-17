@@ -981,8 +981,24 @@ export async function getTimesheetsForMonth(accessToken, month, year) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items` +
     `?$select=` +
-    `Id,Month,Year,Status,Employee/Id,Employee/EMail` +
-    `&$expand=Employee` +
+    [
+      "Id",
+      "Month",
+      "Year",
+      "Status",
+      "TotalWorkingDays",
+      "TotalLeaves",
+      "LeaveDates",
+      "TotalHolidays",
+      "HolidayDates",
+      "TotalBillingDays",
+      "TotalBillingHours",
+      "Client/Id",
+      "Client/Title",
+      "Employee/Id",
+      "Employee/EMail",
+    ].join(",") +
+    `&$expand=Client,Employee` +
     `&$filter=Month eq '${month}' and Year eq ${year}`;
 
   const response = await axios.get(url, {
