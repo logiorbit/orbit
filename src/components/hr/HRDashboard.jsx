@@ -1,8 +1,7 @@
 import { useMsal } from "@azure/msal-react";
 import { useEffect, useState } from "react";
 
-import SubmitTimesheetModal from "./SubmitTimesheetModal";
-import EditTimesheetModal from "./EditTimesheetModal";
+import SubmitTimesheet from "./SubmitTimesheetModal";
 import TimesheetStatusTable from "./TimesheetStatusTable";
 import MonthYearFilter from "./MonthYearFilter";
 
@@ -18,58 +17,64 @@ import "./HRDashboard.css";
 export default function HRDashboard() {
   const { instance, accounts } = useMsal();
 
-  const [token, setToken] = useState(null);
+  const [showSubmitTimesheet, setShowSubmitTimesheet] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [timesheets, setTimesheets] = useState([]);
   const [month, setMonth] = useState("Jan");
   const [year, setYear] = useState(new Date().getFullYear());
-
-  const [showSubmit, setShowSubmit] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState(null);
   const [editingTimesheet, setEditingTimesheet] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  /* =============================
-     AUTH
-     ============================= */
+  /* ============================
+     1️⃣ Acquire Access Token
+     ============================ */
   useEffect(() => {
-    if (!accounts.length) return;
-    getAccessToken(instance, accounts[0]).then(setToken);
+    if (!accounts || accounts.length === 0) return;
+
+    getAccessToken(instance, accounts[0])
+      .then(setToken)
+      .catch((err) => {
+        console.error("Failed to acquire token:", err);
+        setToken(null);
+      });
   }, [instance, accounts]);
 
-  /* =============================
-     LOAD DATA
-     ============================= */
-  async function loadData() {
+  /* ============================
+     2️⃣ Load SharePoint Data
+     ============================ */
+  useEffect(() => {
     if (!token) return;
+
     setLoading(true);
 
-    const [hierarchy, ts] = await Promise.all([
+    Promise.all([
       getEmployeeHierarchy(token),
       getTimesheetsForMonth(token, month, year),
-    ]);
-
-    setEmployees(hierarchy || []);
-    setTimesheets(ts || []);
-    setLoading(false);
-  }
-
-  useEffect(() => {
-    loadData();
+    ])
+      .then(([hierarchy, ts]) => {
+        setEmployees(
+          Array.isArray(hierarchy) ? hierarchy : hierarchy?.value || []
+        );
+        setTimesheets(Array.isArray(ts) ? ts : ts?.value || []);
+      })
+      .catch((error) => {
+        console.error("Failed to load SharePoint data:", error);
+        setEmployees([]);
+        setTimesheets([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [token, month, year]);
 
-  async function handleDelete(ts) {
-    if (!window.confirm("Delete this timesheet?")) return;
-    await deleteTimesheetRecord(token, ts.Id);
-    loadData();
-  }
-
-  if (loading) {
-    return <div className="hr-card">Loading Timesheets…</div>;
-  }
-
+  /* ============================
+     3️⃣ Render (NO EARLY RETURN)
+     ============================ */
   return (
     <>
       <div className="manager-dashboard">
+        {/* ✅ MONTH / YEAR FILTER — ALWAYS VISIBLE */}
         <MonthYearFilter
           month={month}
           year={year}
@@ -77,34 +82,40 @@ export default function HRDashboard() {
           onYearChange={setYear}
         />
 
-        <div className="btn-div">
-          <button className="primary-btn" onClick={() => setShowSubmit(true)}>
-            + Submit Timesheet
-          </button>
-        </div>
+        {loading ? (
+          <div className="hr-card">Loading Timesheet Status…</div>
+        ) : (
+          <>
+            <div className="btn-div">
+              <button
+                className="primary-btn"
+                onClick={() => setShowSubmitTimesheet(true)}
+              >
+                + Submit Timesheet
+              </button>
+            </div>
 
-        <div className="card">
-          <h3>
-            Timesheet Status — {month} {year}
-          </h3>
+            <div className="manager-grid-2">
+              <div className="card">
+                <TimesheetStatusTable
+                  employees={employees}
+                  timesheets={timesheets}
+                  month={month}
+                  year={year}
+                  onEdit={(ts) => setEditingTimesheet(ts)}
+                  onDelete={handleDeleteTimesheet}
+                />
+              </div>
 
-          <TimesheetStatusTable
-            employees={employees}
-            timesheets={timesheets}
-            onEdit={setEditingTimesheet}
-            onDelete={handleDelete}
-          />
-        </div>
+              <div className="card"></div>
+            </div>
+          </>
+        )}
       </div>
 
-      {showSubmit && (
-        <SubmitTimesheetModal
-          token={token}
-          month={month}
-          year={year}
-          onClose={() => setShowSubmit(false)}
-          onSaved={loadData}
-        />
+      {/* MODAL */}
+      {showSubmitTimesheet && (
+        <SubmitTimesheet onClose={() => setShowSubmitTimesheet(false)} />
       )}
 
       {editingTimesheet && (
@@ -112,7 +123,10 @@ export default function HRDashboard() {
           token={token}
           timesheet={editingTimesheet}
           onClose={() => setEditingTimesheet(null)}
-          onSaved={loadData}
+          onSaved={async () => {
+            const ts = await getTimesheetsForMonth(token, month, year);
+            setTimesheets(Array.isArray(ts) ? ts : ts?.value || []);
+          }}
         />
       )}
     </>
