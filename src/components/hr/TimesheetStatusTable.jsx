@@ -1,11 +1,12 @@
-import { CheckCircle, XCircle } from "lucide-react";
-import "../common/table.css";
+import { CheckCircle, XCircle, Pencil, Trash2 } from "lucide-react";
 
 export default function TimesheetStatusTable({
   employees = [],
   timesheets = [],
   month,
   year,
+  onEdit, // optional callback
+  onDelete, // optional callback
 }) {
   /* ============================
      Filter On-Project Employees
@@ -15,13 +16,13 @@ export default function TimesheetStatusTable({
   /* ============================
      Build Timesheet Lookup by Email
      ============================ */
-  const timesheetStatusByEmail = {};
+  const timesheetByEmail = {};
 
   timesheets.forEach((ts) => {
     const email = ts.Employee?.EMail || ts.EmployeeEMail || ts.EmployeeEmail;
 
     if (email) {
-      timesheetStatusByEmail[email.toLowerCase()] = ts.Status?.trim();
+      timesheetByEmail[email.toLowerCase()] = ts;
     }
   });
 
@@ -31,7 +32,9 @@ export default function TimesheetStatusTable({
         status === "Submitted" ||
         status === "HR Approved" ||
         status === "Invoice Created",
+
       hrApproved: status === "HR Approved" || status === "Invoice Created",
+
       invoiceCreated: status === "Invoice Created",
     };
   }
@@ -46,7 +49,7 @@ export default function TimesheetStatusTable({
 
   return (
     <div className="table-card">
-      {/* Toolbar / Header */}
+      {/* Header */}
       <div className="table-toolbar">
         <strong>
           Timesheet Status — {month} {year}
@@ -56,10 +59,12 @@ export default function TimesheetStatusTable({
       {/* Table */}
       <table className="data-table">
         <colgroup>
-          <col style={{ width: "40%" }} />
-          <col style={{ width: "20%" }} />
-          <col style={{ width: "20%" }} />
-          <col style={{ width: "20%" }} />
+          <col style={{ width: "32%" }} />
+          <col style={{ width: "14%" }} />
+          <col style={{ width: "14%" }} />
+          <col style={{ width: "14%" }} />
+          <col style={{ width: "13%" }} />
+          <col style={{ width: "13%" }} />
         </colgroup>
 
         <thead>
@@ -68,6 +73,8 @@ export default function TimesheetStatusTable({
             <th>Submitted</th>
             <th>HR Approved</th>
             <th>Invoice Created</th>
+            <th>Edit</th>
+            <th>Delete</th>
           </tr>
         </thead>
 
@@ -77,21 +84,48 @@ export default function TimesheetStatusTable({
 
             const name = emp.Employee?.Title || emp.Title || "Unknown";
 
-            const status = email && timesheetStatusByEmail[email.toLowerCase()];
+            const timesheet = email && timesheetByEmail[email.toLowerCase()];
 
-            const flags = resolveStatus(status);
+            const flags = resolveStatus(timesheet?.Status);
+
+            const canModify = flags.submitted;
 
             return (
               <tr key={email || name}>
                 <td>{name}</td>
+
                 <td>
                   <StatusIcon done={flags.submitted} />
                 </td>
+
                 <td>
                   <StatusIcon done={flags.hrApproved} />
                 </td>
+
                 <td>
                   <StatusIcon done={flags.invoiceCreated} />
+                </td>
+
+                {/* Edit */}
+                <td className="actions">
+                  <Pencil
+                    size={16}
+                    className={
+                      canModify ? "action-icon edit" : "action-icon disabled"
+                    }
+                    onClick={() => canModify && onEdit?.(timesheet)}
+                  />
+                </td>
+
+                {/* Delete */}
+                <td className="actions">
+                  <Trash2
+                    size={16}
+                    className={
+                      canModify ? "action-icon delete" : "action-icon disabled"
+                    }
+                    onClick={() => canModify && onDelete?.(timesheet)}
+                  />
                 </td>
               </tr>
             );

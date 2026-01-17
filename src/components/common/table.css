@@ -128,3 +128,38 @@
   background: #ffffff;
   z-index: 2;
 }
+
+/* Prevent wrapping for headers and cells */
+.data-table th,
+.data-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================
+   Action Icons
+   ============================ */
+
+.actions {
+  text-align: center;
+}
+
+.action-icon {
+  cursor: pointer;
+  margin: 0 4px;
+}
+
+.action-icon.edit {
+  color: #2563eb; /* blue */
+}
+
+.action-icon.delete {
+  color: #dc2626; /* red */
+}
+
+.action-icon.disabled {
+  color: #9ca3af; /* gray */
+  cursor: not-allowed;
+  opacity: 0.5;
+}
