@@ -1040,14 +1040,14 @@ export async function deleteTimesheetRecord(token, id) {
 }
 
 export async function getTimesheetAttachments(token, id) {
-  const res = await fetch(
-    `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items(${id})/AttachmentFiles`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  const json = await res.json();
-  return json.value;
+  const url = `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items(${id})/AttachmentFiles`;
+
+  const res = await axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json;odata=nometadata",
+    },
+  });
+
+  return res.data.value;
 }

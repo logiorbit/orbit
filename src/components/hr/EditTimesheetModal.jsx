@@ -8,37 +8,16 @@ import {
 export default function EditTimesheetModal({
   token,
   timesheet,
-  clients = [],
+  clients,
   onClose,
   onSaved,
 }) {
-  /* ============================
-     SAME FORM MODEL AS SUBMIT
-     ============================ */
-
   const [form, setForm] = useState(null);
-
-  /*  const [form, setForm] = useState({
-    clientId: "",
-    month: "",
-    year: "",
-    totalWorkingDays: "",
-    totalLeaves: "",
-    leaveDates: "",
-    totalHolidays: "",
-    holidayDates: "",
-    totalBillingDays: "",
-    totalBillingHours: "",
-    attachments: [],
-  }); */
-
   const [existingAttachments, setExistingAttachments] = useState([]);
   const [saving, setSaving] = useState(false);
 
-  console.log("EDIT TIMESHEET:", timesheet);
-
   /* ============================
-     PREFILL FROM SHAREPOINT
+     PREFILL FORM (CRITICAL)
      ============================ */
   useEffect(() => {
     if (!timesheet) return;
@@ -62,13 +41,12 @@ export default function EditTimesheetModal({
     });
   }, [timesheet, token]);
 
+  if (!form) return null;
+
   function updateField(field, value) {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((p) => ({ ...p, [field]: value }));
   }
 
-  /* ============================
-     SAVE HANDLER
-     ============================ */
   async function handleSave(statusOverride) {
     setSaving(true);
     try {
@@ -90,22 +68,19 @@ export default function EditTimesheetModal({
         await uploadTimesheetAttachments(token, timesheet.Id, form.attachments);
       }
 
-      await onSaved();
+      onSaved();
       onClose();
-    } catch (err) {
-      console.error("Edit failed", err);
+    } catch (e) {
       alert("Failed to update timesheet");
+      console.error(e);
     } finally {
       setSaving(false);
     }
   }
 
   /* ============================
-     RENDER (CLONED FROM SUBMIT)
+     MODAL UI (MATCH SUBMIT)
      ============================ */
-  if (!form) {
-    return null;
-  }
   return (
     <div className="modal-overlay">
       <div className="modal-content">
@@ -147,9 +122,7 @@ export default function EditTimesheetModal({
                 "Nov",
                 "Dec",
               ].map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
+                <option key={m}>{m}</option>
               ))}
             </select>
           </div>
@@ -236,7 +209,6 @@ export default function EditTimesheetModal({
           </div>
         </div>
 
-        {/* EXISTING ATTACHMENTS VIEWER */}
         <div className="attachments">
           <h4>Existing Attachments</h4>
           {existingAttachments.length === 0 && <p>No attachments</p>}
@@ -253,7 +225,6 @@ export default function EditTimesheetModal({
 
         <div className="modal-footer">
           <button onClick={onClose}>Cancel</button>
-
           <button
             className="primary-btn"
             disabled={saving}
@@ -261,7 +232,6 @@ export default function EditTimesheetModal({
           >
             Save
           </button>
-
           {timesheet.Status !== "HR Approved" && (
             <button
               className="primary-btn"
