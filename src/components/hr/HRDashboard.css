@@ -216,3 +216,46 @@
 .status-icon.not-done {
   color: #dc2626; /* red */
 }
+
+/* Container that holds all attachment chips */
+.attachment-flex-container {
+  display: flex;
+  flex-wrap: wrap; /* 👈 This is the key for wrapping */
+  gap: 10px; /* Spacing between the items */
+  margin-top: 10px;
+}
+
+/* Individual attachment "Chip" style */
+.attachment-chip {
+  background-color: #f0f2f5;
+  border: 1px solid #dcdcdc;
+  border-radius: 16px;
+  padding: 5px 12px;
+  display: flex;
+  align-items: center;
+  max-width: 250px; /* Prevents a single long filename from taking too much space */
+  transition: background-color 0.2s;
+}
+
+.attachment-chip:hover {
+  background-color: #e4e6e9;
+}
+
+.attachment-chip a {
+  text-decoration: none;
+  color: #333;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.file-icon {
+  margin-right: 6px;
+}
+
+.file-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adds "..." if the filename is too long */
+}

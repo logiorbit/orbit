@@ -252,25 +252,29 @@ export default function EditTimesheetModal({
         </div>
 
         {/* EXISTING ATTACHMENTS VIEWER */}
-        <div className="attachments">
+        <div className="attachments-section">
           <h4>Existing Attachments</h4>
           {existingAttachments.length === 0 ? (
-            <p>No attachments found for this record.</p>
+            <p>No attachments found.</p>
           ) : (
-            <ul>
+            <div className="attachment-flex-container">
               {existingAttachments.map((f, index) => (
-                <li key={f.FileName || index}>
-                  {/* SharePoint returns ServerRelativeUrl for the link [cite: 53] */}
+                <div key={f.FileName || index} className="attachment-chip">
                   <a
                     href={`https://logivention.sharepoint.com${f.ServerRelativeUrl}`}
                     target="_blank"
                     rel="noreferrer"
+                    title={f.FileName}
                   >
-                    {f.FileName}
+                    <span className="file-icon">📎</span>
+                    [cite_start]
+                    <span className="file-name">
+                      {f.FileName} [cite: 53, 54]
+                    </span>
                   </a>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
 
