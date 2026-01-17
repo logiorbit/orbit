@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import SubmitTimesheet from "./SubmitTimesheetModal";
 import TimesheetStatusTable from "./TimesheetStatusTable";
-import MonthYearFilter from "../common/MonthYearFilter";
+import MonthYearFilter from "./MonthYearFilter";
 
 import { getAccessToken } from "../../auth/authService";
 import {
