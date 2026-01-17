@@ -14,10 +14,17 @@ export default function EditTimesheetModal({
   const [attachments, setAttachments] = useState([]);
   const [saving, setSaving] = useState(false);
 
+  /* ============================
+     Initialize Form
+     ============================ */
   useEffect(() => {
+    if (!timesheet) return;
+
     setForm({
-      Hours: timesheet.Hours,
-      Comments: timesheet.Comments,
+      TotalHours: timesheet.TotalHours || "",
+      BillableHours: timesheet.BillableHours || "",
+      NonBillableHours: timesheet.NonBillableHours || "",
+      WorkDescription: timesheet.WorkDescription || "",
       Status: timesheet.Status,
     });
 
@@ -26,73 +33,122 @@ export default function EditTimesheetModal({
 
   async function loadAttachments() {
     const files = await getTimesheetAttachments(token, timesheet.Id);
-    setAttachments(files || []);
+    setAttachments(Array.isArray(files) ? files : []);
   }
 
   function updateField(field, value) {
-    setForm({ ...form, [field]: value });
+    setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  async function handleSave(statusOverride) {
+  async function handleSave(newStatus) {
     setSaving(true);
     try {
       await updateTimesheetRecord(token, timesheet.Id, {
         ...form,
-        Status: statusOverride || form.Status,
+        Status: newStatus || form.Status,
       });
 
-      onSaved();
+      await onSaved();
       onClose();
-    } catch (error) {
-      console.error("Failed to save timesheet:", error);
-      alert("Failed to save timesheet.");
+    } catch (err) {
+      console.error("Save failed:", err);
+      alert("Failed to save timesheet");
     } finally {
       setSaving(false);
     }
   }
 
+  /* ============================
+     Render
+     ============================ */
   return (
-    <div className="modal-backdrop">
-      <div className="modal-card">
-        <h3>Edit Timesheet</h3>
+    <div className="modal-overlay">
+      <div className="modal-container">
+        <div className="modal-header">
+          <h3>Edit Timesheet</h3>
+          <button className="modal-close" onClick={onClose}>
+            ✕
+          </button>
+        </div>
 
-        <label>Hours</label>
-        <input
-          type="number"
-          value={form.Hours || ""}
-          onChange={(e) => updateField("Hours", e.target.value)}
-        />
+        <div className="modal-body">
+          <div className="form-grid">
+            <div>
+              <label>Total Hours</label>
+              <input
+                type="number"
+                value={form.TotalHours}
+                onChange={(e) => updateField("TotalHours", e.target.value)}
+              />
+            </div>
 
-        <label>Comments</label>
-        <textarea
-          value={form.Comments || ""}
-          onChange={(e) => updateField("Comments", e.target.value)}
-        />
+            <div>
+              <label>Billable Hours</label>
+              <input
+                type="number"
+                value={form.BillableHours}
+                onChange={(e) => updateField("BillableHours", e.target.value)}
+              />
+            </div>
 
-        <label>Status</label>
-        <input value={form.Status} disabled />
+            <div>
+              <label>Non-Billable Hours</label>
+              <input
+                type="number"
+                value={form.NonBillableHours}
+                onChange={(e) =>
+                  updateField("NonBillableHours", e.target.value)
+                }
+              />
+            </div>
 
-        {/* Attachments */}
-        <h4>Attachments</h4>
-        <ul>
-          {attachments.map((a) => (
-            <li key={a.Id}>
-              <a href={a.ServerRelativeUrl} target="_blank">
-                {a.FileName}
-              </a>
-            </li>
-          ))}
-        </ul>
+            <div>
+              <label>Status</label>
+              <input value={form.Status} disabled />
+            </div>
 
-        {/* Actions */}
-        <div className="modal-actions">
+            <div className="full-width">
+              <label>Work Description</label>
+              <textarea
+                rows={4}
+                value={form.WorkDescription}
+                onChange={(e) => updateField("WorkDescription", e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Attachments */}
+          <div className="attachments">
+            <h4>Attachments</h4>
+            {attachments.length === 0 && <p>No attachments</p>}
+            <ul>
+              {attachments.map((a) => (
+                <li key={a.FileName}>
+                  <a
+                    href={a.ServerRelativeUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {a.FileName}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="modal-footer">
           <button onClick={onClose}>Cancel</button>
 
-          <button disabled={saving} onClick={() => handleSave()}>
+          <button
+            className="primary-btn"
+            disabled={saving}
+            onClick={() => handleSave()}
+          >
             Save
           </button>
 
-          {timesheet.Status !== "HR Approved" && (
+          {form.Status !== "HR Approved" && (
             <button
               className="primary-btn"
               disabled={saving}
