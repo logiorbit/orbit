@@ -1,4 +1,5 @@
 import { CheckCircle, XCircle } from "lucide-react";
+import "../common/table.css";
 
 export default function TimesheetStatusTable({
   employees = [],
@@ -12,7 +13,7 @@ export default function TimesheetStatusTable({
   const activeEmployees = employees.filter((e) => e.Status === "On Project");
 
   /* ============================
-     Build Timesheet Lookup (Email)
+     Build Timesheet Lookup by Email
      ============================ */
   const timesheetStatusByEmail = {};
 
@@ -44,37 +45,38 @@ export default function TimesheetStatusTable({
   }
 
   return (
-    <div className="timesheet-card">
-      {/* Header */}
-      <div className="timesheet-card-header">
-        <h4>
+    <div className="table-card">
+      {/* Toolbar / Header */}
+      <div className="table-toolbar">
+        <strong>
           Timesheet Status — {month} {year}
-        </h4>
+        </strong>
       </div>
 
       {/* Table */}
-      <table className="timesheet-status-table">
+      <table className="data-table">
         <thead>
           <tr>
-            <th>Employee Name</th>
-            <th>Submitted</th>
-            <th>HR Approved</th>
-            <th>Invoice Created</th>
+            <th style={{ width: "40%" }}>Employee Name</th>
+            <th style={{ width: "20%" }}>Submitted</th>
+            <th style={{ width: "20%" }}>HR Approved</th>
+            <th style={{ width: "20%" }}>Invoice Created</th>
           </tr>
         </thead>
+
         <tbody>
           {activeEmployees.map((emp) => {
             const email = emp.Employee?.EMail || emp.EMail || emp.Email;
 
-            const name = emp.Employee?.Title || emp.Title;
+            const name = emp.Employee?.Title || emp.Title || "Unknown";
 
             const status = email && timesheetStatusByEmail[email.toLowerCase()];
 
             const flags = resolveStatus(status);
 
             return (
-              <tr key={email}>
-                <td className="employee-name">{name}</td>
+              <tr key={email || name}>
+                <td>{name}</td>
                 <td>
                   <StatusIcon done={flags.submitted} />
                 </td>

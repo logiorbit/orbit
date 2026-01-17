@@ -95,9 +95,6 @@ export default function HRDashboard() {
 
             <div className="manager-grid-2">
               <div className="card">
-                <h3>
-                  Timesheet Status — {month} {year}
-                </h3>
                 <TimesheetStatusTable
                   employees={employees}
                   timesheets={timesheets}
@@ -107,9 +104,6 @@ export default function HRDashboard() {
               </div>
 
               <div className="card">
-                <h3>
-                  Timesheet Status — {month} {year}
-                </h3>
                 <TimesheetStatusTable
                   employees={employees}
                   timesheets={timesheets}
