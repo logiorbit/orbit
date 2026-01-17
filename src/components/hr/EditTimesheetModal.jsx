@@ -116,7 +116,7 @@ export default function EditTimesheetModal({
             <label>Client *</label>
             <select
               value={form.clientId}
-              onChange={(e) => updateField("clientId", e.target.value)}
+              onChange={(e) => setForm({ ...form, clientId: e.target.value })}
             >
               <option value="">Select Client</option>
               {clients.map((c) => (
