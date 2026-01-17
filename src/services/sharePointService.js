@@ -1045,9 +1045,18 @@ export async function getTimesheetAttachments(token, id) {
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        // Add this line to force JSON response
+        Accept: "application/json;odata=nometadata",
       },
     }
   );
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("SharePoint Error Response:", errorText);
+    throw new Error(`HTTP error! status: ${res.status}`);
+  }
+
   const json = await res.json();
-  return json.value;
+  return json.value; // SharePoint returns the array inside .value [cite: 195]
 }

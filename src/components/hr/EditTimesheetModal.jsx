@@ -41,7 +41,7 @@ export default function EditTimesheetModal({
      PREFILL FROM SHAREPOINT
      ============================ */
   useEffect(() => {
-    if (!timesheet || !token) {
+    if (!timesheet?.Id || !token) {
       console.warn(
         "EditTimesheetModal: Waiting for token or timesheet data..."
       );
