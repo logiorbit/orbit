@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import SubmitTimesheet from "./SubmitTimesheetModal";
 import TimesheetStatusTable from "./TimesheetStatusTable";
 import MonthYearFilter from "./MonthYearFilter";
+import EditTimesheetModal from "./EditTimesheetModal";
 
 import { getAccessToken } from "../../auth/authService";
 import {
@@ -67,6 +68,32 @@ export default function HRDashboard() {
         setLoading(false);
       });
   }, [token, month, year]);
+
+  async function handleDeleteTimesheet(timesheet) {
+    if (!timesheet || !timesheet.Id) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this timesheet?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteTimesheetRecord(token, timesheet.Id);
+
+      // Reload timesheets after delete
+      const updatedTimesheets = await getTimesheetsForMonth(token, month, year);
+
+      setTimesheets(
+        Array.isArray(updatedTimesheets)
+          ? updatedTimesheets
+          : updatedTimesheets?.value || []
+      );
+    } catch (error) {
+      console.error("Failed to delete timesheet:", error);
+      alert("Failed to delete timesheet record.");
+    }
+  }
 
   /* ============================
      3️⃣ Render (NO EARLY RETURN)
