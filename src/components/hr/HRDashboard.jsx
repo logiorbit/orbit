@@ -14,6 +14,7 @@ import {
 } from "../../services/sharePointService";
 
 import "./HRDashboard.css";
+import "../common/table.css";
 
 export default function HRDashboard() {
   const { instance, accounts } = useMsal();
