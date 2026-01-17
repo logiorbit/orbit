@@ -86,8 +86,8 @@ export default function TimesheetStatusTable({
             const canModify = flags.submitted;
             const canDelete =
               flags.submitted &&
-              (timesheet?.Status !== "HR Approved" ||
-                timesheet?.Status !== "Invoice Created");
+              timesheet?.Status !== "HR Approved" &&
+              timesheet?.Status !== "Invoice Created";
 
             return (
               <tr key={email || name}>
