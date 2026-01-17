@@ -11,6 +11,7 @@ import {
   getEmployeeHierarchy,
   getTimesheetsForMonth,
   deleteTimesheetRecord,
+  getClients,
 } from "../../services/sharePointService";
 
 import "./HRDashboard.css";
