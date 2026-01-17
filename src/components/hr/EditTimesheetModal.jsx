@@ -15,7 +15,10 @@ export default function EditTimesheetModal({
   /* ============================
      SAME FORM MODEL AS SUBMIT
      ============================ */
-  const [form, setForm] = useState({
+
+  const [form, setForm] = useState(null);
+
+  /*  const [form, setForm] = useState({
     clientId: "",
     month: "",
     year: "",
@@ -27,10 +30,12 @@ export default function EditTimesheetModal({
     totalBillingDays: "",
     totalBillingHours: "",
     attachments: [],
-  });
+  }); */
 
   const [existingAttachments, setExistingAttachments] = useState([]);
   const [saving, setSaving] = useState(false);
+
+  console.log("EDIT TIMESHEET:", timesheet);
 
   /* ============================
      PREFILL FROM SHAREPOINT
@@ -100,7 +105,7 @@ export default function EditTimesheetModal({
      ============================ */
   return (
     <div className="modal-overlay">
-      <div className="modal-container">
+      <div className="modal-content">
         <h2>Edit Timesheet</h2>
 
         <div className="form-grid">
