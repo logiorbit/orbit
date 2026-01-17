@@ -66,7 +66,7 @@ export default function ManagerActionModal({ leave, onClose, onSuccess }) {
 
             <div className="review-item">
               <span>Leave Type</span>
-              <strong>{leave.leaveType}</strong>
+              <strong>{leave.leaveType.Title}</strong>
             </div>
 
             <div className="review-item">
