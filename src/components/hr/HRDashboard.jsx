@@ -1,7 +1,7 @@
 import { useMsal } from "@azure/msal-react";
 import { useEffect, useState } from "react";
 
-import MonthYearFilter from "../common/MonthYearFilter";
+import MonthYearFilter from "./MonthYearFilter";
 import SubmitTimesheet from "./SubmitTimesheetModal";
 import TimesheetStatusTable from "./TimesheetStatusTable";
 
