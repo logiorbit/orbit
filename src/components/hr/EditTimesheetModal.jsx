@@ -121,7 +121,7 @@ export default function EditTimesheetModal({
   }
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-card">
         <h2>Edit Timesheet</h2>
 
         <div className="form-grid">
