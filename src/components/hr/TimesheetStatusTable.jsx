@@ -1,22 +1,33 @@
 import { CheckCircle, XCircle } from "lucide-react";
-//import "./HRDashboard.jsx";
 
-export default function TimesheetStatusTable({ employees, timesheets }) {
+export default function TimesheetStatusTable({
+  employees = [],
+  timesheets = [],
+}) {
   /* ============================
-     Filter Active Employees
+     1️⃣ Filter On-Project Employees
      ============================ */
-  const activeEmployees = employees.filter((e) => e.Status === "On Project");
+  const activeEmployees = Array.isArray(employees)
+    ? employees.filter((emp) => emp.Status === "On Project")
+    : [];
 
   /* ============================
-     Map Timesheets by Employee
+     2️⃣ Build Timesheet Lookup by Email
      ============================ */
-  const timesheetMap = {};
-  timesheets.forEach((ts) => {
-    timesheetMap[ts.EmployeeId] = ts.Status;
-  });
+  const timesheetStatusByEmail = {};
+
+  if (Array.isArray(timesheets)) {
+    timesheets.forEach((ts) => {
+      const email = ts.Employee?.Email || ts.EmployeeEmail;
+
+      if (email) {
+        timesheetStatusByEmail[email.toLowerCase()] = ts.Status?.trim();
+      }
+    });
+  }
 
   /* ============================
-     Cascading Status Logic
+     3️⃣ Cascading Status Logic
      ============================ */
   function resolveStatus(status) {
     return {
@@ -33,15 +44,18 @@ export default function TimesheetStatusTable({ employees, timesheets }) {
 
   function StatusIcon({ done }) {
     return done ? (
-      <CheckCircle className="status-icon done" />
+      <CheckCircle className="status-icon completed" />
     ) : (
-      <XCircle className="status-icon not-done" />
+      <XCircle className="status-icon pending" />
     );
   }
 
+  /* ============================
+     4️⃣ Render Table
+     ============================ */
   return (
-    <div className="timesheet-table-card">
-      <table className="status-table">
+    <div className="timesheet-status-wrapper">
+      <table className="timesheet-status-table">
         <thead>
           <tr>
             <th>Employee</th>
@@ -52,12 +66,17 @@ export default function TimesheetStatusTable({ employees, timesheets }) {
         </thead>
         <tbody>
           {activeEmployees.map((emp) => {
-            const status = timesheetMap[emp.EmployeeId];
+            const email = emp.Employee?.Email || emp.Email;
+
+            const displayName = emp.Employee?.Title || emp.Title || "Unknown";
+
+            const status = email && timesheetStatusByEmail[email.toLowerCase()];
+
             const flags = resolveStatus(status);
 
             return (
-              <tr key={emp.EmployeeId}>
-                <td>{emp.EmployeeName}</td>
+              <tr key={email || displayName}>
+                <td>{displayName}</td>
                 <td>
                   <StatusIcon done={flags.submitted} />
                 </td>

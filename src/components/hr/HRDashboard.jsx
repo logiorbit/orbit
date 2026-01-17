@@ -45,6 +45,8 @@ export default function TimesheetStatusTable({ employees, timesheets }) {
     );
   }
 
+  console.log("Hierarchy:", hierarchy);
+  console.log("Timesheets:", ts);
   /* ============================
      4️⃣ Render Table
      ============================ */
