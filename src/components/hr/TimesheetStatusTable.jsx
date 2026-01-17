@@ -4,29 +4,43 @@ export default function TimesheetStatusTable({
   employees = [],
   timesheets = [],
 }) {
+  /* ============================
+     1️⃣ Filter On-Project Employees
+     ============================ */
   const activeEmployees = Array.isArray(employees)
-    ? employees.filter((emp) => emp.Status === "On Project")
+    ? employees.filter((e) => e.Status === "On Project")
     : [];
 
+  /* ============================
+     2️⃣ Build Timesheet Lookup by Email (FIXED)
+     ============================ */
   const timesheetStatusByEmail = {};
 
   if (Array.isArray(timesheets)) {
     timesheets.forEach((ts) => {
-      const email = ts.Employee?.Email || ts.EmployeeEmail;
+      const email =
+        ts.Employee?.EMail || // ✅ FIX
+        ts.EmployeeEMail || // fallback if exists
+        ts.EmployeeEmail;
 
       if (email) {
-        timesheetStatusByEmail[email.toLowerCase()] = ts.Status?.trim();
+        timesheetStatusByEmail[email.trim().toLowerCase()] = ts.Status?.trim();
       }
     });
   }
 
+  /* ============================
+     3️⃣ Cascading Status Logic
+     ============================ */
   function resolveStatus(status) {
     return {
       submitted:
         status === "Submitted" ||
         status === "HR Approved" ||
         status === "Invoice Created",
+
       hrApproved: status === "HR Approved" || status === "Invoice Created",
+
       invoiceCreated: status === "Invoice Created",
     };
   }
@@ -39,6 +53,9 @@ export default function TimesheetStatusTable({
     );
   }
 
+  /* ============================
+     4️⃣ Render Table
+     ============================ */
   return (
     <table className="timesheet-status-table">
       <thead>
@@ -51,17 +68,21 @@ export default function TimesheetStatusTable({
       </thead>
       <tbody>
         {activeEmployees.map((emp) => {
-          const email = emp.Employee?.Email || emp.Email;
+          const email =
+            emp.Employee?.EMail || // ✅ FIX
+            emp.EMail ||
+            emp.Email;
 
-          const name = emp.Employee?.Title || emp.Title || "Unknown";
+          const displayName = emp.Employee?.Title || emp.Title || "Unknown";
 
-          const status = email && timesheetStatusByEmail[email.toLowerCase()];
+          const status =
+            email && timesheetStatusByEmail[email.trim().toLowerCase()];
 
           const flags = resolveStatus(status);
 
           return (
-            <tr key={email || name}>
-              <td>{name}</td>
+            <tr key={email || displayName}>
+              <td>{displayName}</td>
               <td>
                 <StatusIcon done={flags.submitted} />
               </td>
