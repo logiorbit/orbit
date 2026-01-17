@@ -1,9 +1,9 @@
 import { useMsal } from "@azure/msal-react";
 import { useEffect, useState } from "react";
 
+import MonthYearFilter from "../common/MonthYearFilter";
 import SubmitTimesheet from "./SubmitTimesheetModal";
 import TimesheetStatusTable from "./TimesheetStatusTable";
-import MonthYearFilter from "./MonthYearFilter";
 
 import { getAccessToken } from "../../auth/authService";
 import {
@@ -16,58 +16,38 @@ import "./HRDashboard.css";
 export default function HRDashboard() {
   const { instance, accounts } = useMsal();
 
-  const [showSubmitTimesheet, setShowSubmitTimesheet] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [timesheets, setTimesheets] = useState([]);
   const [month, setMonth] = useState("Jan");
   const [year, setYear] = useState(new Date().getFullYear());
-  const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showSubmitTimesheet, setShowSubmitTimesheet] = useState(false);
 
-  /* ============================
-     1️⃣ Acquire Access Token
-     ============================ */
+  /* Acquire token */
   useEffect(() => {
-    async function acquireToken() {
-      if (!accounts || accounts.length === 0) return;
+    if (!accounts?.length) return;
 
-      try {
-        const accessToken = await getAccessToken(instance, accounts[0]);
-        setToken(accessToken);
-      } catch (error) {
-        console.error("Failed to acquire token:", error);
-        setToken(null);
-      }
-    }
-
-    acquireToken();
+    getAccessToken(instance, accounts[0])
+      .then(setToken)
+      .catch(() => setToken(null));
   }, [instance, accounts]);
 
-  /* ============================
-     2️⃣ Load SharePoint Data
-     ============================ */
+  /* Load SharePoint data */
   useEffect(() => {
     if (!token) return;
 
-    async function loadData() {
-      setLoading(true);
+    setLoading(true);
 
-      try {
-        const [hierarchy, ts] = await Promise.all([
-          getEmployeeHierarchy(token),
-          getTimesheetsForMonth(token, month, year),
-        ]);
-
-        setEmployees(hierarchy);
-        setTimesheets(ts);
-      } catch (error) {
-        console.error("Failed to load SharePoint data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
+    Promise.all([
+      getEmployeeHierarchy(token),
+      getTimesheetsForMonth(token, month, year),
+    ])
+      .then(([hierarchy, ts]) => {
+        setEmployees(hierarchy?.value || []);
+        setTimesheets(ts?.value || []);
+      })
+      .finally(() => setLoading(false));
   }, [token, month, year]);
 
   if (loading) {
@@ -75,48 +55,31 @@ export default function HRDashboard() {
   }
 
   return (
-    <>
-      <div className="manager-dashboard">
-        {/* FILTERS */}
-        <MonthYearFilter
-          month={month}
-          year={year}
-          onMonthChange={setMonth}
-          onYearChange={setYear}
-        />
+    <div className="manager-dashboard">
+      {/* FILTERS */}
+      <MonthYearFilter
+        month={month}
+        year={year}
+        onMonthChange={setMonth}
+        onYearChange={setYear}
+      />
 
-        <div className="btn-div">
-          <button
-            className="primary-btn"
-            onClick={() => setShowSubmitTimesheet(true)}
-          >
-            + Submit Timesheet
-          </button>
-        </div>
-
-        <div className="manager-grid-2">
-          <div className="card">
-            <h3>Timesheet Status</h3>
-            <TimesheetStatusTable
-              employees={employees}
-              timesheets={timesheets}
-            />
-          </div>
-
-          <div className="card">
-            <h3>Timesheet Status</h3>
-            <TimesheetStatusTable
-              employees={employees}
-              timesheets={timesheets}
-            />
-          </div>
-        </div>
+      {/* ACTION BUTTON */}
+      <div className="btn-div">
+        <button
+          className="primary-btn"
+          onClick={() => setShowSubmitTimesheet(true)}
+        >
+          + Submit Timesheet
+        </button>
       </div>
 
-      {/* MODAL */}
+      {/* TABLE */}
+      <TimesheetStatusTable employees={employees} timesheets={timesheets} />
+
       {showSubmitTimesheet && (
         <SubmitTimesheet onClose={() => setShowSubmitTimesheet(false)} />
       )}
-    </>
+    </div>
   );
 }
