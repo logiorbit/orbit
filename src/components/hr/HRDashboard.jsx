@@ -1,107 +1,91 @@
-import { useMsal } from "@azure/msal-react";
-import { useEffect, useState } from "react";
+import { CheckCircle, XCircle } from "lucide-react";
 
-import SubmitTimesheet from "./SubmitTimesheetModal";
-import TimesheetStatusTable from "./TimesheetStatusTable";
-import MonthYearFilter from "./MonthYearFilter";
-
-import { getAccessToken } from "../../auth/authService";
-import {
-  getEmployeeHierarchy,
-  getTimesheetsForMonth,
-} from "../../services/sharePointService";
-
-import "./HRDashboard.css";
-
-export default function HRDashboard() {
-  const { instance, accounts } = useMsal();
-
-  const [showSubmitTimesheet, setShowSubmitTimesheet] = useState(false);
-  const [employees, setEmployees] = useState([]);
-  const [timesheets, setTimesheets] = useState([]);
-  const [month, setMonth] = useState("Jan");
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(null);
+export default function TimesheetStatusTable({ employees, timesheets }) {
+  /* ============================
+     1️⃣ Filter On-Project Employees
+     ============================ */
+  const activeEmployees = employees.filter(
+    (emp) => emp.Status === "On Project"
+  );
 
   /* ============================
-     1️⃣ Acquire Access Token
+     2️⃣ Build Timesheet Lookup by Email
      ============================ */
-  useEffect(() => {
-    async function acquireToken() {
-      if (!accounts || accounts.length === 0) return;
+  const timesheetStatusByEmail = {};
 
-      try {
-        const accessToken = await getAccessToken(instance, accounts[0]);
-        setToken(accessToken);
-      } catch (error) {
-        console.error("Failed to acquire token:", error);
-        setToken(null);
-      }
+  timesheets.forEach((ts) => {
+    const email = ts.Employee?.Email || ts.EmployeeEmail;
+
+    if (email) {
+      timesheetStatusByEmail[email.toLowerCase()] = ts.Status?.trim();
     }
-
-    acquireToken();
-  }, [instance, accounts]);
+  });
 
   /* ============================
-     2️⃣ Load SharePoint Data
+     3️⃣ Cascading Status Logic
      ============================ */
-  useEffect(() => {
-    if (!token) return;
+  function resolveStatus(status) {
+    return {
+      submitted:
+        status === "Submitted" ||
+        status === "HR Approved" ||
+        status === "Invoice Created",
 
-    async function loadData() {
-      setLoading(true);
+      hrApproved: status === "HR Approved" || status === "Invoice Created",
 
-      try {
-        const [hierarchy, ts] = await Promise.all([
-          getEmployeeHierarchy(token),
-          getTimesheetsForMonth(token, month, year),
-        ]);
-
-        setEmployees(hierarchy);
-        setTimesheets(ts);
-      } catch (error) {
-        console.error("Failed to load SharePoint data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
-  }, [token, month, year]);
-
-  if (loading) {
-    return <div className="hr-card">Loading Timesheet Status…</div>;
+      invoiceCreated: status === "Invoice Created",
+    };
   }
 
+  function StatusIcon({ done }) {
+    return done ? (
+      <CheckCircle className="status-icon completed" />
+    ) : (
+      <XCircle className="status-icon pending" />
+    );
+  }
+
+  /* ============================
+     4️⃣ Render Table
+     ============================ */
   return (
-    <>
-      <div className="manager-dashboard">
-        {/* FILTERS */}
-        <MonthYearFilter
-          month={month}
-          year={year}
-          onMonthChange={setMonth}
-          onYearChange={setYear}
-        />
+    <div className="timesheet-status-wrapper">
+      <table className="timesheet-status-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Submitted</th>
+            <th>HR Approved</th>
+            <th>Invoice Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {activeEmployees.map((emp) => {
+            const email = emp.Employee?.Email || emp.Email;
 
-        <div className="btn-div">
-          <button
-            className="primary-btn"
-            onClick={() => setShowSubmitTimesheet(true)}
-          >
-            + Submit Timesheet
-          </button>
-        </div>
+            const displayName = emp.Employee?.Title || emp.Title || "Unknown";
 
-        {/* STATUS TABLE */}
-        <TimesheetStatusTable employees={employees} timesheets={timesheets} />
-      </div>
+            const status = email && timesheetStatusByEmail[email.toLowerCase()];
 
-      {/* MODAL */}
-      {showSubmitTimesheet && (
-        <SubmitTimesheet onClose={() => setShowSubmitTimesheet(false)} />
-      )}
-    </>
+            const flags = resolveStatus(status);
+
+            return (
+              <tr key={email || displayName}>
+                <td>{displayName}</td>
+                <td>
+                  <StatusIcon done={flags.submitted} />
+                </td>
+                <td>
+                  <StatusIcon done={flags.hrApproved} />
+                </td>
+                <td>
+                  <StatusIcon done={flags.invoiceCreated} />
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }
