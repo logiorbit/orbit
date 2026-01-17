@@ -55,12 +55,19 @@ export default function TimesheetStatusTable({
 
       {/* Table */}
       <table className="data-table">
+        <colgroup>
+          <col style={{ width: "40%" }} />
+          <col style={{ width: "20%" }} />
+          <col style={{ width: "20%" }} />
+          <col style={{ width: "20%" }} />
+        </colgroup>
+
         <thead>
           <tr>
-            <th style={{ width: "40%" }}>Employee Name</th>
-            <th style={{ width: "20%" }}>Submitted</th>
-            <th style={{ width: "20%" }}>HR Approved</th>
-            <th style={{ width: "20%" }}>Invoice Created</th>
+            <th>Employee Name</th>
+            <th>Submitted</th>
+            <th>HR Approved</th>
+            <th>Invoice Created</th>
           </tr>
         </thead>
 
