@@ -126,21 +126,23 @@ export default function EditTimesheetModal({
 
         <div className="form-grid">
           <div>
-            <label>Client *</label>
-            <select
-              value={form.clientId}
-              onChange={(e) => setForm({ ...form, clientId: e.target.value })}
-            >
-              <option value="">Select Client</option>
-              {clients.map((c) => (
-                <option key={c.Id} value={c.Id}>
-                  {c.Title}
-                </option>
-              ))}
-            </select>
+            <div className="form-group">
+              <label>Client *</label>
+              <select
+                value={form.clientId}
+                onChange={(e) => setForm({ ...form, clientId: e.target.value })}
+              >
+                <option value="">Select Client</option>
+                {clients.map((c) => (
+                  <option key={c.Id} value={c.Id}>
+                    {c.Title}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div>
+          <div className="form-group">
             <label>Month</label>
             <select
               value={form.month}
@@ -167,7 +169,7 @@ export default function EditTimesheetModal({
             </select>
           </div>
 
-          <div>
+          <div className="form-group">
             <label>Year</label>
             <input
               type="number"
@@ -176,7 +178,7 @@ export default function EditTimesheetModal({
             />
           </div>
 
-          <div>
+          <div className="form-group">
             <label>Total Working Days</label>
             <input
               type="number"
@@ -185,7 +187,7 @@ export default function EditTimesheetModal({
             />
           </div>
 
-          <div>
+          <div className="form-group">
             <label>Total Leaves</label>
             <input
               type="number"
@@ -194,7 +196,7 @@ export default function EditTimesheetModal({
             />
           </div>
 
-          <div>
+          <div className="form-group">
             <label>Total Holidays</label>
             <input
               type="number"
@@ -203,7 +205,7 @@ export default function EditTimesheetModal({
             />
           </div>
 
-          <div>
+          <div className="form-group">
             <label>Total Billing Days</label>
             <input
               type="number"
@@ -212,7 +214,7 @@ export default function EditTimesheetModal({
             />
           </div>
 
-          <div>
+          <div className="form-group">
             <label>Total Billing Hours</label>
             <input
               type="number"
@@ -221,7 +223,7 @@ export default function EditTimesheetModal({
             />
           </div>
 
-          <div className="full-width">
+          <div className="form-group">
             <label>Leave Dates</label>
             <textarea
               value={form.leaveDates}
@@ -229,7 +231,7 @@ export default function EditTimesheetModal({
             />
           </div>
 
-          <div className="full-width">
+          <div className="form-group">
             <label>Holiday Dates</label>
             <textarea
               value={form.holidayDates}
@@ -237,7 +239,7 @@ export default function EditTimesheetModal({
             />
           </div>
 
-          <div className="full-width">
+          <div className="form-group">
             <label>Attachments</label>
             <input
               type="file"
