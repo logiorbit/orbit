@@ -123,6 +123,10 @@ export default function EditTimesheetModal({
     <div className="modal-overlay">
       <div className="modal-card">
         <h2>Edit Timesheet</h2>
+        <span className="modal-subtitle">
+          {" "}
+          - {timesheet.Employee?.Title || "Unknown Employee"}
+        </span>
 
         <div className="form-grid">
           <div>
