@@ -51,7 +51,10 @@ export default function TLActionModal({ leave, onClose, onSuccess }) {
                 {leave.StartDate} → {leave.EndDate}
               </strong>
             </div>
-
+            <div className="review-item">
+              <span>Leave Type</span>
+              <strong>{leave.leaveType}</strong>
+            </div>
             <div className="review-item">
               <span>No. of Days</span>
               <strong>{leave.NoofDays}</strong>

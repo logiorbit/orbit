@@ -65,6 +65,11 @@ export default function ManagerActionModal({ leave, onClose, onSuccess }) {
             </div>
 
             <div className="review-item">
+              <span>Leave Type</span>
+              <strong>{leave.leaveType}</strong>
+            </div>
+
+            <div className="review-item">
               <span>No. of Days</span>
               <strong>{leave.NoofDays}</strong>
             </div>
