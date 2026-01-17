@@ -21,26 +21,21 @@ export default function HRDashboard() {
   const [timesheets, setTimesheets] = useState([]);
   const [month, setMonth] = useState("Jan");
   const [year, setYear] = useState(new Date().getFullYear());
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [token, setToken] = useState(null);
 
   /* ============================
      1️⃣ Acquire Access Token
      ============================ */
   useEffect(() => {
-    async function acquireToken() {
-      if (!accounts || accounts.length === 0) return;
+    if (!accounts || accounts.length === 0) return;
 
-      try {
-        const accessToken = await getAccessToken(instance, accounts[0]);
-        setToken(accessToken);
-      } catch (error) {
-        console.error("Failed to acquire token:", error);
+    getAccessToken(instance, accounts[0])
+      .then(setToken)
+      .catch((err) => {
+        console.error("Failed to acquire token:", err);
         setToken(null);
-      }
-    }
-
-    acquireToken();
+      });
   }, [instance, accounts]);
 
   /* ============================
@@ -49,35 +44,34 @@ export default function HRDashboard() {
   useEffect(() => {
     if (!token) return;
 
-    async function loadData() {
-      setLoading(true);
+    setLoading(true);
 
-      try {
-        const [hierarchy, ts] = await Promise.all([
-          getEmployeeHierarchy(token),
-          getTimesheetsForMonth(token, month, year),
-        ]);
-
-        setEmployees(hierarchy);
-        setTimesheets(ts);
-      } catch (error) {
+    Promise.all([
+      getEmployeeHierarchy(token),
+      getTimesheetsForMonth(token, month, year),
+    ])
+      .then(([hierarchy, ts]) => {
+        // ✅ CRITICAL: SharePoint REST returns { value: [] }
+        setEmployees(hierarchy?.value || []);
+        setTimesheets(ts?.value || []);
+      })
+      .catch((error) => {
         console.error("Failed to load SharePoint data:", error);
-      } finally {
+        setEmployees([]);
+        setTimesheets([]);
+      })
+      .finally(() => {
         setLoading(false);
-      }
-    }
-
-    loadData();
+      });
   }, [token, month, year]);
 
-  if (loading) {
-    return <div className="hr-card">Loading Timesheet Status…</div>;
-  }
-
+  /* ============================
+     3️⃣ Render (NO EARLY RETURN)
+     ============================ */
   return (
     <>
       <div className="manager-dashboard">
-        {/* FILTERS */}
+        {/* ✅ MONTH / YEAR FILTER — ALWAYS VISIBLE */}
         <MonthYearFilter
           month={month}
           year={year}
@@ -85,32 +79,46 @@ export default function HRDashboard() {
           onYearChange={setYear}
         />
 
-        <div className="btn-div">
-          <button
-            className="primary-btn"
-            onClick={() => setShowSubmitTimesheet(true)}
-          >
-            + Submit Timesheet
-          </button>
-        </div>
+        {loading ? (
+          <div className="hr-card">Loading Timesheet Status…</div>
+        ) : (
+          <>
+            <div className="btn-div">
+              <button
+                className="primary-btn"
+                onClick={() => setShowSubmitTimesheet(true)}
+              >
+                + Submit Timesheet
+              </button>
+            </div>
 
-        <div className="manager-grid-2">
-          <div className="card">
-            <h3>Timesheet Status</h3>
-            <TimesheetStatusTable
-              employees={employees}
-              timesheets={timesheets}
-            />
-          </div>
+            <div className="manager-grid-2">
+              <div className="card">
+                <h3>
+                  Timesheet Status — {month} {year}
+                </h3>
+                <TimesheetStatusTable
+                  employees={employees}
+                  timesheets={timesheets}
+                  month={month}
+                  year={year}
+                />
+              </div>
 
-          <div className="card">
-            <h3>Timesheet Status</h3>
-            <TimesheetStatusTable
-              employees={employees}
-              timesheets={timesheets}
-            />
-          </div>
-        </div>
+              <div className="card">
+                <h3>
+                  Timesheet Status — {month} {year}
+                </h3>
+                <TimesheetStatusTable
+                  employees={employees}
+                  timesheets={timesheets}
+                  month={month}
+                  year={year}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* MODAL */}
