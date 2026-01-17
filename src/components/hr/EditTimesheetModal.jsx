@@ -8,7 +8,7 @@ import {
 export default function EditTimesheetModal({
   token,
   timesheet,
-  clients,
+  clients = [],
   onClose,
   onSaved,
 }) {
