@@ -94,8 +94,23 @@ export default function HRDashboard() {
           </button>
         </div>
 
-        {/* STATUS TABLE */}
-        <TimesheetStatusTable employees={employees} timesheets={timesheets} />
+        <div className="manager-grid-2">
+          <div className="card">
+            <h3>Timesheet Status</h3>
+            <TimesheetStatusTable
+              employees={employees}
+              timesheets={timesheets}
+            />
+          </div>
+
+          <div className="card">
+            <h3>Timesheet Status</h3>
+            <TimesheetStatusTable
+              employees={employees}
+              timesheets={timesheets}
+            />
+          </div>
+        </div>
       </div>
 
       {/* MODAL */}
