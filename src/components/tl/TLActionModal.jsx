@@ -17,6 +17,8 @@ export default function TLActionModal({ leave, onClose, onSuccess }) {
     setLoading(true);
     const token = await getAccessToken(instance, accounts[0]);
 
+    console.log(leave);
+
     await updateLeaveStatus(token, leave.Id, {
       Status: status,
       TLComment: comment,
