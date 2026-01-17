@@ -163,7 +163,7 @@ h3 {
 
 .modal-card {
   background: #ffffff;
-  width: 420px;
+  width: 80%;
   max-width: 90%;
   border-radius: 6px;
   padding: 20px 24px;
@@ -293,7 +293,7 @@ button:hover,
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 16px;
 }
 
