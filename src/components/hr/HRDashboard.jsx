@@ -56,7 +56,7 @@ export default function HRDashboard() {
       getTimesheetsForMonth(token, month, year),
       getClients(token),
     ])
-      .then(([hierarchy, ts]) => {
+      .then(([hierarchy, ts, clientData]) => {
         setEmployees(
           Array.isArray(hierarchy) ? hierarchy : hierarchy?.value || []
         );
