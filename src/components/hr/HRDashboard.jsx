@@ -18,6 +18,7 @@ export default function HRDashboard() {
   const [month, setMonth] = useState("January");
   const [year, setYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(null); // 👈 Added missing token state
 
   /* ============================
      1️⃣ Acquire Access Token
@@ -26,8 +27,13 @@ export default function HRDashboard() {
     async function acquireToken() {
       if (!accounts || accounts.length === 0) return;
 
-      const token = await getAccessToken(instance, accounts[0]);
-      setAccessToken(token);
+      try {
+        const acquiredToken = await getAccessToken(instance, accounts[0]);
+        setToken(acquiredToken); // 👈 Use setToken instead of undefined setAccessToken
+      } catch (error) {
+        console.error("Failed to acquire token:", error);
+        setToken(null);
+      }
     }
 
     acquireToken();
@@ -42,18 +48,23 @@ export default function HRDashboard() {
     async function loadData() {
       setLoading(true);
 
-      const [hierarchy, ts] = await Promise.all([
-        getEmployeeHierarchy(token),
-        getTimesheetsForMonth(token, month, year),
-      ]);
+      try {
+        const [hierarchy, ts] = await Promise.all([
+          getEmployeeHierarchy(token),
+          getTimesheetsForMonth(token, month, year),
+        ]);
 
-      setEmployees(hierarchy);
-      setTimesheets(ts);
-      setLoading(false);
+        setEmployees(hierarchy);
+        setTimesheets(ts);
+      } catch (error) {
+        console.error("Failed to load data:", error);
+      } finally {
+        setLoading(false);
+      }
     }
 
     loadData();
-  }, [token, month, year]);
+  }, [token, month, year]); // 👈 token now properly in deps
 
   if (loading) {
     return <div className="hr-card">Loading Timesheet Status…</div>;
