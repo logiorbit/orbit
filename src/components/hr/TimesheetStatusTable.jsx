@@ -3,10 +3,8 @@ import { CheckCircle, XCircle, Pencil, Trash2 } from "lucide-react";
 export default function TimesheetStatusTable({
   employees = [],
   timesheets = [],
-  month,
-  year,
-  onEdit, // optional callback
-  onDelete, // optional callback
+  onEdit,
+  onDelete,
 }) {
   /* ============================
      Filter On-Project Employees
@@ -14,7 +12,8 @@ export default function TimesheetStatusTable({
   const activeEmployees = employees.filter((e) => e.Status === "On Project");
 
   /* ============================
-     Build Timesheet Lookup by Email
+     Build FULL timesheet lookup
+     (IMPORTANT FIX)
      ============================ */
   const timesheetByEmail = {};
 
@@ -22,10 +21,14 @@ export default function TimesheetStatusTable({
     const email = ts.Employee?.EMail || ts.EmployeeEMail || ts.EmployeeEmail;
 
     if (email) {
+      // ✅ STORE FULL SHAREPOINT ITEM
       timesheetByEmail[email.toLowerCase()] = ts;
     }
   });
 
+  /* ============================
+     Status cascade logic
+     ============================ */
   function resolveStatus(status) {
     return {
       submitted:
@@ -47,21 +50,12 @@ export default function TimesheetStatusTable({
     );
   }
 
+  /* ============================
+     Render
+     ============================ */
   return (
-    <div className="table-card">
-      {/* Header */}
-      <div className="table-toolbar">
-        <strong>
-          Timesheet Status — {month} {year}
-        </strong>
-      </div>
-
-      {/* Table */}
+    <div className="timesheet-table-wrapper">
       <table className="data-table">
-        <colgroup>
-          <col style={{ width: "100%" }} />
-        </colgroup>
-
         <thead>
           <tr>
             <th>Employee Name</th>
@@ -79,15 +73,14 @@ export default function TimesheetStatusTable({
 
             const name = emp.Employee?.Title || emp.Title || "Unknown";
 
+            // ✅ THIS IS NOW THE FULL ITEM
             const timesheet = email && timesheetByEmail[email.toLowerCase()];
 
             const flags = resolveStatus(timesheet?.Status);
 
-            const canModify = flags.submitted;
+            const canEdit = flags.submitted;
             const canDelete =
-              flags.submitted &&
-              (timesheet?.Status !== "HR Approved" ||
-                timesheet?.Status !== "Invoice Created");
+              flags.submitted && timesheet?.Status !== "HR Approved";
 
             return (
               <tr key={email || name}>
@@ -105,18 +98,16 @@ export default function TimesheetStatusTable({
                   <StatusIcon done={flags.invoiceCreated} />
                 </td>
 
-                {/* Edit */}
                 <td className="actions">
                   <Pencil
                     size={16}
                     className={
-                      canModify ? "action-icon edit" : "action-icon disabled"
+                      canEdit ? "action-icon edit" : "action-icon disabled"
                     }
-                    onClick={() => canModify && onEdit(timesheet)}
+                    onClick={() => canEdit && onEdit(timesheet)}
                   />
                 </td>
 
-                {/* Delete */}
                 <td className="actions">
                   <Trash2
                     size={16}

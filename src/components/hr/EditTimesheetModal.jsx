@@ -10,29 +10,36 @@ export default function EditTimesheetModal({
   onClose,
   onSaved,
 }) {
-  const [form, setForm] = useState({});
+  const [form, setForm] = useState({
+    TotalHours: "",
+    BillableHours: "",
+    NonBillableHours: "",
+    WorkDescription: "",
+    Status: "",
+  });
+
   const [attachments, setAttachments] = useState([]);
   const [saving, setSaving] = useState(false);
 
   /* ============================
-     Initialize Form
+     Initialize Form (CORRECT)
      ============================ */
   useEffect(() => {
     if (!timesheet) return;
 
     setForm({
-      TotalHours: timesheet.TotalHours || "",
-      BillableHours: timesheet.BillableHours || "",
-      NonBillableHours: timesheet.NonBillableHours || "",
-      WorkDescription: timesheet.WorkDescription || "",
-      Status: timesheet.Status,
+      TotalHours: timesheet.TotalHours ?? "",
+      BillableHours: timesheet.BillableHours ?? "",
+      NonBillableHours: timesheet.NonBillableHours ?? "",
+      WorkDescription: timesheet.WorkDescription ?? "",
+      Status: timesheet.Status ?? "",
     });
 
-    loadAttachments();
+    loadAttachments(timesheet.Id);
   }, [timesheet]);
 
-  async function loadAttachments() {
-    const files = await getTimesheetAttachments(token, timesheet.Id);
+  async function loadAttachments(timesheetId) {
+    const files = await getTimesheetAttachments(token, timesheetId);
     setAttachments(Array.isArray(files) ? files : []);
   }
 
@@ -44,7 +51,10 @@ export default function EditTimesheetModal({
     setSaving(true);
     try {
       await updateTimesheetRecord(token, timesheet.Id, {
-        ...form,
+        TotalHours: form.TotalHours,
+        BillableHours: form.BillableHours,
+        NonBillableHours: form.NonBillableHours,
+        WorkDescription: form.WorkDescription,
         Status: newStatus || form.Status,
       });
 
