@@ -212,6 +212,7 @@ export default function HRDashboard() {
       {showCreateInvoice && (
         <CreateInvoiceModal
           clients={clients}
+          token={token}
           onClose={() => setShowCreateInvoice(false)}
         />
       )}

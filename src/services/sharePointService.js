@@ -1091,3 +1091,30 @@ export async function getInvoicesByMonthYear(token, month, year) {
   const data = await response.json();
   return data.value || [];
 }
+
+export async function getApprovedTimesheetsByClient(token, clientId) {
+  const url =
+    `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items` +
+    `?$select=` +
+    `ID,Employee/EmployeeName,Month,Year,TotalHours,WorkingDays,Client/Id` +
+    `&$expand=Employee,Client` +
+    `&$filter=` +
+    `Client/Id eq ${clientId} and Status eq 'HR Approved' and IsInvoiced eq false`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json;odata=nometadata",
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    console.error("Timesheet fetch failed:", text);
+    throw new Error("Failed to fetch approved timesheets");
+  }
+
+  const data = await response.json();
+  return data.value || [];
+}
