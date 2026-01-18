@@ -21,7 +21,14 @@ export default function InvoiceStatusTable({ invoices, loading }) {
   };
 
   return (
-    <div className="table-wrapper">
+    <div className="table-card">
+      {/* Header */}
+      <div className="table-toolbar">
+        <strong>
+          Invoices — {month} {year}
+        </strong>
+      </div>
+
       <table className="data-table">
         <thead>
           <tr>

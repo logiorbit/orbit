@@ -168,26 +168,21 @@ export default function HRDashboard() {
 
               <div className="card">
                 {/* Invoices Section */}
-                <div className="hr-section">
-                  <div className="hr-section-header">
-                    <h3>Invoices</h3>
 
-                    <button
-                      className="primary-btn"
-                      onClick={() => {
-                        // modal wiring comes later
-                        console.log("Create New Invoice clicked");
-                      }}
-                    >
-                      + Create New Invoice
-                    </button>
-                  </div>
+                <button
+                  className="primary-btn"
+                  onClick={() => {
+                    // modal wiring comes later
+                    console.log("Create New Invoice clicked");
+                  }}
+                >
+                  + Create New Invoice
+                </button>
 
-                  <InvoiceStatusTable
-                    invoices={invoices}
-                    loading={loadingInvoices}
-                  />
-                </div>
+                <InvoiceStatusTable
+                  invoices={invoices}
+                  loading={loadingInvoices}
+                />
               </div>
             </div>
           </>
