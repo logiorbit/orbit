@@ -1092,8 +1092,6 @@ export async function getInvoicesByMonthYear(token, month, year) {
   return data.value || [];
 }
 
-import { SITE_URL } from "../config";
-
 export async function getApprovedTimesheetsByClient(token, clientId) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items` +
