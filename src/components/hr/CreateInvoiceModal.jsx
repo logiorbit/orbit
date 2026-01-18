@@ -18,6 +18,7 @@ export default function CreateInvoiceModal({ clients = [], token, onClose }) {
       try {
         const data = await getApprovedTimesheetsByClient(token, selectedClient);
         setTimesheets(data);
+        console.log("THe data is---", data);
       } catch (err) {
         console.error(err);
         setTimesheets([]);
