@@ -1096,7 +1096,7 @@ export async function getApprovedTimesheetsByClient(token, clientId) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items` +
     `?$select=` +
-    `ID,Month,Year,TotalHours,WorkingDays,Status,IsInvoiced,` +
+    `ID,Month,Year,TotalBillingHours,TotalBillingDays,Status,IsInvoiced,` +
     `Employee/Title,Client/Id` +
     `&$expand=Employee,Client` +
     `&$filter=` +
