@@ -27,6 +27,15 @@ export default function InvoiceStatusTable({ invoices, loading, month, year }) {
         <strong>
           Invoices — {month} {year}
         </strong>
+        <button
+          className="primary-btn"
+          onClick={() => {
+            // modal wiring comes later
+            console.log("Create New Invoice clicked");
+          }}
+        >
+          + Create New Invoice
+        </button>
       </div>
 
       <table className="data-table">
