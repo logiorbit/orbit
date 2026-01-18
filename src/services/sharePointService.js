@@ -140,7 +140,7 @@ export async function getLeaveTypeId(accessToken, leaveTypeName) {
   // console.log("Requested Leave Type:", leaveTypeName);
 
   const match = res.data.value.find(
-    (lt) => lt.Title.trim() === leaveTypeName.trim()
+    (lt) => lt.Title.trim() === leaveTypeName.trim(),
   );
 
   return match?.Id;
@@ -240,7 +240,7 @@ export async function getLeaveEntitlementRecord(
   accessToken,
   employeeId,
   leaveTypeId,
-  year
+  year,
 ) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Leave_Entitlement')/items` +
@@ -266,7 +266,7 @@ export async function getLeaveEntitlementRecord(
 export async function updateLeaveEntitlement(
   accessToken,
   entitlementId,
-  payload
+  payload,
 ) {
   const url = `${SITE_URL}/_api/web/lists/getbytitle('Leave_Entitlement')/items(${entitlementId})`;
 
@@ -288,7 +288,7 @@ export async function finalizeLeaveApproval(accessToken, leave) {
     accessToken,
     leave.Employee.Id,
     leave.LeaveType.Id,
-    year
+    year,
   );
 
   if (!entitlement) {
@@ -535,7 +535,7 @@ export function getTeamMembers(hierarchy, tlEmail) {
       (h) =>
         h.TL?.EMail?.toLowerCase() === tlEmail.toLowerCase() ||
         h.ATL?.EMail?.toLowerCase() === tlEmail.toLowerCase() ||
-        h.GTL?.EMail?.toLowerCase() === tlEmail.toLowerCase()
+        h.GTL?.EMail?.toLowerCase() === tlEmail.toLowerCase(),
     )
     .map((h) => h.Employee);
 }
@@ -725,7 +725,7 @@ export async function getTasksForMonth(accessToken, month, year) {
 
 export function getManagerTeamMembers(hierarchy, managerEmail) {
   return hierarchy.filter(
-    (h) => h.Manager?.EMail?.toLowerCase() === managerEmail.toLowerCase()
+    (h) => h.Manager?.EMail?.toLowerCase() === managerEmail.toLowerCase(),
   );
 }
 
@@ -735,7 +735,7 @@ export function getAllTeamMembers(hierarchy, managerEmail) {
 
 export function getSelfMembers(hierarchy, managerEmail) {
   return hierarchy.filter(
-    (h) => h.Employee?.EMail?.toLowerCase() === managerEmail.toLowerCase()
+    (h) => h.Employee?.EMail?.toLowerCase() === managerEmail.toLowerCase(),
   );
 }
 
@@ -919,7 +919,7 @@ export async function updateEmployeeHierarchy(token, itemId, payload) {
         "IF-MATCH": "*",
         "X-HTTP-Method": "MERGE",
       },
-    }
+    },
   );
 }
 
@@ -954,7 +954,7 @@ export async function submitTimesheet(accessToken, data) {
         Accept: "application/json;odata=nometadata",
         "Content-Type": "application/json",
       },
-    }
+    },
   );
 
   return res.data.Id; // needed for attachments
@@ -1023,7 +1023,7 @@ export async function updateTimesheetRecord(token, id, payload) {
         "IF-MATCH": "*",
       },
       body: JSON.stringify(payload),
-    }
+    },
   );
 }
 
@@ -1036,7 +1036,7 @@ export async function deleteTimesheetRecord(token, id) {
         Authorization: `Bearer ${token}`,
         "IF-MATCH": "*",
       },
-    }
+    },
   );
 }
 
@@ -1049,7 +1049,7 @@ export async function getTimesheetAttachments(token, id) {
         // Add this line to force JSON response
         Accept: "application/json;odata=nometadata",
       },
-    }
+    },
   );
 
   if (!res.ok) {
@@ -1060,4 +1060,28 @@ export async function getTimesheetAttachments(token, id) {
 
   const json = await res.json();
   return json.value; // SharePoint returns the array inside .value [cite: 195]
+}
+
+export async function getInvoicesByMonthYear(accessToken, month, year) {
+  const filter = `InvoiceMonth eq '${month}' and InvoiceYear eq ${year}`;
+
+  return getListItems(
+    accessToken,
+    "Invoice_Header",
+    filter,
+    [
+      "ID",
+      "InvoiceID",
+      "InvoiceMonth",
+      "InvoiceYear",
+      "InvoiceStatus",
+      "SubTotal",
+      "GrandTotal",
+      "IsLocked",
+      "Client/Id",
+      "Client/ClientName",
+      "PDFUrl",
+    ],
+    ["Client"],
+  );
 }

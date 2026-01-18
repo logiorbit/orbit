@@ -5,6 +5,7 @@ import SubmitTimesheet from "./SubmitTimesheetModal";
 import TimesheetStatusTable from "./TimesheetStatusTable";
 import MonthYearFilter from "./MonthYearFilter";
 import EditTimesheetModal from "./EditTimesheetModal";
+import InvoiceStatusTable from "./InvoiceStatusTable";
 
 import { getAccessToken } from "../../auth/authService";
 import {
@@ -12,6 +13,7 @@ import {
   getTimesheetsForMonth,
   deleteTimesheetRecord,
   getClients,
+  getInvoicesByMonthYear,
 } from "../../services/sharePointService";
 
 import "./HRDashboard.css";
@@ -28,6 +30,8 @@ export default function HRDashboard() {
   const [token, setToken] = useState(null);
   const [editingTimesheet, setEditingTimesheet] = useState(null);
   const [clients, setClients] = useState([]);
+  const [invoices, setInvoices] = useState([]);
+  const [loadingInvoices, setLoadingInvoices] = useState(false);
 
   /* ============================
      1️⃣ Acquire Access Token
@@ -58,11 +62,11 @@ export default function HRDashboard() {
     ])
       .then(([hierarchy, ts, clientData]) => {
         setEmployees(
-          Array.isArray(hierarchy) ? hierarchy : hierarchy?.value || []
+          Array.isArray(hierarchy) ? hierarchy : hierarchy?.value || [],
         );
         setTimesheets(Array.isArray(ts) ? ts : ts?.value || []);
         setClients(
-          Array.isArray(clientData) ? clientData : clientData?.value || []
+          Array.isArray(clientData) ? clientData : clientData?.value || [],
         );
       })
       .catch((error) => {
@@ -75,11 +79,34 @@ export default function HRDashboard() {
       });
   }, [token, month, year]);
 
+  useEffect(() => {
+    async function fetchInvoices() {
+      if (!selectedMonth || !selectedYear) return;
+
+      setLoadingInvoices(true);
+      try {
+        const token = await getAccessToken(instance);
+        const data = await getInvoicesByMonthYear(
+          token,
+          selectedMonth,
+          selectedYear,
+        );
+        setInvoices(data);
+      } catch (error) {
+        console.error("Error fetching invoices", error);
+      } finally {
+        setLoadingInvoices(false);
+      }
+    }
+
+    fetchInvoices();
+  }, [selectedMonth, selectedYear]);
+
   async function handleDeleteTimesheet(timesheet) {
     if (!timesheet || !timesheet.Id) return;
 
     const confirmed = window.confirm(
-      "Are you sure you want to delete this timesheet?"
+      "Are you sure you want to delete this timesheet?",
     );
 
     if (!confirmed) return;
@@ -93,7 +120,7 @@ export default function HRDashboard() {
       setTimesheets(
         Array.isArray(updatedTimesheets)
           ? updatedTimesheets
-          : updatedTimesheets?.value || []
+          : updatedTimesheets?.value || [],
       );
     } catch (error) {
       console.error("Failed to delete timesheet:", error);
@@ -140,7 +167,29 @@ export default function HRDashboard() {
                 />
               </div>
 
-              <div className="card"></div>
+              <div className="card">
+                {/* Invoices Section */}
+                <div className="hr-section">
+                  <div className="hr-section-header">
+                    <h3>Invoices</h3>
+
+                    <button
+                      className="primary-btn"
+                      onClick={() => {
+                        // modal wiring comes later
+                        console.log("Create New Invoice clicked");
+                      }}
+                    >
+                      + Create New Invoice
+                    </button>
+                  </div>
+
+                  <InvoiceStatusTable
+                    invoices={invoices}
+                    loading={loadingInvoices}
+                  />
+                </div>
+              </div>
             </div>
           </>
         )}
