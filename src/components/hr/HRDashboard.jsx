@@ -61,6 +61,9 @@ export default function HRDashboard() {
       getClients(token),
     ])
       .then(([hierarchy, ts, clientData]) => {
+        console.log(hierarchy);
+        console.log(ts);
+        console.log(clientData);
         setEmployees(
           Array.isArray(hierarchy) ? hierarchy : hierarchy?.value || [],
         );
