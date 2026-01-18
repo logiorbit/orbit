@@ -1072,6 +1072,8 @@ export async function getInvoicesByMonthYear(token, month, year) {
     `&$expand=Client` +
     `&$filter=InvoiceMonth eq '${month}' and InvoiceYear eq '${year}'`;
 
+  console.log(url);
+
   const response = await fetch(url, {
     method: "GET",
     headers: {
