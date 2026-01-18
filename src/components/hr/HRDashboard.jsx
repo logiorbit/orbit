@@ -83,23 +83,23 @@ export default function HRDashboard() {
   }, [token, month, year]);
 
   useEffect(() => {
-    async function fetchInvoices() {
-      if (!month || !year) return;
+    if (!token || !month || !year) return;
 
+    async function fetchInvoices() {
       setLoadingInvoices(true);
       try {
-        const token = await getAccessToken(instance);
         const data = await getInvoicesByMonthYear(token, month, year);
         setInvoices(data);
       } catch (error) {
         console.error("Error fetching invoices", error);
+        setInvoices([]);
       } finally {
         setLoadingInvoices(false);
       }
     }
 
     fetchInvoices();
-  }, [month, year]);
+  }, [token, month, year]);
 
   async function handleDeleteTimesheet(timesheet) {
     if (!timesheet || !timesheet.Id) return;
