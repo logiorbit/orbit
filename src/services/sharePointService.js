@@ -1062,24 +1062,29 @@ export async function getTimesheetAttachments(token, id) {
   return json.value; // SharePoint returns the array inside .value [cite: 195]
 }
 
-export async function getInvoicesByMonthYear(token, month, year) {
-  const filter = `InvoiceMonth eq '${month}' and InvoiceYear eq ${year}`;
+import { SITE_URL } from "../config";
 
-  const response = await fetch(
+export async function getInvoicesByMonthYear(token, month, year) {
+  const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items` +
-      `?$select=ID,InvoiceID,InvoiceMonth,InvoiceYear,InvoiceStatus,SubTotal,GrandTotal,IsLocked,PDFUrl,Client/Id,Client/ClientName` +
-      `&$expand=Client` +
-      `&$filter=${encodeURIComponent(filter)}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json;odata=nometadata",
-      },
+    `?$select=` +
+    `ID,InvoiceID,InvoiceMonth,InvoiceYear,InvoiceStatus,` +
+    `SubTotal,GrandTotal,IsLocked,PDFUrl,` +
+    `Client/Id,Client/ClientName` +
+    `&$expand=Client` +
+    `&$filter=InvoiceMonth eq '${month}' and InvoiceYear eq '${year}'`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json;odata=nometadata",
     },
-  );
+  });
 
   if (!response.ok) {
+    const text = await response.text();
+    console.error("Invoice fetch failed:", text);
     throw new Error("Failed to fetch invoices");
   }
 
