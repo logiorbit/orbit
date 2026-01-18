@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function CreateInvoiceModal({ clients, onClose }) {
+export default function CreateInvoiceModal({ clients = [], onClose }) {
   const [selectedClient, setSelectedClient] = useState("");
 
   return (
@@ -26,7 +26,7 @@ export default function CreateInvoiceModal({ clients, onClose }) {
               <option value="">-- Select Client --</option>
               {clients.map((c) => (
                 <option key={c.Id} value={c.Id}>
-                  {c.ClientName}
+                  {c.Title}
                 </option>
               ))}
             </select>
