@@ -22,7 +22,7 @@ export default function InvoiceStatusTable({ invoices, loading }) {
 
   return (
     <div className="table-wrapper">
-      <table className="hr-table">
+      <table className="data-table">
         <thead>
           <tr>
             <th>Invoice No</th>
