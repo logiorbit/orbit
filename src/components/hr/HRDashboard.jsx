@@ -182,6 +182,8 @@ export default function HRDashboard() {
                 <InvoiceStatusTable
                   invoices={invoices}
                   loading={loadingInvoices}
+                  month={month}
+                  year={year}
                 />
               </div>
             </div>
