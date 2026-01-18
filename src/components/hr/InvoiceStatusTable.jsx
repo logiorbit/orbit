@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function InvoiceStatusTable({ invoices, loading }) {
+export default function InvoiceStatusTable({ invoices, loading, month, year }) {
   const renderStatus = (status) => {
     switch (status) {
       case "Draft":
