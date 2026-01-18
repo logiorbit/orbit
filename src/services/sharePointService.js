@@ -1062,8 +1062,6 @@ export async function getTimesheetAttachments(token, id) {
   return json.value; // SharePoint returns the array inside .value [cite: 195]
 }
 
-import { SITE_URL } from "../config";
-
 export async function getInvoicesByMonthYear(token, month, year) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items` +
