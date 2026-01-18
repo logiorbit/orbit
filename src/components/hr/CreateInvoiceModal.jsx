@@ -96,11 +96,11 @@ export default function CreateInvoiceModal({ clients = [], token, onClose }) {
                             }}
                           />
                         </td>
-                        <td>{ts.Employee?.EmployeeName}</td>
+                        <td>{ts.Employee?.Title}</td>
                         <td>{ts.Month}</td>
                         <td>{ts.Year}</td>
-                        <td>{ts.TotalHours ?? "-"}</td>
-                        <td>{ts.WorkingDays ?? "-"}</td>
+                        <td>{ts.TotalBillingHours ?? "-"}</td>
+                        <td>{ts.TotalBillingDays ?? "-"}</td>
                       </tr>
                     ))}
                   </tbody>
