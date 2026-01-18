@@ -1095,11 +1095,9 @@ export async function getInvoicesByMonthYear(token, month, year) {
 export async function getApprovedTimesheetsByClient(token, clientId) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items` +
-    `?$select=` +
-    `ID,Employee/Title,Month,Year,TotalBillingHours,TotalBillingDays,Client/Id` +
+    `?$select=ID,Employee/EmployeeName,Month,Year,Status,IsInvoiced,Client/Id` +
     `&$expand=Employee,Client` +
-    `&$filter=` +
-    `Client/Id eq ${clientId} and Status eq 'HR Approved' and IsInvoiced eq false`;
+    `&$filter=Client/Id eq ${clientId}`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -1109,13 +1107,7 @@ export async function getApprovedTimesheetsByClient(token, clientId) {
     },
   });
 
-  if (!response.ok) {
-    const text = await response.text();
-    console.error("Timesheet fetch failed:", text);
-    throw new Error("Failed to fetch approved timesheets");
-  }
-
   const data = await response.json();
-  console.log("Pankaj Data is", data);
+  console.log("DEBUG timesheets:", data.value);
   return data.value || [];
 }
