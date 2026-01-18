@@ -1095,9 +1095,7 @@ export async function getInvoicesByMonthYear(token, month, year) {
 export async function getApprovedTimesheetsByClient(token, clientId) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items` +
-    `?$select=ID,Employee/EmployeeName,Month,Year,Status,IsInvoiced,Client/Id` +
-    `&$expand=Employee,Client` +
-    `&$filter=Client/Id eq ${clientId}`;
+    `?$select=ID,Status,IsInvoiced`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -1107,7 +1105,15 @@ export async function getApprovedTimesheetsByClient(token, clientId) {
     },
   });
 
-  const data = await response.json();
-  console.log("DEBUG timesheets:", data.value);
-  return data.value || [];
+  const rawText = await response.text();
+  console.log("RAW SharePoint response:", rawText);
+
+  try {
+    const json = JSON.parse(rawText);
+    console.log("PARSED JSON:", json);
+    return json.value || [];
+  } catch (e) {
+    console.error("JSON parse failed");
+    return [];
+  }
 }
