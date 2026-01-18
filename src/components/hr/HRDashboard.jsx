@@ -103,6 +103,10 @@ export default function HRDashboard() {
     fetchInvoices();
   }, [token, month, year]);
 
+  useEffect(() => {
+    console.log("showCreateInvoice =", showCreateInvoice);
+  }, [showCreateInvoice]);
+
   async function handleDeleteTimesheet(timesheet) {
     if (!timesheet || !timesheet.Id) return;
 
@@ -176,7 +180,10 @@ export default function HRDashboard() {
                   loading={loadingInvoices}
                   month={month}
                   year={year}
-                  onCreateInvoice={() => setShowCreateInvoice(true)}
+                  onCreateInvoice={() => {
+                    console.log("HRDashboard received create invoice click");
+                    setShowCreateInvoice(true);
+                  }}
                 />
               </div>
             </div>

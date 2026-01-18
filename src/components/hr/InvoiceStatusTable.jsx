@@ -38,6 +38,7 @@ export default function InvoiceStatusTable({
           onClick={() => {
             // modal wiring comes later
             console.log("Create New Invoice clicked");
+            onCreateInvoice && onCreateInvoice();
           }}
         >
           + Create New Invoice
