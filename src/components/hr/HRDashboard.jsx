@@ -6,6 +6,7 @@ import TimesheetStatusTable from "./TimesheetStatusTable";
 import MonthYearFilter from "./MonthYearFilter";
 import EditTimesheetModal from "./EditTimesheetModal";
 import InvoiceStatusTable from "./InvoiceStatusTable";
+import CreateInvoiceModal from "./CreateInvoiceModal";
 
 import { getAccessToken } from "../../auth/authService";
 import {
@@ -32,6 +33,7 @@ export default function HRDashboard() {
   const [clients, setClients] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [loadingInvoices, setLoadingInvoices] = useState(false);
+  const [showCreateInvoice, setShowCreateInvoice] = useState(false);
 
   /* ============================
      1️⃣ Acquire Access Token
@@ -174,6 +176,7 @@ export default function HRDashboard() {
                   loading={loadingInvoices}
                   month={month}
                   year={year}
+                  onCreateInvoice={{} => setShowCreateInvoice(true)}
                 />
               </div>
             </div>
@@ -198,6 +201,15 @@ export default function HRDashboard() {
           }}
         />
       )}
+
+
+      {showCreateInvoice && (
+  <CreateInvoiceModal
+    clients={clients}
+    onClose={() => setShowCreateInvoice(false)}
+  />
+)}
+
     </>
   );
 }
