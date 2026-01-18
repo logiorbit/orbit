@@ -176,7 +176,7 @@ export default function HRDashboard() {
                   loading={loadingInvoices}
                   month={month}
                   year={year}
-                  onCreateInvoice={{} => setShowCreateInvoice(true)}
+                  onCreateInvoice={() => setShowCreateInvoice(true)}
                 />
               </div>
             </div>
@@ -202,14 +202,12 @@ export default function HRDashboard() {
         />
       )}
 
-
       {showCreateInvoice && (
-  <CreateInvoiceModal
-    clients={clients}
-    onClose={() => setShowCreateInvoice(false)}
-  />
-)}
-
+        <CreateInvoiceModal
+          clients={clients}
+          onClose={() => setShowCreateInvoice(false)}
+        />
+      )}
     </>
   );
 }
