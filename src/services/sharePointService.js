@@ -1092,10 +1092,19 @@ export async function getInvoicesByMonthYear(token, month, year) {
   return data.value || [];
 }
 
+import { SITE_URL } from "../config";
+
 export async function getApprovedTimesheetsByClient(token, clientId) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items` +
-    `?$select=ID,Status,IsInvoiced`;
+    `?$select=` +
+    `ID,Month,Year,TotalHours,WorkingDays,Status,IsInvoiced,` +
+    `Employee/Title,Client/Id` +
+    `&$expand=Employee,Client` +
+    `&$filter=` +
+    `Client/Id eq ${clientId}` +
+    ` and Status eq 'HR Approved'` +
+    ` and (IsInvoiced eq false or IsInvoiced eq null)`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -1105,15 +1114,12 @@ export async function getApprovedTimesheetsByClient(token, clientId) {
     },
   });
 
-  const rawText = await response.text();
-  console.log("RAW SharePoint response:", rawText);
-
-  try {
-    const json = JSON.parse(rawText);
-    console.log("PARSED JSON:", json);
-    return json.value || [];
-  } catch (e) {
-    console.error("JSON parse failed");
-    return [];
+  if (!response.ok) {
+    const text = await response.text();
+    console.error("Timesheet fetch failed:", text);
+    throw new Error("Failed to fetch approved timesheets");
   }
+
+  const data = await response.json();
+  return data.value || [];
 }
