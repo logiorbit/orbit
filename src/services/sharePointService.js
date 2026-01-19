@@ -1137,10 +1137,20 @@ export async function createInvoiceHeader(token, payload) {
 
   if (!response.ok) {
     const text = await response.text();
+    console.error("createInvoiceHeader failed:", text);
     throw new Error(text);
   }
 
-  return response.json(); // returns created item incl. ID
+  // Fetch the latest created invoice (safe approach)
+  const location = response.headers.get("Location");
+  if (location) {
+    const idMatch = location.match(/\((\d+)\)$/);
+    if (idMatch) {
+      return { ID: Number(idMatch[1]) };
+    }
+  }
+
+  throw new Error("Invoice created but ID not returned");
 }
 
 export async function createInvoiceTimesheetMap(token, payload) {
