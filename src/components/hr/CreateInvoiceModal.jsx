@@ -199,7 +199,7 @@ export default function CreateInvoiceModal({
               <option value="">-- Select Client --</option>
               {clients.map((c) => (
                 <option key={c.ID} value={c.ID}>
-                  {c.ClientName}
+                  {c.Title}
                 </option>
               ))}
             </select>
