@@ -213,6 +213,8 @@ export default function HRDashboard() {
         <CreateInvoiceModal
           clients={clients}
           token={token}
+          month={month}
+          year={year}
           onClose={() => setShowCreateInvoice(false)}
         />
       )}

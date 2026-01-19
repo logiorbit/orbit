@@ -1,57 +1,87 @@
 import { useEffect, useState } from "react";
-import { getApprovedTimesheetsByClient } from "../../services/sharePointService";
 import {
+  getApprovedTimesheetsByClient,
   createInvoiceHeader,
   createInvoiceTimesheetMap,
   markTimesheetInvoiced,
   getEmployeeClientAssignment,
 } from "../../services/sharePointService";
 
-export default function CreateInvoiceModal({ clients = [], token, onClose }) {
+/**
+ * CreateInvoiceModal
+ *
+ * Responsibilities:
+ * - Select client
+ * - Load HR-approved, not-invoiced timesheets
+ * - Select timesheets
+ * - Create Draft Invoice + mapping records
+ */
+export default function CreateInvoiceModal({
+  clients = [],
+  token,
+  month,
+  year,
+  onClose,
+}) {
+  /* =========================
+     1️⃣ STATE
+     ========================= */
   const [selectedClient, setSelectedClient] = useState("");
   const [timesheets, setTimesheets] = useState([]);
   const [loadingTs, setLoadingTs] = useState(false);
   const [selectedTsIds, setSelectedTsIds] = useState([]);
+  const [saving, setSaving] = useState(false);
 
+  /* =========================
+     2️⃣ HELPER — CALCULATION
+     (Draft-only logic)
+     ========================= */
+  function calculateLine(ts, assignment, client) {
+    const { RateType, RateValue } = assignment;
+
+    if (RateType === "Hour") {
+      return {
+        units: ts.TotalHours,
+        amount: ts.TotalHours * RateValue,
+      };
+    }
+
+    if (RateType === "Day") {
+      const days =
+        client?.FixedWorkingDays != null
+          ? client.FixedWorkingDays
+          : ts.WorkingDays;
+
+      return {
+        units: days,
+        amount: days * RateValue,
+      };
+    }
+
+    // Month
+    return {
+      units: 1,
+      amount: RateValue,
+    };
+  }
+
+  /* =========================
+     3️⃣ LOAD TIMESHEETS
+     ========================= */
   useEffect(() => {
     if (!selectedClient) {
       setTimesheets([]);
+      setSelectedTsIds([]);
       return;
-    }
-
-    function calculateLine(ts, assignment, client) {
-      const { RateType, RateValue } = assignment;
-
-      if (RateType === "Hour") {
-        return {
-          units: ts.TotalHours,
-          amount: ts.TotalHours * RateValue,
-        };
-      }
-
-      if (RateType === "Day") {
-        const days = client.FixedWorkingDays ?? ts.WorkingDays;
-        return {
-          units: days,
-          amount: days * RateValue,
-        };
-      }
-
-      // Month
-      return {
-        units: 1,
-        amount: RateValue,
-      };
     }
 
     async function loadTimesheets() {
       setLoadingTs(true);
       try {
         const data = await getApprovedTimesheetsByClient(token, selectedClient);
-        setTimesheets(data);
-        console.log("THe data is---", data);
+        setTimesheets(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error(err);
+        console.error("Failed to load timesheets:", err);
         setTimesheets([]);
       } finally {
         setLoadingTs(false);
@@ -61,13 +91,21 @@ export default function CreateInvoiceModal({ clients = [], token, onClose }) {
     loadTimesheets();
   }, [selectedClient, token]);
 
+  /* =========================
+     4️⃣ SAVE HANDLER
+     ========================= */
   async function handleSave() {
-    if (!selectedClient || selectedTsIds.length === 0) return;
+    if (!selectedClient || selectedTsIds.length === 0 || saving) return;
+
+    setSaving(true);
 
     try {
-      // 1️⃣ Create Invoice Header (Draft)
+      // Resolve selected client metadata (for FixedWorkingDays, etc.)
+      const clientMeta = clients.find((c) => c.ID === Number(selectedClient));
+
+      /* 1️⃣ Create Invoice Header (Draft) */
       const invoice = await createInvoiceHeader(token, {
-        ClientId: selectedClient,
+        ClientId: Number(selectedClient),
         InvoiceMonth: month,
         InvoiceYear: year,
         InvoiceStatus: "Draft",
@@ -76,23 +114,23 @@ export default function CreateInvoiceModal({ clients = [], token, onClose }) {
 
       let subTotal = 0;
 
-      // 2️⃣ Process each selected timesheet
+      /* 2️⃣ Process each selected timesheet */
       for (const ts of timesheets.filter((t) => selectedTsIds.includes(t.ID))) {
         const assignment = await getEmployeeClientAssignment(
           token,
           ts.Employee.Id,
-          selectedClient,
+          Number(selectedClient),
         );
 
         if (!assignment) {
-          throw new Error("Rate not found for employee/client");
+          throw new Error(`Rate not found for Employee ${ts.Employee.Id}`);
         }
 
         const { units, amount } = calculateLine(ts, assignment, clientMeta);
 
         subTotal += amount;
 
-        // 3️⃣ Create mapping row (snapshot)
+        /* 3️⃣ Create mapping (snapshot) */
         await createInvoiceTimesheetMap(token, {
           InvoiceId: invoice.ID,
           TimesheetId: ts.ID,
@@ -103,13 +141,13 @@ export default function CreateInvoiceModal({ clients = [], token, onClose }) {
           IsEditable: true,
         });
 
-        // 4️⃣ Mark timesheet invoiced
+        /* 4️⃣ Mark timesheet invoiced */
         await markTimesheetInvoiced(token, ts.ID, invoice.ID);
       }
 
-      // 5️⃣ Update invoice totals
+      /* 5️⃣ Update invoice totals */
       await fetch(
-        `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoice.ID})`,
+        `${process.env.REACT_APP_SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoice.ID})`,
         {
           method: "PATCH",
           headers: {
@@ -127,11 +165,16 @@ export default function CreateInvoiceModal({ clients = [], token, onClose }) {
 
       onClose();
     } catch (err) {
-      console.error(err);
-      alert("Failed to create invoice");
+      console.error("Invoice creation failed:", err);
+      alert("Failed to create invoice. Check console for details.");
+    } finally {
+      setSaving(false);
     }
   }
 
+  /* =========================
+     5️⃣ RENDER
+     ========================= */
   return (
     <div className="modal-overlay">
       <div className="modal-card large">
@@ -154,61 +197,59 @@ export default function CreateInvoiceModal({ clients = [], token, onClose }) {
             >
               <option value="">-- Select Client --</option>
               {clients.map((c) => (
-                <option key={c.Id} value={c.Id}>
-                  {c.Title}
+                <option key={c.ID} value={c.ID}>
+                  {c.ClientName}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Placeholder for Approved Timesheets */}
-          <div className="placeholder-box">
-            <div className="timesheet-grid">
-              {loadingTs ? (
-                <p>Loading approved timesheets...</p>
-              ) : timesheets.length === 0 ? (
-                <p>No approved timesheets available for this client.</p>
-              ) : (
-                <table className="hr-table">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>Employee</th>
-                      <th>Month</th>
-                      <th>Year</th>
-                      <th>Hours</th>
-                      <th>Days</th>
+          {/* Timesheet Grid */}
+          <div className="timesheet-grid">
+            {loadingTs ? (
+              <p>Loading approved timesheets...</p>
+            ) : timesheets.length === 0 ? (
+              <p>No approved timesheets available for this client.</p>
+            ) : (
+              <table className="hr-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Employee</th>
+                    <th>Month</th>
+                    <th>Year</th>
+                    <th>Hours</th>
+                    <th>Days</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {timesheets.map((ts) => (
+                    <tr key={ts.ID}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedTsIds.includes(ts.ID)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedTsIds((prev) => [...prev, ts.ID]);
+                            } else {
+                              setSelectedTsIds((prev) =>
+                                prev.filter((id) => id !== ts.ID),
+                              );
+                            }
+                          }}
+                        />
+                      </td>
+                      <td>{ts.Employee?.Title}</td>
+                      <td>{ts.Month}</td>
+                      <td>{ts.Year}</td>
+                      <td>{ts.TotalHours ?? "-"}</td>
+                      <td>{ts.WorkingDays ?? "-"}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {timesheets.map((ts) => (
-                      <tr key={ts.ID}>
-                        <td>
-                          <input
-                            type="checkbox"
-                            checked={selectedTsIds.includes(ts.ID)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setSelectedTsIds([...selectedTsIds, ts.ID]);
-                              } else {
-                                setSelectedTsIds(
-                                  selectedTsIds.filter((id) => id !== ts.ID),
-                                );
-                              }
-                            }}
-                          />
-                        </td>
-                        <td>{ts.Employee?.Title}</td>
-                        <td>{ts.Month}</td>
-                        <td>{ts.Year}</td>
-                        <td>{ts.TotalBillingHours ?? "-"}</td>
-                        <td>{ts.TotalBillingDays ?? "-"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 
@@ -220,10 +261,10 @@ export default function CreateInvoiceModal({ clients = [], token, onClose }) {
 
           <button
             className="primary-btn"
-            disabled={selectedTsIds.length === 0}
+            disabled={selectedTsIds.length === 0 || saving}
             onClick={handleSave}
           >
-            Save Invoice
+            {saving ? "Saving..." : "Save Invoice"}
           </button>
         </div>
       </div>
