@@ -41,8 +41,8 @@ export default function CreateInvoiceModal({
 
     if (RateType === "Hour") {
       return {
-        units: ts.TotalHours,
-        amount: ts.TotalHours * RateValue,
+        units: ts.TotalBillingHours,
+        amount: ts.TotalBillingHours * RateValue,
       };
     }
 
@@ -115,6 +115,8 @@ export default function CreateInvoiceModal({
 
       let subTotal = 0;
 
+      console.log(timesheets);
+
       /* 2️⃣ Process each selected timesheet */
       for (const ts of timesheets.filter((t) => selectedTsIds.includes(t.ID))) {
         const assignment = await getEmployeeClientAssignment(
@@ -124,7 +126,7 @@ export default function CreateInvoiceModal({
         );
 
         if (!assignment) {
-          throw new Error(`Rate not found for Employee ${ts.Employee.Id}`);
+          throw new Error(`Rate not found for Employee ${ts.Employee.ID}`);
         }
 
         const { units, amount } = calculateLine(ts, assignment, clientMeta);
