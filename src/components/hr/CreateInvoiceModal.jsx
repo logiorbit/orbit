@@ -96,6 +96,7 @@ export default function CreateInvoiceModal({
      ========================= */
   async function handleSave() {
     if (!selectedClient || selectedTsIds.length === 0 || saving) return;
+    const SITE_URL = "https://logivention.sharepoint.com/sites/LogiOrbit";
 
     setSaving(true);
 
@@ -147,7 +148,7 @@ export default function CreateInvoiceModal({
 
       /* 5️⃣ Update invoice totals */
       await fetch(
-        `${process.env.REACT_APP_SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoice.ID})`,
+        `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoice.ID})`,
         {
           method: "PATCH",
           headers: {
