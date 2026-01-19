@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 import { getApprovedTimesheetsByClient } from "../../services/sharePointService";
+import {
+  createInvoiceHeader,
+  createInvoiceTimesheetMap,
+  markTimesheetInvoiced,
+  getEmployeeClientAssignment,
+} from "../../services/sharePointService";
 
 export default function CreateInvoiceModal({ clients = [], token, onClose }) {
   const [selectedClient, setSelectedClient] = useState("");
@@ -11,6 +17,31 @@ export default function CreateInvoiceModal({ clients = [], token, onClose }) {
     if (!selectedClient) {
       setTimesheets([]);
       return;
+    }
+
+    function calculateLine(ts, assignment, client) {
+      const { RateType, RateValue } = assignment;
+
+      if (RateType === "Hour") {
+        return {
+          units: ts.TotalHours,
+          amount: ts.TotalHours * RateValue,
+        };
+      }
+
+      if (RateType === "Day") {
+        const days = client.FixedWorkingDays ?? ts.WorkingDays;
+        return {
+          units: days,
+          amount: days * RateValue,
+        };
+      }
+
+      // Month
+      return {
+        units: 1,
+        amount: RateValue,
+      };
     }
 
     async function loadTimesheets() {
@@ -29,6 +60,77 @@ export default function CreateInvoiceModal({ clients = [], token, onClose }) {
 
     loadTimesheets();
   }, [selectedClient, token]);
+
+  async function handleSave() {
+    if (!selectedClient || selectedTsIds.length === 0) return;
+
+    try {
+      // 1️⃣ Create Invoice Header (Draft)
+      const invoice = await createInvoiceHeader(token, {
+        ClientId: selectedClient,
+        InvoiceMonth: month,
+        InvoiceYear: year,
+        InvoiceStatus: "Draft",
+        IsLocked: false,
+      });
+
+      let subTotal = 0;
+
+      // 2️⃣ Process each selected timesheet
+      for (const ts of timesheets.filter((t) => selectedTsIds.includes(t.ID))) {
+        const assignment = await getEmployeeClientAssignment(
+          token,
+          ts.Employee.Id,
+          selectedClient,
+        );
+
+        if (!assignment) {
+          throw new Error("Rate not found for employee/client");
+        }
+
+        const { units, amount } = calculateLine(ts, assignment, clientMeta);
+
+        subTotal += amount;
+
+        // 3️⃣ Create mapping row (snapshot)
+        await createInvoiceTimesheetMap(token, {
+          InvoiceId: invoice.ID,
+          TimesheetId: ts.ID,
+          RateType: assignment.RateType,
+          RateValue: assignment.RateValue,
+          WorkingUnits: units,
+          LineTotal: amount,
+          IsEditable: true,
+        });
+
+        // 4️⃣ Mark timesheet invoiced
+        await markTimesheetInvoiced(token, ts.ID, invoice.ID);
+      }
+
+      // 5️⃣ Update invoice totals
+      await fetch(
+        `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoice.ID})`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json;odata=nometadata",
+            "IF-MATCH": "*",
+          },
+          body: JSON.stringify({
+            SubTotal: subTotal,
+            TaxTotal: 0,
+            GrandTotal: subTotal,
+          }),
+        },
+      );
+
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create invoice");
+    }
+  }
 
   return (
     <div className="modal-overlay">
@@ -116,7 +218,11 @@ export default function CreateInvoiceModal({ clients = [], token, onClose }) {
             Cancel
           </button>
 
-          <button className="primary-btn" disabled={selectedTsIds.length === 0}>
+          <button
+            className="primary-btn"
+            disabled={selectedTsIds.length === 0}
+            onClick={handleSave}
+          >
             Save Invoice
           </button>
         </div>
