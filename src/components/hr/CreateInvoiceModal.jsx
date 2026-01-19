@@ -142,6 +142,8 @@ export default function CreateInvoiceModal({
           IsEditable: true,
         });
 
+        console.log("Employee object:", ts.Employee);
+
         /* 4️⃣ Mark timesheet invoiced */
         await markTimesheetInvoiced(token, ts.ID, invoice.ID);
       }
