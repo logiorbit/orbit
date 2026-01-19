@@ -106,11 +106,11 @@ export default function CreateInvoiceModal({
 
       /* 1️⃣ Create Invoice Header (Draft) */
       const invoice = await createInvoiceHeader(token, {
-        ClientId: Number(selectedClient),
-        InvoiceMonth: month,
-        InvoiceYear: year,
-        InvoiceStatus: "Draft",
-        IsLocked: false,
+        ClientId: Number(selectedClient), // Lookup → number (correct)
+        InvoiceMonth: String(month), // Choice/Text → string
+        InvoiceYear: String(year), // TEXT → string (FIX)
+        InvoiceStatus: "Draft", // Choice → string
+        IsLocked: "No", // TEXT → string (FIX)
       });
 
       let subTotal = 0;
