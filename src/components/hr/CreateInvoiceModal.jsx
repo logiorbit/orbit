@@ -244,8 +244,8 @@ export default function CreateInvoiceModal({
                       <td>{ts.Employee?.Title}</td>
                       <td>{ts.Month}</td>
                       <td>{ts.Year}</td>
-                      <td>{ts.TotalHours ?? "-"}</td>
-                      <td>{ts.WorkingDays ?? "-"}</td>
+                      <td>{ts.TotalBillingHours ?? "-"}</td>
+                      <td>{ts.TotalBillingDays ?? "-"}</td>
                     </tr>
                   ))}
                 </tbody>
