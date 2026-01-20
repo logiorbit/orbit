@@ -17,6 +17,9 @@ export default function Login() {
           <h1>
             Logi<span>Beats</span>
           </h1>
+          <h1>
+            Logi<span className="space">Space</span>
+          </h1>
 
           <p>
             LogiBeats is a modern workforce intelligence platform designed to
