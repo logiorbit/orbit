@@ -15,7 +15,7 @@ export default function Login() {
         {/* LEFT CONTENT */}
         <div className="landing-text">
           <h1>
-            Logi<span>Space</span>
+            Logi<span>Beats</span>
           </h1>
 
           <p>
