@@ -19,7 +19,7 @@ export default function Login() {
           </h1>
 
           <p>
-            LogiSpace is a modern workforce intelligence platform designed to
+            LogiBeats is a modern workforce intelligence platform designed to
             bring clarity, accountability, and visibility into how teams work
             every day.
           </p>
@@ -30,7 +30,7 @@ export default function Login() {
           </p>
 
           <p>
-            Built for Employees, Team Leads, Managers, and Leadership, LogiSpace
+            Built for Employees, Team Leads, Managers, and Leadership, LogiBeats
             enables data-driven decisions with real-time insights across the
             organization.
           </p>
@@ -44,7 +44,7 @@ export default function Login() {
 
         {/* RIGHT IMAGE */}
         <div className="landing-image">
-          <img src="./landing-hero.png.jpg" alt="LogiSpace Workforce Preview" />
+          <img src="./landing-hero.jpg" alt="LogiBeats Workforce Preview" />
         </div>
       </div>
     </div>
