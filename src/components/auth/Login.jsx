@@ -15,11 +15,11 @@ export default function Login() {
         {/* LEFT CONTENT */}
         <div className="landing-text">
           <h1>
-            Logi<span>Orbit</span>
+            Logi<span>Space</span>
           </h1>
 
           <p>
-            LogiOrbit is a modern workforce intelligence platform designed to
+            LogiSpace is a modern workforce intelligence platform designed to
             bring clarity, accountability, and visibility into how teams work
             every day.
           </p>
@@ -30,7 +30,7 @@ export default function Login() {
           </p>
 
           <p>
-            Built for Employees, Team Leads, Managers, and Leadership, LogiOrbit
+            Built for Employees, Team Leads, Managers, and Leadership, LogiSpace
             enables data-driven decisions with real-time insights across the
             organization.
           </p>
@@ -44,7 +44,7 @@ export default function Login() {
 
         {/* RIGHT IMAGE */}
         <div className="landing-image">
-          <img src="./landing-hero.png.jpg" alt="LogiOrbit Workforce Preview" />
+          <img src="./landing-hero.png.jpg" alt="LogiSpace Workforce Preview" />
         </div>
       </div>
     </div>
