@@ -1252,3 +1252,73 @@ export async function updateInvoiceStatus(token, invoiceId, payload) {
 
   return true;
 }
+
+export async function getInvoiceById(token, invoiceId) {
+  const response = await fetch(
+    `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoiceId})?$expand=Client`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json;odata=nometadata",
+      },
+    },
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text);
+  }
+
+  return await response.json();
+}
+
+export async function markInvoiceSent(token, invoiceId) {
+  const response = await fetch(
+    `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoiceId})`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json;odata=nometadata",
+        "IF-MATCH": "*",
+      },
+      body: JSON.stringify({
+        InvoiceStatus: "Sent",
+        SentDate: new Date().toISOString(),
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text);
+  }
+
+  return true;
+}
+
+export async function markInvoicePaid(token, invoiceId, paymentReference) {
+  const response = await fetch(
+    `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoiceId})`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json;odata=nometadata",
+        "IF-MATCH": "*",
+      },
+      body: JSON.stringify({
+        InvoiceStatus: "Paid",
+        PaidDate: new Date().toISOString(),
+        PaymentReference: paymentReference,
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text);
+  }
+
+  return true;
+}

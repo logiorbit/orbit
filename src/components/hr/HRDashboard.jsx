@@ -8,6 +8,12 @@ import MonthYearFilter from "./MonthYearFilter";
 import EditTimesheetModal from "./EditTimesheetModal";
 import InvoiceStatusTable from "./InvoiceStatusTable";
 import CreateInvoiceModal from "./CreateInvoiceModal";
+import PdfViewerModal from "../common/PdfViewerModal";
+
+import {
+  markInvoiceSent,
+  markInvoicePaid,
+} from "../../services/sharePointService";
 
 import { getAccessToken } from "../../auth/authService";
 import {
@@ -37,6 +43,7 @@ export default function HRDashboard() {
   const [invoices, setInvoices] = useState([]);
   const [loadingInvoices, setLoadingInvoices] = useState(false);
   const [showCreateInvoice, setShowCreateInvoice] = useState(false);
+  const [pdfToView, setPdfToView] = useState(null);
 
   /* ============================
      1️⃣ Acquire Access Token
@@ -175,6 +182,19 @@ export default function HRDashboard() {
     refreshInvoices();
   };
 
+  const handleMarkSent = async (invoice) => {
+    await markInvoiceSent(token, invoice.ID);
+    refreshInvoices();
+  };
+
+  const handleMarkPaid = async (invoice) => {
+    const ref = window.prompt("Enter payment reference / UTR:");
+    if (!ref) return;
+
+    await markInvoicePaid(token, invoice.ID, ref);
+    refreshInvoices();
+  };
+
   /* ============================
      3️⃣ Render (NO EARLY RETURN)
      ============================ */
@@ -228,6 +248,9 @@ export default function HRDashboard() {
                   onApproveByHOD={handleHODApprove}
                   onClientVerified={handleClientVerified}
                   onGenerateEInvoice={handleGenerateEInvoice}
+                  onViewPdf={(url) => setPdfToView(url)}
+                  onMarkSent={handleMarkSent}
+                  onMarkPaid={handleMarkPaid}
                   onCreateInvoice={() => {
                     console.log("HRDashboard received create invoice click");
                     setShowCreateInvoice(true);
@@ -265,6 +288,10 @@ export default function HRDashboard() {
           year={year}
           onClose={() => setShowCreateInvoice(false)}
         />
+      )}
+
+      {pdfToView && (
+        <PdfViewerModal pdfUrl={pdfToView} onClose={() => setPdfToView(null)} />
       )}
     </>
   );

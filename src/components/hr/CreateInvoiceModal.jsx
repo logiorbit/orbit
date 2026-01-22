@@ -7,6 +7,8 @@ import {
   getEmployeeClientAssignment,
 } from "../../services/sharePointService";
 
+import { syncInvoicePDF } from "../../services/invoicePdfSyncService";
+
 /**
  * CreateInvoiceModal
  *
@@ -180,6 +182,8 @@ export default function CreateInvoiceModal({
           }),
         },
       );
+
+      await syncInvoicePDF(token, invoice.ID);
 
       onClose();
     } catch (err) {

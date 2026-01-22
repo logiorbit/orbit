@@ -12,6 +12,9 @@ export default function InvoiceStatusTable({
   onApproveByHOD,
   onClientVerified,
   onGenerateEInvoice,
+  onViewPdf,
+  onMarkSent,
+  onMarkPaid,
 }) {
   const { userRoles } = useUserContext();
   /* ===============================
@@ -90,6 +93,24 @@ export default function InvoiceStatusTable({
       );
     }
 
+    // Client Verified → Sent
+    if (status === "EInvoice" && userRoles.isHR) {
+      return (
+        <button className="secondary-btn" onClick={() => onMarkSent(invoice)}>
+          Mark as Sent
+        </button>
+      );
+    }
+
+    // Sent → Paid
+    if (status === "Sent" && userRoles.isHR) {
+      return (
+        <button className="primary-btn" onClick={() => onMarkPaid(invoice)}>
+          Mark as Paid
+        </button>
+      );
+    }
+
     // Everything else
     return <span className="muted">—</span>;
   };
@@ -145,9 +166,12 @@ export default function InvoiceStatusTable({
                 <td>{inv.GrandTotal ?? "-"}</td>
                 <td>
                   {inv.PDFUrl ? (
-                    <a href={inv.PDFUrl.Url} target="_blank" rel="noreferrer">
+                    <button
+                      className="link-btn"
+                      onClick={() => onViewPdf(inv.PDFUrl.Url)}
+                    >
                       View
-                    </a>
+                    </button>
                   ) : (
                     "-"
                   )}
