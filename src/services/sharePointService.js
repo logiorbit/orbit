@@ -1166,16 +1166,19 @@ export async function createInvoiceTimesheetMap(token, payload) {
     },
   );
 
+  const text = await response.text(); // ALWAYS read as text
+
   if (!response.ok) {
-    const text = await response.text();
+    console.error("Invoice_Timesheet_Map create failed:", text);
     throw new Error(text);
   }
 
-  return response.json();
+  // SharePoint may return empty body or XML → do NOT parse
+  return true;
 }
 
 export async function markTimesheetInvoiced(token, id, invoiceId) {
-  return fetch(
+  const response = await fetch(
     `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items(${id})`,
     {
       method: "PATCH",
@@ -1190,6 +1193,14 @@ export async function markTimesheetInvoiced(token, id, invoiceId) {
       }),
     },
   );
+
+  if (!response.ok) {
+    const text = await response.text();
+    console.error("Timesheet update failed:", text);
+    throw new Error(text);
+  }
+
+  return true;
 }
 
 export async function getEmployeeClientAssignment(token, employeeId, clientId) {
