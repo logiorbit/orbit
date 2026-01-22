@@ -1193,9 +1193,10 @@ export async function markTimesheetInvoiced(token, id, invoiceId) {
 }
 
 export async function getEmployeeClientAssignment(token, employeeId, clientId) {
+  console.log("Employee ID is", employeeId);
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Employee_Client_Assignment')/items` +
-    `?$select=ID,RateType,RateValue` +
+    `?$select=ID,RateType,RateValue,Employee/Id,Client/Id,Active` +
     `&$filter=Employee/Id eq ${employeeId} and Client/Id eq ${clientId} and Active eq true` +
     `&$expand=Employee,Client`;
 
