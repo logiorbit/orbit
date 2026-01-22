@@ -104,13 +104,6 @@ export default function HRDashboard() {
     fetchInvoices();
   }, [token, month, year]);
 
-  const handleClientVerified = async (invoice) => {
-    await updateInvoiceStatus(token, invoice.ID, {
-      InvoiceStatus: "Client Verified",
-    });
-    refreshInvoices();
-  };
-
   useEffect(() => {
     console.log("showCreateInvoice =", showCreateInvoice);
   }, [showCreateInvoice]);
@@ -140,6 +133,45 @@ export default function HRDashboard() {
       alert("Failed to delete timesheet record.");
     }
   }
+
+  const refreshInvoices = async () => {
+    setLoadingInvoices(true);
+    try {
+      const data = await getInvoicesByMonthYear(token, month, year);
+      setInvoices(data);
+    } finally {
+      setLoadingInvoices(false);
+    }
+  };
+
+  const handleHRApprove = async (invoice) => {
+    await updateInvoiceStatus(token, invoice.ID, {
+      InvoiceStatus: "HR Approved",
+    });
+    refreshInvoices();
+  };
+
+  const handleHODApprove = async (invoice) => {
+    await updateInvoiceStatus(token, invoice.ID, {
+      InvoiceStatus: "HOD Approved",
+      IsLocked: true, // 🔒 lock starts here
+    });
+    refreshInvoices();
+  };
+
+  const handleClientVerified = async (invoice) => {
+    await updateInvoiceStatus(token, invoice.ID, {
+      InvoiceStatus: "Client Verified",
+    });
+    refreshInvoices();
+  };
+
+  const handleGenerateEInvoice = async (invoice) => {
+    await updateInvoiceStatus(token, invoice.ID, {
+      InvoiceStatus: "EInvoice",
+    });
+    refreshInvoices();
+  };
 
   /* ============================
      3️⃣ Render (NO EARLY RETURN)
