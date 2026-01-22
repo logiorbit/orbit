@@ -1322,3 +1322,30 @@ export async function markInvoicePaid(token, invoiceId, paymentReference) {
 
   return true;
 }
+
+// Fetch invoice line items from Invoice_Timesheet_Map
+export async function getInvoiceLineItems(token, invoiceId) {
+  const response = await fetch(
+    `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Timesheet_Map')/items` +
+      `?$select=` +
+      `ID,EmployeeName,RateType,RateValue,WorkingUnits,LineTotal,Invoice/ID` +
+      `&$expand=Invoice` +
+      `&$filter=Invoice/ID eq ${invoiceId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json;odata=nometadata",
+      },
+    },
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    console.error("Failed to fetch invoice line items:", text);
+    throw new Error("Failed to fetch invoice line items");
+  }
+
+  const data = await response.json();
+  return data.value || [];
+}
