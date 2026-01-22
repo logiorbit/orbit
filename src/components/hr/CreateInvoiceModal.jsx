@@ -58,6 +58,8 @@ export default function CreateInvoiceModal({
       };
     }
 
+    console.log("RateValue", RateValue);
+
     // Month
     return {
       units: 1,
@@ -138,6 +140,13 @@ export default function CreateInvoiceModal({
         subTotal += amount;
 
         /* 3️⃣ Create mapping (snapshot) */
+        console.log("invoice.ID", invoice.ID);
+        console.log("ts.ID", ts.ID);
+        console.log("assignment.RateType", assignment.RateType);
+        console.log("assignment.RateValue", assignment.RateValue);
+        console.log("units", units);
+        console.log("amount", amount);
+
         await createInvoiceTimesheetMap(token, {
           InvoiceId: invoice.ID,
           TimesheetId: ts.ID,
