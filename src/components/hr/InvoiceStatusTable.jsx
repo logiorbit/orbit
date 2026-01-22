@@ -1,4 +1,5 @@
 import React from "react";
+import { useUserContext } from "../../context/UserContext";
 
 export default function InvoiceStatusTable({
   invoices,
@@ -12,6 +13,7 @@ export default function InvoiceStatusTable({
   onClientVerified,
   onGenerateEInvoice,
 }) {
+  const { userRoles } = useUserContext();
   /* ===============================
      1️⃣ STATUS BADGE RENDERING
      =============================== */
@@ -44,7 +46,7 @@ export default function InvoiceStatusTable({
     const status = invoice.InvoiceStatus;
 
     // Draft → HR Approved
-    if (status === "Draft" && userRole === "HR") {
+    if (status === "Draft" && userRoles.isHR) {
       return (
         <button
           className="secondary-btn"
@@ -56,7 +58,7 @@ export default function InvoiceStatusTable({
     }
 
     // HR Approved → HOD Approved
-    if (status === "HR Approved" && userRole === "HOD") {
+    if (status === "HR Approved" && userRoles.isLeadership) {
       return (
         <button className="primary-btn" onClick={() => onApproveByHOD(invoice)}>
           Approve (HOD)
@@ -65,7 +67,7 @@ export default function InvoiceStatusTable({
     }
 
     // HOD Approved → Client Verified (HR action)
-    if (status === "HOD Approved" && userRole === "HR") {
+    if (status === "HOD Approved" && userRoles.isHR) {
       return (
         <button
           className="secondary-btn"
@@ -77,7 +79,7 @@ export default function InvoiceStatusTable({
     }
 
     // Client Verified → E-Invoice
-    if (status === "Client Verified" && userRole === "HR") {
+    if (status === "Client Verified" && userRoles.isHR) {
       return (
         <button
           className="primary-btn"

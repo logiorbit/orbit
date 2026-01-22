@@ -1,5 +1,6 @@
 import { useMsal } from "@azure/msal-react";
 import { useEffect, useState } from "react";
+import { useUserContext } from "../../context/UserContext";
 
 import SubmitTimesheet from "./SubmitTimesheetModal";
 import TimesheetStatusTable from "./TimesheetStatusTable";
@@ -22,6 +23,7 @@ import "./HRDashboard.css";
 
 export default function HRDashboard() {
   const { instance, accounts } = useMsal();
+  const { userRoles } = useUserContext();
 
   const [showSubmitTimesheet, setShowSubmitTimesheet] = useState(false);
   const [employees, setEmployees] = useState([]);
