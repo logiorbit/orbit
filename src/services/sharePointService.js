@@ -1349,3 +1349,54 @@ export async function getInvoiceLineItems(token, invoiceId) {
   const data = await response.json();
   return data.value || [];
 }
+
+// Upload or overwrite invoice PDF in SharePoint
+export async function uploadInvoicePDF(token, invoiceId, pdfBlob) {
+  const fileName = `Invoice-${invoiceId}.pdf`;
+
+  const uploadUrl =
+    `${SITE_URL}/_api/web/GetFolderByServerRelativeUrl('Shared Documents/Invoices')` +
+    `/Files/add(overwrite=true,url='${fileName}')`;
+
+  const response = await fetch(uploadUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json;odata=nometadata",
+    },
+    body: pdfBlob,
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    console.error("PDF upload failed:", text);
+    throw new Error("Failed to upload invoice PDF");
+  }
+
+  const data = await response.json();
+  return data.ServerRelativeUrl;
+}
+
+// Update invoice header fields (status, PDF URL, lock, etc.)
+export async function updateInvoiceStatus(token, invoiceId, payload) {
+  const response = await fetch(
+    `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoiceId})`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json;odata=nometadata",
+        "IF-MATCH": "*",
+      },
+      body: JSON.stringify(payload),
+    },
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    console.error("Invoice update failed:", text);
+    throw new Error("Failed to update invoice");
+  }
+
+  return true;
+}
