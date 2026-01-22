@@ -121,15 +121,17 @@ export default function CreateInvoiceModal({
       for (const ts of timesheets.filter((t) => selectedTsIds.includes(t.ID))) {
         const assignment = await getEmployeeClientAssignment(
           token,
-          ts.EmployeeHierarchy.Id,
+          ts.EmployeeHierarchy.ID,
           Number(selectedClient),
         );
 
         if (!assignment) {
           throw new Error(
-            `Rate not found for Employee ${ts.EmployeeHierarchy.Id}`,
+            `Rate not found for Employee ${ts.EmployeeHierarchy.ID}`,
           );
         }
+
+        console.log("Assignment is---", assignment);
 
         const { units, amount } = calculateLine(ts, assignment, clientMeta);
 

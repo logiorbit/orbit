@@ -1097,10 +1097,10 @@ export async function getApprovedTimesheetsByClient(token, clientId) {
     `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items` +
     `?$select=` +
     `ID,Month,Year,TotalBillingHours,TotalBillingDays,Status,IsInvoiced,` +
-    `Employee/Title,Employee/Id,Employee/EMail,EmployeeHierarchy/Id,Client/Id` +
-    `&$expand=Employee,Client,EmployeeHierarchy` +
+    `Employee/Title,EmployeeHierarchy/ID,Client/ID` +
+    `&$expand=Employee,EmployeeHierarchy,Client` +
     `&$filter=` +
-    `Client/Id eq ${clientId}` +
+    `Client/ID eq ${clientId}` +
     ` and Status eq 'HR Approved'` +
     ` and (IsInvoiced eq false or IsInvoiced eq null)`;
 
