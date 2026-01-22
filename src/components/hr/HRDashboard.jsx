@@ -15,6 +15,7 @@ import {
   deleteTimesheetRecord,
   getClients,
   getInvoicesByMonthYear,
+  updateInvoiceStatus,
 } from "../../services/sharePointService";
 
 import "./HRDashboard.css";
@@ -103,6 +104,13 @@ export default function HRDashboard() {
     fetchInvoices();
   }, [token, month, year]);
 
+  const handleClientVerified = async (invoice) => {
+    await updateInvoiceStatus(token, invoice.ID, {
+      InvoiceStatus: "Client Verified",
+    });
+    refreshInvoices();
+  };
+
   useEffect(() => {
     console.log("showCreateInvoice =", showCreateInvoice);
   }, [showCreateInvoice]);
@@ -160,7 +168,7 @@ export default function HRDashboard() {
               </button>
             </div>
 
-            <div className="manager-grid-2">
+            <div className="manager-grid-1">
               <div className="card">
                 <TimesheetStatusTable
                   employees={employees}
@@ -171,7 +179,8 @@ export default function HRDashboard() {
                   onDelete={handleDeleteTimesheet}
                 />
               </div>
-
+            </div>
+            <div className="manager-grid-1">
               <div className="card">
                 {/* Invoices Section */}
 
@@ -180,6 +189,11 @@ export default function HRDashboard() {
                   loading={loadingInvoices}
                   month={month}
                   year={year}
+                  userRole="HR"
+                  onApproveByHR={handleHRApprove}
+                  onApproveByHOD={handleHODApprove}
+                  onClientVerified={handleClientVerified}
+                  onGenerateEInvoice={handleGenerateEInvoice}
                   onCreateInvoice={() => {
                     console.log("HRDashboard received create invoice click");
                     setShowCreateInvoice(true);
