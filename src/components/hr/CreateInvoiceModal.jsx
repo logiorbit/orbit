@@ -121,7 +121,7 @@ export default function CreateInvoiceModal({
       for (const ts of timesheets.filter((t) => selectedTsIds.includes(t.ID))) {
         const assignment = await getEmployeeClientAssignment(
           token,
-          ts.Employee.EMail,
+          ts.EmployeeHierarchy.Id,
           Number(selectedClient),
         );
 
