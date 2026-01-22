@@ -1194,10 +1194,16 @@ export async function markTimesheetInvoiced(token, id, invoiceId) {
 
 export async function getEmployeeClientAssignment(token, employeeId, clientId) {
   console.log("Employee ID is", employeeId);
+  console.log("Employee ID is", clientId);
+  //  const url =
+  //    `${SITE_URL}/_api/web/lists/getbytitle('Employee_Client_Assignment')/items` +
+  //    `?$select=ID,RateType,RateValue,Employee/Id,Client/Id,Active` +
+  //    `&$filter=Employee/Id eq ${employeeId} and Client/Id eq ${clientId} and Active eq true` +
+  //    `&$expand=Employee,Client`;
+
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Employee_Client_Assignment')/items` +
     `?$select=ID,RateType,RateValue,Employee/Id,Client/Id,Active` +
-    `&$filter=Employee/Id eq ${employeeId} and Client/Id eq ${clientId} and Active eq true` +
     `&$expand=Employee,Client`;
 
   const res = await fetch(url, {
@@ -1209,5 +1215,6 @@ export async function getEmployeeClientAssignment(token, employeeId, clientId) {
   });
 
   const data = await res.json();
+  console.log("The Entire Employee data without filter is---", data);
   return data.value?.[0]; // assume one active assignment
 }

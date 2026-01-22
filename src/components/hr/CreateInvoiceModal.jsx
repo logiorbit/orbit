@@ -126,7 +126,9 @@ export default function CreateInvoiceModal({
         );
 
         if (!assignment) {
-          throw new Error(`Rate not found for Employee ${ts.Employee.Id}`);
+          throw new Error(
+            `Rate not found for Employee ${ts.EmployeeHierarchy.Id}`,
+          );
         }
 
         const { units, amount } = calculateLine(ts, assignment, clientMeta);
