@@ -1230,29 +1230,6 @@ export async function getEmployeeClientAssignment(token, employeeId, clientId) {
   return data.value?.[0]; // assume one active assignment
 }
 
-export async function updateInvoiceStatus(token, invoiceId, payload) {
-  const response = await fetch(
-    `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoiceId})`,
-    {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json;odata=nometadata",
-        "IF-MATCH": "*",
-      },
-      body: JSON.stringify(payload),
-    },
-  );
-
-  if (!response.ok) {
-    const text = await response.text();
-    console.error("Invoice status update failed:", text);
-    throw new Error(text);
-  }
-
-  return true;
-}
-
 export async function getInvoiceById(token, invoiceId) {
   const response = await fetch(
     `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoiceId})?$expand=Client`,
