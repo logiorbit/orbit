@@ -1097,7 +1097,7 @@ export async function getApprovedTimesheetsByClient(token, clientId) {
     `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items` +
     `?$select=` +
     `ID,Month,Year,TotalBillingHours,TotalBillingDays,Status,IsInvoiced,` +
-    `Employee/Title,Employee/Id,Client/Id` +
+    `Employee/Title,Employee/Id,Employee/EMail,Client/Id` +
     `&$expand=Employee,Client` +
     `&$filter=` +
     `Client/Id eq ${clientId}` +
@@ -1196,7 +1196,7 @@ export async function getEmployeeClientAssignment(token, employeeId, clientId) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Employee_Client_Assignment')/items` +
     `?$select=ID,RateType,RateValue` +
-    `&$filter=Employee/Employee/Id eq ${employeeId} and Client/Id eq ${clientId} and Active eq true` +
+    `&$filter=Employee/EmployeeEmail eq ${employeeId} and Client/Id eq ${clientId} and Active eq true` +
     `&$expand=Employee,Client`;
 
   const res = await fetch(url, {
