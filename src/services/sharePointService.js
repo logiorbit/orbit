@@ -1311,7 +1311,7 @@ export async function getInvoiceLineItems(token, invoiceId) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Timesheet_Map')/items` +
     `?$select=` +
-    `ID,EmployeeName,RateType,RateValue,WorkingUnits,LineTotal,InvoiceId` +
+    `ID,RateType,RateValue,WorkingUnits,LineTotal,InvoiceId` +
     `&$filter=InvoiceId eq ${invoiceId}`;
 
   const response = await fetch(url, {
