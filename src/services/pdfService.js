@@ -41,7 +41,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
     l.LineTotal || "-",
   ]);
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: 65,
     head: [["#", "Rate Type", "Units", "Rate", "Amount"]],
     body: tableRows,
