@@ -1336,9 +1336,12 @@ export async function getInvoiceLineItems(token, invoiceId) {
 export async function uploadInvoicePDF(token, invoiceId, pdfBlob) {
   const fileName = `Invoice-${invoiceId}.pdf`;
 
+  const folderServerRelativeUrl = "/sites/LogiOrbit/Shared Documents/Invoices";
+
   const uploadUrl =
-    `${SITE_URL}/_api/web/GetFolderByServerRelativeUrl('Shared Documents/Invoices')` +
-    `/Files/add(overwrite=true,url='${fileName}')`;
+    `${SITE_URL}/_api/web/GetFolderByServerRelativeUrl(` +
+    `'${folderServerRelativeUrl}')/Files/add` +
+    `(overwrite=true,url='${fileName}')`;
 
   const response = await fetch(uploadUrl, {
     method: "POST",
