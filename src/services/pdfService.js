@@ -35,7 +35,6 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
      ============================ */
   const tableRows = lineItems.map((l, index) => [
     index + 1,
-    l.EmployeeName || "-",
     l.RateType || "-",
     l.WorkingUnits || "-",
     l.RateValue || "-",
@@ -44,7 +43,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
 
   doc.autoTable({
     startY: 65,
-    head: [["#", "Employee", "Rate Type", "Units", "Rate", "Amount"]],
+    head: [["#", "Rate Type", "Units", "Rate", "Amount"]],
     body: tableRows,
     styles: {
       fontSize: 9,
