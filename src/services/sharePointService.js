@@ -1231,18 +1231,24 @@ export async function getEmployeeClientAssignment(token, employeeId, clientId) {
 }
 
 export async function getInvoiceById(token, invoiceId) {
-  const response = await fetch(
-    `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoiceId})?$expand=Client`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json;odata=nometadata",
-      },
+  const url =
+    `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoiceId})` +
+    `?$select=` +
+    `ID,InvoiceID,InvoiceMonth,InvoiceYear,InvoiceStatus,IsLocked,` +
+    `SubTotal,TaxTotal,GrandTotal,PDFUrl,Client/ID,Client/ClientName` +
+    `&$expand=Client`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json;odata=nometadata",
     },
-  );
+  });
 
   if (!response.ok) {
     const text = await response.text();
+    console.error("getInvoiceById failed:", text);
     throw new Error(text);
   }
 
@@ -1302,25 +1308,24 @@ export async function markInvoicePaid(token, invoiceId, paymentReference) {
 
 // Fetch invoice line items from Invoice_Timesheet_Map
 export async function getInvoiceLineItems(token, invoiceId) {
-  const response = await fetch(
+  const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Timesheet_Map')/items` +
-      `?$select=` +
-      `ID,EmployeeName,RateType,RateValue,WorkingUnits,LineTotal,Invoice/ID` +
-      `&$expand=Invoice` +
-      `&$filter=Invoice/ID eq ${invoiceId}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json;odata=nometadata",
-      },
+    `?$select=` +
+    `ID,EmployeeName,RateType,RateValue,WorkingUnits,LineTotal,InvoiceId` +
+    `&$filter=InvoiceId eq ${invoiceId}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json;odata=nometadata",
     },
-  );
+  });
 
   if (!response.ok) {
     const text = await response.text();
-    console.error("Failed to fetch invoice line items:", text);
-    throw new Error("Failed to fetch invoice line items");
+    console.error("getInvoiceLineItems failed:", text);
+    throw new Error(text);
   }
 
   const data = await response.json();
