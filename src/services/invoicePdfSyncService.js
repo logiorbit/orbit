@@ -37,7 +37,10 @@ export async function syncInvoicePDF(token, invoiceId) {
 
   // 6️⃣ Update invoice with PDF URL (same URL reused)
   await updateInvoiceStatus(token, invoiceId, {
-    PDFUrl: pdfUrl,
+    PDFUrl: {
+      Url: pdfUrl,
+      Description: `Invoice ${invoiceId}`,
+    },
   });
 
   console.log(`Invoice ${invoiceId} PDF synced successfully.`);
