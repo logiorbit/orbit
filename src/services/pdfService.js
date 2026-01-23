@@ -1,7 +1,7 @@
 // src/services/pdfService.js
 
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 /**
  * Generates Invoice PDF using LOCKED / LATEST invoice data
