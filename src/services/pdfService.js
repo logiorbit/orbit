@@ -4,9 +4,8 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 /**
- * Generates Invoice PDF using LOCKED / LATEST invoice data
- * This function does NOT upload anything.
- * It ONLY creates the PDF document.
+ * Generates Invoice PDF using latest invoice data
+ * Does NOT upload the PDF
  */
 export async function generateInvoicePDF({ invoice, lineItems, client }) {
   const doc = new jsPDF();
@@ -31,10 +30,11 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
   }
 
   /* ============================
-     LINE ITEMS TABLE
+     LINE ITEMS
      ============================ */
   const tableRows = lineItems.map((l, index) => [
     index + 1,
+    l.EmployeeName || "-",
     l.RateType || "-",
     l.WorkingUnits || "-",
     l.RateValue || "-",
@@ -43,7 +43,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
 
   autoTable(doc, {
     startY: 65,
-    head: [["#", "Rate Type", "Units", "Rate", "Amount"]],
+    head: [["#", "Employee", "Rate Type", "Units", "Rate", "Amount"]],
     body: tableRows,
     styles: {
       fontSize: 9,
