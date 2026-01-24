@@ -51,6 +51,7 @@ export default function TimesheetStatusTable({
   }
 
   function resolveFlags(status) {
+    console.log("Pankaj Status is--" + status);
     return {
       submitted:
         status === "Submitted" ||
