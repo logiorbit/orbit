@@ -1383,3 +1383,25 @@ export async function updateInvoiceStatus(token, invoiceId, payload) {
 
   return true;
 }
+
+export async function getEmployeeHierarchyByEmail(token, email) {
+  const url =
+    `${SITE_URL}/_api/web/lists/getbytitle('Employee_Hierarchy')/items` +
+    `?$select=ID,Title,EmployeeEmail` +
+    `&$filter=EmployeeEmail eq '${email}'`;
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json;odata=nometadata",
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text);
+  }
+
+  const data = await response.json();
+  return data.value?.[0] || null;
+}

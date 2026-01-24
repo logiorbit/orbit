@@ -1,22 +1,26 @@
 import { useEffect, useState } from "react";
 import { useMsal } from "@azure/msal-react";
 import { getAccessToken } from "../../auth/authService";
+
 import {
   getClients,
   submitTimesheet,
   uploadTimesheetAttachments,
+  getEmployeeHierarchyByEmail,
 } from "../../services/sharePointService";
 
 export default function SubmitTimesheetModal({ onClose }) {
   const { instance, accounts } = useMsal();
   const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [files, setFiles] = useState([]);
 
   /* =========================
-     TIMESHEET STATE (CSV-ONLY)
+     TIMESHEET STATE
      ========================= */
   const [form, setForm] = useState({
     title: "Timesheet",
-    client: "",
+    clientId: "",
     month: "",
     year: new Date().getFullYear(),
     totalWorkingDays: "",
@@ -26,22 +30,23 @@ export default function SubmitTimesheetModal({ onClose }) {
     holidayDates: "",
     totalBillingDays: "",
     totalBillingHours: "",
-    status: "Submitted", // EXACT Choice
+    status: "Submitted",
   });
 
-  const [files, setFiles] = useState([]);
-  const [loading, setLoading] = useState(false);
-
+  /* =========================
+     LOAD CLIENTS
+     ========================= */
   useEffect(() => {
     async function load() {
       const token = await getAccessToken(instance, accounts[0]);
-      setClients(await getClients(token));
+      const data = await getClients(token);
+      setClients(Array.isArray(data) ? data : []);
     }
     load();
   }, [instance, accounts]);
 
   /* =========================
-     SUBMIT
+     SUBMIT HANDLER
      ========================= */
   const submit = async () => {
     if (!form.clientId || !form.month || !form.year) {
@@ -54,17 +59,55 @@ export default function SubmitTimesheetModal({ onClose }) {
     try {
       const token = await getAccessToken(instance, accounts[0]);
 
-      const itemId = await submitTimesheet(token, {
-        ...form,
-        cliendId: Number(form.clientId),
-        year: String(form.year),
-        totalWorkingDays: Number(form.totalWorkingDays),
-        totalLeaves: Number(form.totalLeaves),
-        totalHolidays: Number(form.totalHolidays),
-        totalBillingDays: Number(form.totalBillingDays),
-        totalBillingHours: Number(form.totalBillingHours),
-      });
+      /* =========================
+         Resolve Logged-in Employee
+         ========================= */
+      const userEmail = accounts[0]?.username;
 
+      if (!userEmail) {
+        throw new Error("Unable to determine logged-in user email");
+      }
+
+      const employeeHierarchy = await getEmployeeHierarchyByEmail(
+        token,
+        userEmail,
+      );
+
+      if (!employeeHierarchy) {
+        throw new Error(
+          `Employee not found in Employee_Hierarchy for ${userEmail}`,
+        );
+      }
+
+      /* =========================
+         Build Timesheet Payload
+         ========================= */
+      const payload = {
+        Title: form.title,
+        Month: form.month,
+        Year: String(form.year),
+        Status: "Submitted",
+
+        ClientId: Number(form.clientId), // Lookup
+        EmployeeHierarchyId: employeeHierarchy.ID, // 🔑 FIX
+
+        TotalWorkingDays: Number(form.totalWorkingDays) || 0,
+        TotalLeaves: Number(form.totalLeaves) || 0,
+        TotalHolidays: Number(form.totalHolidays) || 0,
+        LeaveDates: form.leaveDates || "",
+        HolidayDates: form.holidayDates || "",
+        TotalBillingDays: Number(form.totalBillingDays) || 0,
+        TotalBillingHours: Number(form.totalBillingHours) || 0,
+      };
+
+      /* =========================
+         Create Timesheet
+         ========================= */
+      const itemId = await submitTimesheet(token, payload);
+
+      /* =========================
+         Upload Attachments
+         ========================= */
       if (files.length > 0) {
         await uploadTimesheetAttachments(token, itemId, files);
       }
@@ -72,8 +115,8 @@ export default function SubmitTimesheetModal({ onClose }) {
       onClose();
       window.location.reload();
     } catch (err) {
-      console.error(err);
-      alert("Failed to save timesheet");
+      console.error("Failed to save timesheet:", err);
+      alert(err.message || "Failed to save timesheet");
     } finally {
       setLoading(false);
     }
@@ -86,6 +129,7 @@ export default function SubmitTimesheetModal({ onClose }) {
     <div className="modal-overlay">
       <div className="modal-card">
         <h3>Create Timesheet</h3>
+
         <div className="form-grid">
           <div className="form-group">
             <label>Client *</label>
@@ -96,7 +140,7 @@ export default function SubmitTimesheetModal({ onClose }) {
             >
               <option value="">Select Client</option>
               {clients.map((c) => (
-                <option key={c.Id} value={c.Id}>
+                <option key={c.ID} value={c.ID}>
                   {c.Title}
                 </option>
               ))}
@@ -104,7 +148,7 @@ export default function SubmitTimesheetModal({ onClose }) {
           </div>
 
           <div className="form-group">
-            <label>Month</label>
+            <label>Month *</label>
             <select
               value={form.month}
               onChange={(e) => setForm({ ...form, month: e.target.value })}
@@ -132,10 +176,9 @@ export default function SubmitTimesheetModal({ onClose }) {
           </div>
 
           <div className="form-group">
-            <label>Year</label>
+            <label>Year *</label>
             <input
               type="number"
-              placeholder="Year"
               value={form.year}
               onChange={(e) => setForm({ ...form, year: e.target.value })}
             />
@@ -145,7 +188,6 @@ export default function SubmitTimesheetModal({ onClose }) {
             <label>Total Working Days</label>
             <input
               type="number"
-              placeholder="Total Working Days"
               value={form.totalWorkingDays}
               onChange={(e) =>
                 setForm({ ...form, totalWorkingDays: e.target.value })
@@ -157,7 +199,6 @@ export default function SubmitTimesheetModal({ onClose }) {
             <label>Total Leaves</label>
             <input
               type="number"
-              placeholder="Total Leaves"
               value={form.totalLeaves}
               onChange={(e) =>
                 setForm({ ...form, totalLeaves: e.target.value })
@@ -169,7 +210,6 @@ export default function SubmitTimesheetModal({ onClose }) {
             <label>Total Holidays</label>
             <input
               type="number"
-              placeholder="Total Holidays"
               value={form.totalHolidays}
               onChange={(e) =>
                 setForm({ ...form, totalHolidays: e.target.value })
@@ -180,16 +220,14 @@ export default function SubmitTimesheetModal({ onClose }) {
           <div className="form-group">
             <label>Leave Dates</label>
             <textarea
-              placeholder="Leave Dates"
               value={form.leaveDates}
               onChange={(e) => setForm({ ...form, leaveDates: e.target.value })}
             />
           </div>
 
           <div className="form-group">
-            <label>Holiday Date</label>
+            <label>Holiday Dates</label>
             <textarea
-              placeholder="Holiday Dates"
               value={form.holidayDates}
               onChange={(e) =>
                 setForm({ ...form, holidayDates: e.target.value })
@@ -201,7 +239,6 @@ export default function SubmitTimesheetModal({ onClose }) {
             <label>Total Billing Days</label>
             <input
               type="number"
-              placeholder="Total Billing Days"
               value={form.totalBillingDays}
               onChange={(e) =>
                 setForm({ ...form, totalBillingDays: e.target.value })
@@ -213,7 +250,6 @@ export default function SubmitTimesheetModal({ onClose }) {
             <label>Total Billing Hours</label>
             <input
               type="number"
-              placeholder="Total Billing Hours"
               value={form.totalBillingHours}
               onChange={(e) =>
                 setForm({ ...form, totalBillingHours: e.target.value })
@@ -222,7 +258,6 @@ export default function SubmitTimesheetModal({ onClose }) {
           </div>
 
           <div className="form-group">
-            {" "}
             <label>Attachments</label>
             <input
               type="file"
