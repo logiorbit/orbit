@@ -1063,19 +1063,18 @@ export async function getTimesheetAttachments(token, id) {
 }
 
 export async function getInvoicesByMonthYear(token, month, year) {
+  const filter = `InvoiceMonth eq '${month}' and InvoiceYear eq '${year}'`;
+
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items` +
     `?$select=` +
     `ID,InvoiceID,InvoiceMonth,InvoiceYear,InvoiceStatus,` +
     `SubTotal,GrandTotal,IsLocked,PDFUrl,` +
-    `Client/Id,Client/ClientName` +
+    `Client/ID,Client/ClientName` +
     `&$expand=Client` +
-    `&$filter=InvoiceMonth eq '${month}' and InvoiceYear eq '${year}'`;
-
-  console.log(url);
+    `&$filter=${encodeURIComponent(filter)}`;
 
   const response = await fetch(url, {
-    method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: "application/json;odata=nometadata",
@@ -1084,8 +1083,7 @@ export async function getInvoicesByMonthYear(token, month, year) {
 
   if (!response.ok) {
     const text = await response.text();
-    console.error("Invoice fetch failed:", text);
-    throw new Error("Failed to fetch invoices");
+    throw new Error(text);
   }
 
   const data = await response.json();
