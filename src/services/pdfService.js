@@ -6,6 +6,55 @@ function safeAmount(value) {
   return isNaN(num) ? "0.00" : num.toFixed(2);
 }
 
+function drawWatermark(doc, status) {
+  if (!status) return;
+
+  let text = "";
+
+  switch (status) {
+    case "Draft":
+      text = "DRAFT";
+      break;
+
+    case "HR Approved":
+      text = "HR APPROVED";
+      break;
+
+    case "Paid":
+      text = "PAID";
+      break;
+
+    // All verified / issued states
+    case "HOD Approved":
+    case "Client Verified":
+    case "EInvoice":
+    case "Sent":
+      text = "APPROVED";
+      break;
+
+    default:
+      return;
+  }
+
+  const pageCount = doc.getNumberOfPages();
+
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+
+    doc.setFontSize(50);
+    doc.setTextColor(180, 180, 180);
+    doc.setFont("helvetica", "bold");
+
+    doc.text(text, 105, 150, {
+      align: "center",
+      angle: 45,
+    });
+  }
+
+  // Reset color for rest of content
+  doc.setTextColor(0, 0, 0);
+}
+
 export async function generateInvoicePDF({ invoice, lineItems, client }) {
   const doc = new jsPDF("p", "mm", "a4");
 
@@ -188,6 +237,8 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
     10,
     y + 20,
   );
+
+  drawWatermark(doc, invoice.InvoiceStatus);
 
   return doc;
 }
