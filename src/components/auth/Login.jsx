@@ -1,7 +1,7 @@
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../../auth/msalConfig";
 import landingHero from "../../assets/landing-hero.jpg";
-import companyLogo from "../../assets/company-logo.png";
+import companyLogo from "../../assets/company-logo2.png";
 import "./landing.css";
 
 export default function Login() {

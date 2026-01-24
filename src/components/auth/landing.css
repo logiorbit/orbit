@@ -85,7 +85,7 @@
 .company-logo {
   position: absolute;
   top: 20px;
-  right: 24px;
+  left: 24px;
   z-index: 10;
 }
 
