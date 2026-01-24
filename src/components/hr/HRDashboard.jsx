@@ -23,6 +23,7 @@ import {
   getClients,
   getInvoicesByMonthYear,
   updateInvoiceStatus,
+  getEmployeeClientAssignments, // ✅ NEW (already in service)
 } from "../../services/sharePointService";
 
 import "./HRDashboard.css";
@@ -33,6 +34,7 @@ export default function HRDashboard() {
 
   const [showSubmitTimesheet, setShowSubmitTimesheet] = useState(false);
   const [employees, setEmployees] = useState([]);
+  const [assignments, setAssignments] = useState([]); // ✅ NEW
   const [timesheets, setTimesheets] = useState([]);
   const [month, setMonth] = useState("Jan");
   const [year, setYear] = useState(new Date().getFullYear());
@@ -69,24 +71,20 @@ export default function HRDashboard() {
 
     Promise.all([
       getEmployeeHierarchy(token),
+      getEmployeeClientAssignments(token), // ✅ NEW SOURCE OF TRUTH
       getTimesheetsForMonth(token, month, year),
       getClients(token),
     ])
-      .then(([hierarchy, ts, clientData]) => {
-        console.log(hierarchy);
-        console.log(ts);
-        console.log(clientData);
-        setEmployees(
-          Array.isArray(hierarchy) ? hierarchy : hierarchy?.value || [],
-        );
-        setTimesheets(Array.isArray(ts) ? ts : ts?.value || []);
-        setClients(
-          Array.isArray(clientData) ? clientData : clientData?.value || [],
-        );
+      .then(([hierarchy, assignmentData, ts, clientData]) => {
+        setEmployees(Array.isArray(hierarchy) ? hierarchy : []);
+        setAssignments(Array.isArray(assignmentData) ? assignmentData : []);
+        setTimesheets(Array.isArray(ts) ? ts : []);
+        setClients(Array.isArray(clientData) ? clientData : []);
       })
       .catch((error) => {
         console.error("Failed to load SharePoint data:", error);
         setEmployees([]);
+        setAssignments([]);
         setTimesheets([]);
       })
       .finally(() => {
@@ -94,6 +92,9 @@ export default function HRDashboard() {
       });
   }, [token, month, year]);
 
+  /* ============================
+     Invoices
+     ============================ */
   useEffect(() => {
     if (!token || !month || !year) return;
 
@@ -113,36 +114,27 @@ export default function HRDashboard() {
     fetchInvoices();
   }, [token, month, year]);
 
-  useEffect(() => {
-    console.log("showCreateInvoice =", showCreateInvoice);
-  }, [showCreateInvoice]);
-
   async function handleDeleteTimesheet(timesheet) {
     if (!timesheet || !timesheet.Id) return;
 
     const confirmed = window.confirm(
       "Are you sure you want to delete this timesheet?",
     );
-
     if (!confirmed) return;
 
     try {
       await deleteTimesheetRecord(token, timesheet.Id);
-
-      // Reload timesheets after delete
-      const updatedTimesheets = await getTimesheetsForMonth(token, month, year);
-
-      setTimesheets(
-        Array.isArray(updatedTimesheets)
-          ? updatedTimesheets
-          : updatedTimesheets?.value || [],
-      );
+      const updated = await getTimesheetsForMonth(token, month, year);
+      setTimesheets(Array.isArray(updated) ? updated : []);
     } catch (error) {
       console.error("Failed to delete timesheet:", error);
       alert("Failed to delete timesheet record.");
     }
   }
 
+  /* ============================
+     Invoice Actions (UNCHANGED)
+     ============================ */
   const refreshInvoices = async () => {
     setLoadingInvoices(true);
     try {
@@ -163,7 +155,7 @@ export default function HRDashboard() {
   const handleHODApprove = async (invoice) => {
     await updateInvoiceStatus(token, invoice.ID, {
       InvoiceStatus: "HOD Approved",
-      IsLocked: true, // 🔒 lock starts here
+      IsLocked: true,
     });
     refreshInvoices();
   };
@@ -190,18 +182,16 @@ export default function HRDashboard() {
   const handleMarkPaid = async (invoice) => {
     const ref = window.prompt("Enter payment reference / UTR:");
     if (!ref) return;
-
     await markInvoicePaid(token, invoice.ID, ref);
     refreshInvoices();
   };
 
   /* ============================
-     3️⃣ Render (NO EARLY RETURN)
+     Render
      ============================ */
   return (
     <>
       <div className="manager-dashboard">
-        {/* ✅ MONTH / YEAR FILTER — ALWAYS VISIBLE */}
         <MonthYearFilter
           month={month}
           year={year}
@@ -225,7 +215,7 @@ export default function HRDashboard() {
             <div className="manager-grid-1">
               <div className="card">
                 <TimesheetStatusTable
-                  employees={employees}
+                  assignments={assignments} // ✅ NEW
                   timesheets={timesheets}
                   month={month}
                   year={year}
@@ -234,10 +224,9 @@ export default function HRDashboard() {
                 />
               </div>
             </div>
+
             <div className="manager-grid-1">
               <div className="card">
-                {/* Invoices Section */}
-
                 <InvoiceStatusTable
                   invoices={invoices}
                   loading={loadingInvoices}
@@ -251,10 +240,7 @@ export default function HRDashboard() {
                   onViewPdf={(url) => setPdfToView(url)}
                   onMarkSent={handleMarkSent}
                   onMarkPaid={handleMarkPaid}
-                  onCreateInvoice={() => {
-                    console.log("HRDashboard received create invoice click");
-                    setShowCreateInvoice(true);
-                  }}
+                  onCreateInvoice={() => setShowCreateInvoice(true)}
                 />
               </div>
             </div>
@@ -262,7 +248,6 @@ export default function HRDashboard() {
         )}
       </div>
 
-      {/* MODAL */}
       {showSubmitTimesheet && (
         <SubmitTimesheet onClose={() => setShowSubmitTimesheet(false)} />
       )}
@@ -275,7 +260,7 @@ export default function HRDashboard() {
           onClose={() => setEditingTimesheet(null)}
           onSaved={async () => {
             const ts = await getTimesheetsForMonth(token, month, year);
-            setTimesheets(Array.isArray(ts) ? ts : ts?.value || []);
+            setTimesheets(Array.isArray(ts) ? ts : []);
           }}
         />
       )}

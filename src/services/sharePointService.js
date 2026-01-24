@@ -1405,3 +1405,39 @@ export async function getEmployeeHierarchyByEmail(token, email) {
   const data = await response.json();
   return data.value?.[0] || null;
 }
+
+export async function getTimesheetAssignmentMatrix(token, month, year) {
+  const assignmentsUrl =
+    `${SITE_URL}/_api/web/lists/getbytitle('Employee_Client_Assignment')/items` +
+    `?$select=` +
+    `ID,Active,BillingStartDate,BillingEndDate,` +
+    `Employee/ID,Employee/Title,` +
+    `Client/ID,Client/Title` +
+    `&$expand=Employee,Client`;
+
+  const timesheetsUrl =
+    `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items` +
+    `?$select=ID,Month,Year,Status,EmployeeHierarchy/ID,Client/ID` +
+    `&$expand=EmployeeHierarchy,Client` +
+    `&$filter=Month eq '${month}' and Year eq ${year}`;
+
+  const [aRes, tRes] = await Promise.all([
+    fetch(assignmentsUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json;odata=nometadata",
+      },
+    }),
+    fetch(timesheetsUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json;odata=nometadata",
+      },
+    }),
+  ]);
+
+  return {
+    assignments: (await aRes.json()).value || [],
+    timesheets: (await tRes.json()).value || [],
+  };
+}
