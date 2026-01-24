@@ -25,7 +25,7 @@ function getMonthRange(month, year) {
 }
 
 function isAssignmentActiveForMonth(a, month, year) {
-  if (!a.IsActive) return false;
+  if (!a.Active) return false;
 
   const { start, end } = getMonthRange(month, year);
   const billingStart = new Date(a.BillingStartDate);
