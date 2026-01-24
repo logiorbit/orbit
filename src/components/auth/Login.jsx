@@ -1,5 +1,7 @@
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../../auth/msalConfig";
+import landingHero from "../../assets/landing-hero.jpg";
+import companyLogo from "../../assets/company-logo.png";
 import "./landing.css";
 
 export default function Login() {
@@ -11,6 +13,9 @@ export default function Login() {
 
   return (
     <div className="landing-container">
+      <div className="company-logo">
+        <img src={companyLogo} alt="Company Logo" />
+      </div>
       <div className="landing-content">
         {/* LEFT CONTENT */}
         <div className="landing-text">
@@ -44,7 +49,7 @@ export default function Login() {
 
         {/* RIGHT IMAGE */}
         <div className="landing-image">
-          <img src="./landing-hero.jpg" alt="LogiSpace Workforce Preview" />
+          <img src={landingHero} alt="LogiSpace Workforce Preview" />
         </div>
       </div>
     </div>

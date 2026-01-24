@@ -81,3 +81,15 @@
     margin-top: 40px;
   }
 }
+
+.company-logo {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 10;
+}
+
+.company-logo img {
+  height: 48px;
+  width: auto;
+}
