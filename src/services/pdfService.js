@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import companyLogo from "../assets/company-logo.png";
 
 function safeAmount(value) {
   const num = Number(value);
@@ -55,8 +56,107 @@ function drawWatermark(doc, status) {
   doc.setTextColor(0, 0, 0);
 }
 
+function numberToWordsINR(amount) {
+  const num = Math.floor(Number(amount));
+
+  if (isNaN(num) || num === 0) {
+    return "Rupees Zero Only";
+  }
+
+  const ones = [
+    "",
+    "One",
+    "Two",
+    "Three",
+    "Four",
+    "Five",
+    "Six",
+    "Seven",
+    "Eight",
+    "Nine",
+    "Ten",
+    "Eleven",
+    "Twelve",
+    "Thirteen",
+    "Fourteen",
+    "Fifteen",
+    "Sixteen",
+    "Seventeen",
+    "Eighteen",
+    "Nineteen",
+  ];
+
+  const tens = [
+    "",
+    "",
+    "Twenty",
+    "Thirty",
+    "Forty",
+    "Fifty",
+    "Sixty",
+    "Seventy",
+    "Eighty",
+    "Ninety",
+  ];
+
+  function convertBelowThousand(n) {
+    let str = "";
+
+    if (n >= 100) {
+      str += ones[Math.floor(n / 100)] + " Hundred ";
+      n %= 100;
+    }
+
+    if (n >= 20) {
+      str += tens[Math.floor(n / 10)] + " ";
+      n %= 10;
+    }
+
+    if (n > 0) {
+      str += ones[n] + " ";
+    }
+
+    return str.trim();
+  }
+
+  let words = "";
+  let remainder = num;
+
+  const crore = Math.floor(remainder / 10000000);
+  remainder %= 10000000;
+
+  const lakh = Math.floor(remainder / 100000);
+  remainder %= 100000;
+
+  const thousand = Math.floor(remainder / 1000);
+  remainder %= 1000;
+
+  if (crore > 0) {
+    words += convertBelowThousand(crore) + " Crore ";
+  }
+
+  if (lakh > 0) {
+    words += convertBelowThousand(lakh) + " Lakh ";
+  }
+
+  if (thousand > 0) {
+    words += convertBelowThousand(thousand) + " Thousand ";
+  }
+
+  if (remainder > 0) {
+    words += convertBelowThousand(remainder) + " ";
+  }
+
+  return `Rupees ${words.trim()} Only`;
+}
+
 export async function generateInvoicePDF({ invoice, lineItems, client }) {
   const doc = new jsPDF("p", "mm", "a4");
+
+  /* ===============================
+   COMPANY LOGO
+   =============================== */
+  doc.addImage(companyLogo, "PNG", 10, 12, 35, 12);
 
   /* ===============================
      HEADER STRIP
@@ -81,7 +181,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
      =============================== */
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
-  doc.text("Logivention Technologies Pvt. Ltd.", 10, 32);
+  doc.text("Logivention Technologies Pvt. Ltd.", 50, 32);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
@@ -218,7 +318,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.text(
-    `Total Amount (INR - In Words): ${invoice.AmountInWords}`,
+    `Total Amount (INR - In Words): ${numberToWordsINR(invoice.GrandTotal)}`,
     10,
     y + 10,
   );
