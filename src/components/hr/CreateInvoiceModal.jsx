@@ -17,6 +17,7 @@ import { syncInvoicePDF } from "../../services/invoicePdfSyncService";
  * - Load HR-approved, not-invoiced timesheets
  * - Select timesheets
  * - Create Draft Invoice + mapping records
+ * - Calculate GST based on Client_Master rules
  */
 export default function CreateInvoiceModal({
   clients = [],
@@ -35,8 +36,7 @@ export default function CreateInvoiceModal({
   const [saving, setSaving] = useState(false);
 
   /* =========================
-     2️⃣ HELPER — CALCULATION
-     (Draft-only logic)
+     2️⃣ HELPER — LINE CALCULATION
      ========================= */
   function calculateLine(ts, assignment, client) {
     const { RateType, RateValue } = assignment;
@@ -60,8 +60,6 @@ export default function CreateInvoiceModal({
       };
     }
 
-    console.log("RateValue", RateValue);
-
     // Month
     return {
       units: 1,
@@ -70,7 +68,7 @@ export default function CreateInvoiceModal({
   }
 
   /* =========================
-     3️⃣ LOAD TIMESHEETS
+     3️⃣ LOAD APPROVED TIMESHEETS
      ========================= */
   useEffect(() => {
     if (!selectedClient) {
@@ -100,28 +98,26 @@ export default function CreateInvoiceModal({
      ========================= */
   async function handleSave() {
     if (!selectedClient || selectedTsIds.length === 0 || saving) return;
-    const SITE_URL = "https://logivention.sharepoint.com/sites/LogiOrbit";
 
+    const SITE_URL = "https://logivention.sharepoint.com/sites/LogiOrbit";
     setSaving(true);
 
     try {
-      // Resolve selected client metadata (for FixedWorkingDays, etc.)
+      /* Resolve client metadata */
       const clientMeta = clients.find((c) => c.ID === Number(selectedClient));
 
       /* 1️⃣ Create Invoice Header (Draft) */
       const invoice = await createInvoiceHeader(token, {
-        ClientId: Number(selectedClient), // Lookup → number (correct)
-        InvoiceMonth: String(month), // Choice/Text → string
-        InvoiceYear: String(year), // TEXT → string (FIX)
-        InvoiceStatus: "Draft", // Choice → string
-        IsLocked: false, // TEXT → string (FIX)
+        ClientId: Number(selectedClient),
+        InvoiceMonth: String(month),
+        InvoiceYear: String(year),
+        InvoiceStatus: "Draft",
+        IsLocked: false,
       });
 
       let subTotal = 0;
 
-      console.log(timesheets);
-
-      /* 2️⃣ Process each selected timesheet */
+      /* 2️⃣ Process selected timesheets */
       for (const ts of timesheets.filter((t) => selectedTsIds.includes(t.ID))) {
         const assignment = await getEmployeeClientAssignment(
           token,
@@ -135,20 +131,10 @@ export default function CreateInvoiceModal({
           );
         }
 
-        console.log("Assignment is---", assignment);
-
         const { units, amount } = calculateLine(ts, assignment, clientMeta);
-
         subTotal += amount;
 
-        /* 3️⃣ Create mapping (snapshot) */
-        console.log("invoice.ID", invoice.ID);
-        console.log("ts.ID", ts.ID);
-        console.log("assignment.RateType", assignment.RateType);
-        console.log("assignment.RateValue", assignment.RateValue);
-        console.log("units", units);
-        console.log("amount", amount);
-
+        /* Create mapping snapshot */
         await createInvoiceTimesheetMap(token, {
           InvoiceId: invoice.ID,
           TimesheetId: ts.ID,
@@ -159,13 +145,48 @@ export default function CreateInvoiceModal({
           IsEditable: true,
         });
 
-        console.log("Employee object:", ts.Employee);
-
-        /* 4️⃣ Mark timesheet invoiced */
+        /* Mark timesheet invoiced */
         await markTimesheetInvoiced(token, ts.ID, invoice.ID);
       }
 
-      /* 5️⃣ Update invoice totals */
+      /* =========================
+         3️⃣ GST CALCULATION (FINAL)
+         ========================= */
+
+      let CGSTPercent = 0;
+      let SGSTPercent = 0;
+      let IGSTPercent = 0;
+
+      let CGSTAmount = 0;
+      let SGSTAmount = 0;
+      let IGSTAmount = 0;
+
+      // Outside India → NO TAX
+      if (clientMeta?.ClientLocation === "Outside India") {
+        // all taxes remain 0
+      }
+
+      // Inside India
+      else if (clientMeta?.ClientLocation === "India") {
+        // Maharashtra → CGST + SGST
+        if (clientMeta?.State === "Maharashtra") {
+          CGSTPercent = 9;
+          SGSTPercent = 9;
+
+          CGSTAmount = (subTotal * CGSTPercent) / 100;
+          SGSTAmount = (subTotal * SGSTPercent) / 100;
+        }
+
+        // Outside Maharashtra → IGST
+        else if (clientMeta?.State === "Outside Maharashtra") {
+          IGSTPercent = 18;
+          IGSTAmount = (subTotal * IGSTPercent) / 100;
+        }
+      }
+
+      const grandTotal = subTotal + CGSTAmount + SGSTAmount + IGSTAmount;
+
+      /* 4️⃣ Update Invoice Totals */
       await fetch(
         `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoice.ID})`,
         {
@@ -177,12 +198,22 @@ export default function CreateInvoiceModal({
           },
           body: JSON.stringify({
             SubTotal: subTotal,
-            TaxTotal: 0,
-            GrandTotal: subTotal,
+
+            CGSTPercent,
+            CGSTAmount,
+
+            SGSTPercent,
+            SGSTAmount,
+
+            IGSTPercent,
+            IGSTAmount,
+
+            GrandTotal: grandTotal,
           }),
         },
       );
 
+      /* 5️⃣ Generate + Sync PDF (always latest data) */
       await syncInvoicePDF(token, invoice.ID);
 
       onClose();
@@ -200,7 +231,6 @@ export default function CreateInvoiceModal({
   return (
     <div className="modal-overlay">
       <div className="modal-card large">
-        {/* Header */}
         <div className="modal-header">
           <h3>Create Invoice</h3>
           <button className="close-btn" onClick={onClose}>
@@ -208,9 +238,7 @@ export default function CreateInvoiceModal({
           </button>
         </div>
 
-        {/* Body */}
         <div className="modal-body">
-          {/* Client Selection */}
           <div className="form-group">
             <label>Select Client</label>
             <select
@@ -226,7 +254,6 @@ export default function CreateInvoiceModal({
             </select>
           </div>
 
-          {/* Timesheet Grid */}
           <div className="timesheet-grid">
             {loadingTs ? (
               <p>Loading approved timesheets...</p>
@@ -275,12 +302,10 @@ export default function CreateInvoiceModal({
           </div>
         </div>
 
-        {/* Footer */}
         <div className="modal-footer">
           <button className="secondary-btn" onClick={onClose}>
             Cancel
           </button>
-
           <button
             className="primary-btn"
             disabled={selectedTsIds.length === 0 || saving}
