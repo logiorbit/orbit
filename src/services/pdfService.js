@@ -1,6 +1,11 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+function safeAmount(value) {
+  const num = Number(value);
+  return isNaN(num) ? "0.00" : num.toFixed(2);
+}
+
 export async function generateInvoicePDF({ invoice, lineItems, client }) {
   const doc = new jsPDF("p", "mm", "a4");
 
@@ -71,8 +76,8 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
     l.Description || "Salesforce Development",
     l.HSNSAC || "998314",
     l.WorkingUnits,
-    l.RateValue.toFixed(2),
-    l.LineTotal.toFixed(2),
+    safeAmount(l.RateValue),
+    safeAmount(l.LineTotal),
   ]);
 
   autoTable(doc, {
@@ -122,7 +127,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
     gstRows.push([
       "CGST",
       `${invoice.CGSTPercent}%`,
-      invoice.CGSTAmount.toFixed(2),
+      safeAmount(invoice.CGSTAmount),
     ]);
   }
 
@@ -130,7 +135,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
     gstRows.push([
       "SGST",
       `${invoice.SGSTPercent}%`,
-      invoice.SGSTAmount.toFixed(2),
+      safeAmount(invoice.SGSTAmount),
     ]);
   }
 
@@ -138,11 +143,11 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
     gstRows.push([
       "IGST",
       `${invoice.IGSTPercent}%`,
-      invoice.IGSTAmount.toFixed(2),
+      safeAmount(invoice.IGSTAmount),
     ]);
   }
 
-  gstRows.push(["Grand Total", "", invoice.GrandTotal.toFixed(2)]);
+  gstRows.push(["Grand Total", "", safeAmount(invoice.GrandTotal)]);
 
   autoTable(doc, {
     startY: doc.lastAutoTable.finalY + 6,
