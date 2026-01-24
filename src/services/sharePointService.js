@@ -1441,3 +1441,25 @@ export async function getTimesheetAssignmentMatrix(token, month, year) {
     timesheets: (await tRes.json()).value || [],
   };
 }
+
+/* ===============================
+   EMPLOYEE–CLIENT ASSIGNMENTS
+   =============================== */
+export async function getEmployeeClientAssignments(accessToken) {
+  const url =
+    `${SITE_URL}/_api/web/lists/getbytitle('Employee_Client_Assignment')/items` +
+    `?$select=` +
+    `Id,IsActive,BillingStartDate,BillingEndDate,` +
+    `Employee/Id,Employee/Title,Employee/EMail,` +
+    `Client/Id,Client/Title` +
+    `&$expand=Employee,Client`;
+
+  const response = await axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json;odata=nometadata",
+    },
+  });
+
+  return response.data.value || [];
+}
