@@ -156,6 +156,8 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
     },
   });
 
+  const y = doc.lastAutoTable.finalY;
+
   /* ===============================
      AMOUNT IN WORDS
      =============================== */
