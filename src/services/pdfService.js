@@ -1,63 +1,186 @@
-// src/services/pdfService.js
-
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-/**
- * Generates Invoice PDF using latest invoice data
- * Does NOT upload the PDF
- */
 export async function generateInvoicePDF({ invoice, lineItems, client }) {
-  const doc = new jsPDF();
+  const doc = new jsPDF("p", "mm", "a4");
 
-  /* ============================
-     HEADER
-     ============================ */
-  doc.setFontSize(16);
-  doc.text("INVOICE", 14, 20);
+  /* ===============================
+     HEADER STRIP
+     =============================== */
+  doc.setFillColor(207, 226, 243);
+  doc.rect(10, 10, 190, 14, "F");
 
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.text("TAX INVOICE", 105, 19, { align: "center" });
+
+  doc.setFontSize(9);
+  doc.text(`INVOICE NO: ${invoice.InvoiceID}`, 140, 17);
+  doc.text(
+    `DATE: ${new Date(invoice.Created || Date.now()).toLocaleDateString("en-GB")}`,
+    140,
+    22,
+  );
+
+  /* ===============================
+     COMPANY INFO (STATIC)
+     =============================== */
   doc.setFontSize(10);
-  doc.text(`Invoice No: ${invoice.InvoiceID || invoice.ID}`, 14, 30);
-  doc.text(`Invoice Date: ${new Date().toLocaleDateString()}`, 14, 36);
+  doc.setFont("helvetica", "bold");
+  doc.text("Logivention Technologies Pvt. Ltd.", 10, 32);
 
-  /* ============================
-     CLIENT DETAILS
-     ============================ */
-  doc.text(`Client: ${client?.ClientName || "-"}`, 14, 46);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.text(
+    [
+      "Office No: 408, Pride Icon, MH SH27,",
+      "Pune Nashik Highway, Kharadi,",
+      "Pune, Maharashtra, 411014",
+      "Phone: 8888744254 | support@logivention.in",
+      "GSTIN: 27AAECL6024G1ZN",
+      "PAN: AAECL6024G",
+    ],
+    10,
+    36,
+  );
 
-  if (client?.Address) {
-    doc.text(client.Address, 14, 52);
-  }
+  /* ===============================
+     CLIENT BLOCK
+     =============================== */
+  doc.setDrawColor(0);
+  doc.rect(10, 62, 90, 26);
 
-  /* ============================
-     LINE ITEMS
-     ============================ */
-  const tableRows = lineItems.map((l, index) => [
-    index + 1,
-    l.EmployeeName || "-",
-    l.RateType || "-",
-    l.WorkingUnits || "-",
-    l.RateValue || "-",
-    l.LineTotal || "-",
+  doc.setFont("helvetica", "bold");
+  doc.text("To,", 12, 68);
+
+  doc.setFont("helvetica", "normal");
+  doc.text(
+    [
+      client?.ClientName || "",
+      client?.Address || "",
+      `GSTIN: ${client?.GSTIN || "-"}`,
+    ],
+    12,
+    73,
+  );
+
+  /* ===============================
+     LINE ITEMS TABLE
+     =============================== */
+  const tableRows = lineItems.map((l) => [
+    l.Description || "Salesforce Development",
+    l.HSNSAC || "998314",
+    l.WorkingUnits,
+    l.RateValue.toFixed(2),
+    l.LineTotal.toFixed(2),
   ]);
 
   autoTable(doc, {
-    startY: 65,
-    head: [["#", "Employee", "Rate Type", "Units", "Rate", "Amount"]],
+    startY: 95,
+    head: [["Particulars (Description)", "HSN / SAC", "Qty", "Rate", "Amount"]],
     body: tableRows,
     styles: {
-      fontSize: 9,
+      fontSize: 8,
+    },
+    headStyles: {
+      fillColor: [230, 230, 230],
     },
   });
 
-  /* ============================
+  /* ===============================
      TOTALS
-     ============================ */
-  const finalY = doc.lastAutoTable.finalY + 10;
+     =============================== */
+  /*  let y = doc.lastAutoTable.finalY + 5;
 
-  doc.text(`Sub Total: ${invoice.SubTotal || "0"}`, 140, finalY);
-  doc.text(`Tax: ${invoice.TaxTotal || "0"}`, 140, finalY + 6);
-  doc.text(`Grand Total: ${invoice.GrandTotal || "0"}`, 140, finalY + 12);
+  doc.text(`Total`, 140, y);
+  doc.text(invoice.SubTotal.toFixed(2), 180, y, { align: "right" });
+
+  y += 5;
+  doc.text(`Add: CGST`, 140, y);
+  doc.text(invoice.CGSTAmount?.toFixed(2) || "0.00", 180, y, {
+    align: "right",
+  });
+
+  y += 5;
+  doc.text(`Add: SGST`, 140, y);
+  doc.text(invoice.SGSTAmount?.toFixed(2) || "0.00", 180, y, {
+    align: "right",
+  });
+
+  y += 5;
+  doc.setFont("helvetica", "bold");
+  doc.text(`Grand Total`, 140, y);
+  doc.text(invoice.GrandTotal.toFixed(2), 180, y, { align: "right" }); **/
+
+  /* ===============================
+   GST BREAKUP TABLE
+   =============================== */
+
+  const gstRows = [];
+
+  if (invoice.CGSTPercent && invoice.CGSTAmount) {
+    gstRows.push([
+      "CGST",
+      `${invoice.CGSTPercent}%`,
+      invoice.CGSTAmount.toFixed(2),
+    ]);
+  }
+
+  if (invoice.SGSTPercent && invoice.SGSTAmount) {
+    gstRows.push([
+      "SGST",
+      `${invoice.SGSTPercent}%`,
+      invoice.SGSTAmount.toFixed(2),
+    ]);
+  }
+
+  if (invoice.IGSTPercent && invoice.IGSTAmount) {
+    gstRows.push([
+      "IGST",
+      `${invoice.IGSTPercent}%`,
+      invoice.IGSTAmount.toFixed(2),
+    ]);
+  }
+
+  gstRows.push(["Grand Total", "", invoice.GrandTotal.toFixed(2)]);
+
+  autoTable(doc, {
+    startY: doc.lastAutoTable.finalY + 6,
+    head: [["Tax Type", "Rate", "Amount"]],
+    body: gstRows,
+    styles: {
+      fontSize: 8,
+    },
+    columnStyles: {
+      2: { halign: "right" },
+    },
+  });
+
+  /* ===============================
+     AMOUNT IN WORDS
+     =============================== */
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.text(
+    `Total Amount (INR - In Words): ${invoice.AmountInWords}`,
+    10,
+    y + 10,
+  );
+
+  /* ===============================
+     FOOTER (STATIC)
+     =============================== */
+  doc.text(
+    [
+      "Payment Terms:",
+      "1. Payment within 35 days",
+      "2. This is a digital invoice",
+      "",
+      "For Logivention Technologies Pvt. Ltd.",
+    ],
+    10,
+    y + 20,
+  );
 
   return doc;
 }
