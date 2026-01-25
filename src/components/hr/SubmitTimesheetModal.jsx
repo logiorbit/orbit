@@ -113,7 +113,7 @@ export default function SubmitTimesheetModal({ onClose }) {
       }
 
       onClose();
-      window.location.reload();
+      // window.location.reload();
     } catch (err) {
       console.error("Failed to save timesheet:", err);
       alert(err.message || "Failed to save timesheet");
