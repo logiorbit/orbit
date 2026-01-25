@@ -69,8 +69,8 @@ export async function updateInvoiceTotals(
     VAT,
     TaxTotal,
     GrandTotal,
-    IsLocked: true,
-    LockReason: "Invoice generated and totals finalized",
+    IsLocked: false,
+    LockReason: "",
   };
 
   const res = await fetch(
