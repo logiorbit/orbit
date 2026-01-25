@@ -6,6 +6,7 @@ import {
   markTimesheetInvoiced,
   getEmployeeClientAssignment,
 } from "../../services/sharePointService";
+import { updateInvoiceTotals } from "../../services/invoiceService";
 
 import { syncInvoicePDF } from "../../services/invoicePdfSyncService";
 
@@ -140,7 +141,7 @@ export default function CreateInvoiceModal({
 
         /* Create mapping snapshot */
         await createInvoiceTimesheetMap(token, {
-          Title: `Invoice ${invoice.InvoiceID} - TS ${ts.ID}`,
+          Title: `Invoice ${invoice.ID} - TS ${ts.ID}`,
           MapID: `INV-${invoice.ID}-TS-${ts.ID}`,
           InvoiceId: invoice.ID,
           TimesheetId: ts.ID,
@@ -156,68 +157,10 @@ export default function CreateInvoiceModal({
       }
 
       /* =========================
-         3️⃣ GST CALCULATION (FINAL)
-         ========================= */
+   3️⃣ FINALIZE TOTALS
+   ========================= */
 
-      let CGSTPercent = 0;
-      let SGSTPercent = 0;
-      let IGSTPercent = 0;
-
-      let CGSTAmount = 0;
-      let SGSTAmount = 0;
-      let IGSTAmount = 0;
-
-      // Outside India → NO TAX
-      if (clientMeta?.ClientLocation === "Outside India") {
-        // all taxes remain 0
-      }
-
-      // Inside India
-      else if (clientMeta?.ClientLocation === "India") {
-        // Maharashtra → CGST + SGST
-        if (clientMeta?.State === "Maharashtra") {
-          CGSTPercent = 9;
-          SGSTPercent = 9;
-
-          CGSTAmount = (subTotal * CGSTPercent) / 100;
-          SGSTAmount = (subTotal * SGSTPercent) / 100;
-        }
-
-        // Outside Maharashtra → IGST
-        else if (clientMeta?.State === "Outside Maharashtra") {
-          IGSTPercent = 18;
-          IGSTAmount = (subTotal * IGSTPercent) / 100;
-        }
-      }
-
-      const grandTotal = subTotal + CGSTAmount + SGSTAmount + IGSTAmount;
-
-      /* 4️⃣ Update Invoice Totals */
-      await fetch(
-        `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoice.ID})`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json;odata=nometadata",
-            "IF-MATCH": "*",
-          },
-          body: JSON.stringify({
-            SubTotal: subTotal,
-
-            CGSTPercent,
-            CGSTAmount,
-
-            SGSTPercent,
-            SGSTAmount,
-
-            IGSTPercent,
-            IGSTAmount,
-
-            GrandTotal: grandTotal,
-          }),
-        },
-      );
+      await updateInvoiceTotals(token, invoice.ID, subTotal, clientMeta);
 
       /* 5️⃣ Generate + Sync PDF (always latest data) */
       await syncInvoicePDF(token, invoice.ID);
