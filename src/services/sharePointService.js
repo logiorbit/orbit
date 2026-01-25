@@ -1197,28 +1197,47 @@ export async function createInvoiceTimesheetMap(token, payload) {
   return true;
 }
 
-export async function markTimesheetInvoiced(token, id, invoiceId) {
-  const response = await fetch(
-    `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items(${id})`,
+import axios from "axios";
+import { SITE_URL } from "../config";
+import { getCurrentUser } from "./sharePointService"; // adjust import if needed
+
+export async function markTimesheetInvoiced(
+  accessToken,
+  timesheetId,
+  invoiceId,
+) {
+  // 1️⃣ Resolve current user (for Person field)
+  const currentUser = await getCurrentUser(accessToken);
+
+  if (!currentUser || !currentUser.Id) {
+    throw new Error("Unable to resolve current SharePoint user");
+  }
+
+  // 2️⃣ Build payload
+  const payload = {
+    IsInvoiced: true,
+
+    // Lookup → Invoice_Header
+    InvoiceId: invoiceId,
+
+    // Audit
+    InvoiceMappedOn: new Date().toISOString(),
+    InvoiceMappedById: currentUser.Id,
+  };
+
+  // 3️⃣ PATCH Timesheet
+  const res = await axios.patch(
+    `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items(${timesheetId})`,
+    payload,
     {
-      method: "PATCH",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json;odata=nometadata",
         "Content-Type": "application/json;odata=nometadata",
         "IF-MATCH": "*",
       },
-      body: JSON.stringify({
-        IsInvoiced: true,
-        InvoiceId: invoiceId,
-      }),
     },
   );
-
-  if (!response.ok) {
-    const text = await response.text();
-    console.error("Timesheet update failed:", text);
-    throw new Error(text);
-  }
 
   return true;
 }
