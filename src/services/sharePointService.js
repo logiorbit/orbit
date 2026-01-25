@@ -1201,28 +1201,26 @@ export async function markTimesheetInvoiced(
   accessToken,
   timesheetId,
   invoiceId,
+  assignmentId,
 ) {
-  // 1️⃣ Resolve current user (for Person field)
   const currentUser = await getCurrentUser(accessToken);
 
-  if (!currentUser || !currentUser.Id) {
+  if (!currentUser?.Id) {
     throw new Error("Unable to resolve current SharePoint user");
   }
 
-  // 2️⃣ Build payload
   const payload = {
     IsInvoiced: true,
+    Status: "Invoice Created",
 
-    // Lookup → Invoice_Header
-    InvoiceId: invoiceId,
+    InvoiceId: Number(invoiceId),
+    AssignmentId: Number(assignmentId),
 
-    // Audit
     InvoiceMappedOn: new Date().toISOString(),
     InvoiceMappedById: currentUser.Id,
   };
 
-  // 3️⃣ PATCH Timesheet
-  const res = await axios.patch(
+  await axios.patch(
     `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items(${timesheetId})`,
     payload,
     {

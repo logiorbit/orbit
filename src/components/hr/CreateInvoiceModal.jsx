@@ -146,7 +146,7 @@ export default function CreateInvoiceModal({
         });
 
         /* Mark timesheet invoiced */
-        await markTimesheetInvoiced(token, ts.ID, invoice.ID);
+        await markTimesheetInvoiced(token, ts.ID, invoice.ID, assignment.ID);
       }
 
       /* =========================
