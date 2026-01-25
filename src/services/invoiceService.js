@@ -63,21 +63,12 @@ export async function updateInvoiceTotals(
 
   const payload = {
     SubTotal: subTotal,
-
-    CGSTPercent,
-    CGSTAmount,
-
-    SGSTPercent,
-    SGSTAmount,
-
-    IGSTPercent,
-    IGSTAmount,
-
+    CGST,
+    SGST,
+    IGST,
     VAT,
     TaxTotal,
-
     GrandTotal,
-
     InvoiceStatus: "Generated",
     IsLocked: true,
     LockReason: "Invoice generated and totals finalized",
