@@ -951,18 +951,18 @@ export async function submitTimesheet(accessToken, data) {
   }
 
   const payload = {
-    Title: data.title,
-    ClientId: data.clientId,
-    Month: data.month,
-    Year: data.year,
-    TotalWorkingDays: data.totalWorkingDays,
-    TotalLeaves: data.totalLeaves,
-    TotalHolidays: data.totalHolidays,
-    LeaveDates: data.leaveDates,
-    HolidayDates: data.holidayDates,
-    TotalBillingDays: data.totalBillingDays,
-    TotalBillingHours: data.totalBillingHours,
-    Status: data.status, // MUST MATCH CHOICE
+    Title: data.Title,
+    ClientId: data.ClientId,
+    Month: data.Month,
+    Year: data.Year,
+    TotalWorkingDays: data.TotalWorkingDays,
+    TotalLeaves: data.TotalLeaves,
+    TotalHolidays: data.TotalHolidays,
+    LeaveDates: data.LeaveDates,
+    HolidayDates: data.HolidayDates,
+    TotalBillingDays: data.TotalBillingDays,
+    TotalBillingHours: data.TotalBillingHours,
+    Status: data.Status, // MUST MATCH CHOICE
     EmployeeId: user.Id, // Person field
     EmployeeHierarchyId: employeeHierarchy.Id, // ✅ FIX
   };
