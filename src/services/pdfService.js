@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import companyLogo from "../../assets/company-logo.png";
+import companyLogo from "../assets/company-logo2.png";
 
 function safeAmount(value) {
   const num = Number(value);
@@ -181,7 +181,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
      =============================== */
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
-  doc.text("Logivention Technologies Pvt. Ltd.", 50, 32);
+  doc.text("Logivention Technologies Pvt. Ltd.", 10, 32);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
