@@ -63,9 +63,9 @@ export async function updateInvoiceTotals(
 
   const payload = {
     SubTotal: subTotal,
-    CGST,
-    SGST,
-    IGST,
+    CGST: CGSTAmount,
+    SGST: SGSTAmount,
+    IGST: IGSTAmount,
     VAT,
     TaxTotal,
     GrandTotal,
