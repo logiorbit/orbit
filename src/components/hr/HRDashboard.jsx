@@ -148,6 +148,8 @@ export default function HRDashboard() {
   const handleHRApprove = async (invoice) => {
     await updateInvoiceStatus(token, invoice.ID, {
       InvoiceStatus: "HR Approved",
+      ApprovedOnHR: new Date().toISOString(),
+      ApprovedByHR: currentUser.Id,
     });
     refreshInvoices();
   };
@@ -156,6 +158,8 @@ export default function HRDashboard() {
     await updateInvoiceStatus(token, invoice.ID, {
       InvoiceStatus: "HOD Approved",
       IsLocked: true,
+      ApprovedOnHOD: new Date().toISOString(),
+      ApprovedByHOD: currentUser.Id,
     });
     refreshInvoices();
   };
@@ -163,6 +167,8 @@ export default function HRDashboard() {
   const handleClientVerified = async (invoice) => {
     await updateInvoiceStatus(token, invoice.ID, {
       InvoiceStatus: "Client Verified",
+      IsLocked: true,
+      LockReason: "Client has verified the PDF",
     });
     refreshInvoices();
   };
