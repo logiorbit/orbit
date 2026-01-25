@@ -929,9 +929,30 @@ export async function updateEmployeeHierarchy(token, itemId, payload) {
 export async function submitTimesheet(accessToken, data) {
   const user = await getCurrentUser(accessToken);
 
+  console.log("Pankaj Data is---", data);
+
+  // 2️⃣ Resolve EmployeeHierarchy by email
+  const ehRes = await axios.get(
+    `${SITE_URL}/_api/web/lists/getbytitle('Employee_Hierarchy')/items` +
+      `?$select=Id,EmployeeEmail` +
+      `&$filter=EmployeeEmail eq '${user.Email}'`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json;odata=nometadata",
+      },
+    },
+  );
+
+  const employeeHierarchy = ehRes.data?.value?.[0];
+
+  if (!employeeHierarchy) {
+    throw new Error(`EmployeeHierarchy not found for email: ${user.Email}`);
+  }
+
   const payload = {
     Title: data.title,
-    ClientId: data.cliendId,
+    ClientId: data.clientId,
     Month: data.month,
     Year: data.year,
     TotalWorkingDays: data.totalWorkingDays,
@@ -943,6 +964,7 @@ export async function submitTimesheet(accessToken, data) {
     TotalBillingHours: data.totalBillingHours,
     Status: data.status, // MUST MATCH CHOICE
     EmployeeId: user.Id, // Person field
+    EmployeeHierarchyId: employeeHierarchy.Id, // ✅ FIX
   };
 
   const res = await axios.post(
