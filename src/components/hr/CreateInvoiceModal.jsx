@@ -109,7 +109,7 @@ export default function CreateInvoiceModal({
       /* 1️⃣ Create Invoice Header (Draft) */
       const invoice = await createInvoiceHeader(token, {
         Title: `Invoice - ${clientMeta.Title}`,
-        InvoiceID: `INV-${year}-${String(invoiceId).padStart(4, "0")}`,
+        //  InvoiceID: `INV-${year}-${String(invoiceId).padStart(4, "0")}`,
         InvoiceDate: new Date().toISOString(),
         Currency: clientMeta.Currency || "INR",
         ClientId: Number(selectedClient),
