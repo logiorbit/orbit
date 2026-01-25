@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import companyLogo from "../assets/company-logo.png";
+import companyLogo from "../../assets/company-logo.png";
 
 function safeAmount(value) {
   const num = Number(value);
