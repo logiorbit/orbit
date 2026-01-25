@@ -108,6 +108,10 @@ export default function CreateInvoiceModal({
 
       /* 1️⃣ Create Invoice Header (Draft) */
       const invoice = await createInvoiceHeader(token, {
+        Title: `Invoice - ${clientMeta.Title}`,
+        InvoiceID: `INV-${year}-${String(invoiceId).padStart(4, "0")}`,
+        InvoiceDate: new Date().toISOString(),
+        Currency: clientMeta.Currency || "INR",
         ClientId: Number(selectedClient),
         InvoiceMonth: String(month),
         InvoiceYear: String(year),
@@ -136,6 +140,8 @@ export default function CreateInvoiceModal({
 
         /* Create mapping snapshot */
         await createInvoiceTimesheetMap(token, {
+          Title: `Invoice ${invoice.InvoiceID} - TS ${ts.ID}`,
+          MapID: `INV-${invoice.ID}-TS-${ts.ID}`,
           InvoiceId: invoice.ID,
           TimesheetId: ts.ID,
           RateType: assignment.RateType,
