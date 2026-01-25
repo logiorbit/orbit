@@ -15,6 +15,7 @@ export default function InvoiceStatusTable({
   onViewPdf,
   onMarkSent,
   onMarkPaid,
+  onDeleteInvoice,
 }) {
   const { userRoles } = useUserContext();
   /* ===============================
@@ -144,17 +145,18 @@ export default function InvoiceStatusTable({
             <th>Grand Total</th>
             <th>PDF</th>
             <th>Actions</th> {/* ✅ NEW COLUMN */}
+            <th>Delete</th>
           </tr>
         </thead>
 
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan="7">Loading invoices...</td>
+              <td colSpan="8">Loading invoices...</td>
             </tr>
           ) : invoices.length === 0 ? (
             <tr>
-              <td colSpan="7">No invoices found</td>
+              <td colSpan="8">No invoices found</td>
             </tr>
           ) : (
             invoices.map((inv) => (
@@ -177,6 +179,15 @@ export default function InvoiceStatusTable({
                   )}
                 </td>
                 <td>{renderActions(inv)}</td> {/* ✅ HERE */}
+                <td>
+                  <button
+                    className="danger-btn"
+                    disabled={inv.InvoiceStatus === "Paid"}
+                    onClick={() => onDeleteInvoice(inv)}
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))
           )}

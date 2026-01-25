@@ -26,11 +26,13 @@ import {
   getEmployeeClientAssignments, // ✅ NEW (already in service)
 } from "../../services/sharePointService";
 
+import { deleteInvoiceCompletely } from "../../services/invoiceDeleteService";
+
 import "./HRDashboard.css";
 
 export default function HRDashboard() {
   const { instance, accounts } = useMsal();
-  const { userRoles } = useUserContext();
+  const { userRoles, currentUser } = useUserContext();
 
   const [showSubmitTimesheet, setShowSubmitTimesheet] = useState(false);
   const [employees, setEmployees] = useState([]);
@@ -192,6 +194,23 @@ export default function HRDashboard() {
     refreshInvoices();
   };
 
+  async function handleDeleteInvoice(invoice) {
+    const confirm = window.confirm(
+      `This will permanently delete Invoice ${invoice.Title}.\n\nThis action cannot be undone. Continue?`,
+    );
+
+    if (!confirm) return;
+
+    try {
+      await deleteInvoiceCompletely(token, invoice.ID);
+      alert("Invoice deleted successfully");
+      refreshInvoices(); // refresh table
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete invoice. Check console.");
+    }
+  }
+
   /* ============================
      Render
      ============================ */
@@ -247,6 +266,7 @@ export default function HRDashboard() {
                   onMarkSent={handleMarkSent}
                   onMarkPaid={handleMarkPaid}
                   onCreateInvoice={() => setShowCreateInvoice(true)}
+                  onDeleteInvoice={handleDeleteInvoice}
                 />
               </div>
             </div>
