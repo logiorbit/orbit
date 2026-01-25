@@ -69,7 +69,6 @@ export async function updateInvoiceTotals(
     VAT,
     TaxTotal,
     GrandTotal,
-    InvoiceStatus: "Generated",
     IsLocked: true,
     LockReason: "Invoice generated and totals finalized",
   };
