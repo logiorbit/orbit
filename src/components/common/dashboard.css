@@ -232,12 +232,12 @@ h3 {
 
 .btn-div {
   width: 60%;
+  align-items: right;
 }
 
 button,
 .btn,
 .primary-btn {
-  right: 0%;
   background-color: #d9f99d;
   color: #000;
   border: none;
