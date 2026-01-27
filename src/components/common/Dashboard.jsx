@@ -14,6 +14,7 @@ import EmployeeTaskCards from "../employee/EmployeeTaskCards";
 import EmployeeKpiCards from "../employee/EmployeeKpiCards";
 import MyTasksTable from "../employee/MyTasksTable";
 import EditEmployeeProfileModal from "../employee/EditEmployeeProfileModal";
+import SubmitTimesheet from "../hr/SubmitTimesheetModal";
 
 import TLDashboard from "../tl/TLDashboard";
 import ManagerDashboard from "../manager/ManagerDashboard";
@@ -95,6 +96,7 @@ function EmployeeDashboard() {
   const [showApply, setShowApply] = useState(false);
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [showHoliday, setShowHoliday] = useState(false);
+  const [showSubmitTimesheet, setShowSubmitTimesheet] = useState(false);
   const [leaveRefreshKey, setLeaveRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -138,6 +140,15 @@ function EmployeeDashboard() {
           <button className="primary-btn" onClick={() => setShowProfile(true)}>
             Edit Profile
           </button>
+
+          <div className="btn-div">
+            <button
+              className="primary-btn"
+              onClick={() => setShowSubmitTimesheet(true)}
+            >
+              + Submit Timesheet
+            </button>
+          </div>
         </div>
       </div>
 
@@ -189,6 +200,10 @@ function EmployeeDashboard() {
           holidays={holidays}
           onClose={() => setShowHoliday(false)}
         />
+      )}
+
+      {showSubmitTimesheet && (
+        <SubmitTimesheet onClose={() => setShowSubmitTimesheet(false)} />
       )}
     </>
   );
