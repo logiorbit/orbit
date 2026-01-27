@@ -1475,3 +1475,26 @@ export async function getEmployeeClientAssignments(accessToken) {
 
   return response.data.value || [];
 }
+
+export async function getMyTimesheets(accessToken, employeeHierarchyId) {
+  const response = await fetch(
+    `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items` +
+      `?$select=Id,Title,Month,Year,Status,TotalBillingHours,TotalBillingDays` +
+      `&$filter=EmployeeHierarchy/Id eq ${employeeHierarchyId}` +
+      `&$orderby=Created desc`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json;odata=nometadata",
+      },
+    },
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text);
+  }
+
+  const data = await response.json();
+  return data.value || [];
+}

@@ -3,6 +3,11 @@ import { useMsal } from "@azure/msal-react";
 import { useUserContext } from "../../context/UserContext";
 import { getAccessToken } from "../../auth/authService";
 import { getMyLeaves } from "../../services/sharePointService";
+import {
+  getMyTimesheets,
+  getEmployeeHierarchyByEmail,
+  deleteTimesheetRecord,
+} from "../../services/sharePointService";
 
 import "./dashboard.css";
 import ChartCard from "./ChartCard";
@@ -13,8 +18,10 @@ import CreateTaskModal from "../employee/CreateTaskModal";
 import EmployeeTaskCards from "../employee/EmployeeTaskCards";
 import EmployeeKpiCards from "../employee/EmployeeKpiCards";
 import MyTasksTable from "../employee/MyTasksTable";
+import EmployeeTimesheetTable from "../employee/EmployeeTimesheetTable";
 import EditEmployeeProfileModal from "../employee/EditEmployeeProfileModal";
 import SubmitTimesheet from "../hr/SubmitTimesheetModal";
+import EditTimesheetModal from "../hr/EditTimesheetModal";
 
 import TLDashboard from "../tl/TLDashboard";
 import ManagerDashboard from "../manager/ManagerDashboard";
@@ -98,6 +105,8 @@ function EmployeeDashboard() {
   const [showHoliday, setShowHoliday] = useState(false);
   const [showSubmitTimesheet, setShowSubmitTimesheet] = useState(false);
   const [leaveRefreshKey, setLeaveRefreshKey] = useState(0);
+  const [timesheets, setTimesheets] = useState([]);
+  const [editingTs, setEditingTs] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -111,10 +120,29 @@ function EmployeeDashboard() {
       const year = new Date().getFullYear();
       const holidayData = await getHolidaysForYear(token, year);
       setHolidays(holidayData);
+
+      const employee = await getEmployeeHierarchyByEmail(
+        token,
+        accounts[0].username,
+      );
+
+      const data = await getMyTimesheets(token, employee.ID);
+      setTimesheets(data);
     }
 
     load();
   }, [accounts]);
+
+  async function handleDelete(ts) {
+    if (!window.confirm("Are you sure you want to delete this timesheet?")) {
+      return;
+    }
+
+    const token = await getAccessToken(instance, accounts[0]);
+    await deleteTimesheetRecord(token, ts.Id);
+
+    setTimesheets((prev) => prev.filter((t) => t.Id !== ts.Id));
+  }
 
   return (
     <>
@@ -175,6 +203,15 @@ function EmployeeDashboard() {
             <h3>My Tasks</h3>
             <MyTasksTable />
           </div>
+
+          <div className="card" style={{ marginTop: 24 }}>
+            <h3>My Timesheets</h3>
+            <EmployeeTimesheetTable
+              timesheets={timesheets}
+              onEdit={(ts) => setEditingTs(ts)}
+              onDelete={handleDelete}
+            />
+          </div>
         </div>
       </div>
 
@@ -204,6 +241,14 @@ function EmployeeDashboard() {
 
       {showSubmitTimesheet && (
         <SubmitTimesheet onClose={() => setShowSubmitTimesheet(false)} />
+      )}
+
+      {editingTs && (
+        <EditTimesheetModal
+          timesheet={editingTs}
+          onClose={() => setEditingTs(null)}
+          onSaved={() => window.location.reload()}
+        />
       )}
     </>
   );
