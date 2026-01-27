@@ -45,7 +45,7 @@ export default function TimesheetStatusTable({
   function findTimesheet(a) {
     return timesheets.find(
       (ts) =>
-        ts.EmployeeHierarchy?.Id === a.Employee?.Id &&
+        ts.EmployeeHierarchy?.EmployeeEmail === a.Employee?.EmployeeEmail &&
         ts.Client?.Id === a.Client?.Id,
     );
   }

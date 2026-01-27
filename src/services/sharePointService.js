@@ -1024,7 +1024,7 @@ export async function getTimesheetsForMonth(accessToken, month, year) {
       "EmployeeHierarchy/EmployeeEmail",
       "EmployeeHierarchy/Title",
     ].join(",") +
-    `&$expand=Client,Employee` +
+    `&$expand=Client,Employee,EmployeeHierarchy` +
     `&$filter=Month eq '${month}' and Year eq ${year}`;
 
   const response = await axios.get(url, {
@@ -1488,7 +1488,7 @@ export async function getEmployeeClientAssignments(accessToken) {
     `${SITE_URL}/_api/web/lists/getbytitle('Employee_Client_Assignment')/items` +
     `?$select=` +
     `Id,Active,BillingStartDate,BillingEndDate,` +
-    `Employee/Id,Employee/Title,` +
+    `Employee/Id,Employee/Title,Employee/EmployeeEmail` +
     `Client/Id,Client/Title` +
     `&$expand=Employee,Client`;
 
