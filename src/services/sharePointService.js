@@ -2,8 +2,6 @@ import axios from "axios";
 
 const SITE_URL = "https://logivention.sharepoint.com/sites/LogiOrbit";
 
-//console.log("sharePointService.js LOADED");
-
 export async function getEmployeeHierarchy(accessToken) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Employee_Hierarchy')/items` +
@@ -21,13 +19,10 @@ export async function getEmployeeHierarchy(accessToken) {
     },
   });
 
-  //console.log(response.data.value);
-
   return response.data.value;
 }
 
 export async function getLeadershipConfig(accessToken) {
-  // console.log("getLeadershipConfig CALLED");
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Leadership_Config')/items` +
     `?$select=Leader/EMail&$expand=Leader`;
@@ -38,9 +33,6 @@ export async function getLeadershipConfig(accessToken) {
       Accept: "application/json;odata=nometadata",
     },
   });
-
-  // console.log("sharePointService.js LOADED");
-  // console.log("Leadership RAW ITEM:", response.data.value[0]);
 
   return response.data.value;
 }
@@ -136,9 +128,6 @@ export async function getLeaveTypeId(accessToken, leaveTypeName) {
     },
   });
 
-  //console.log("Leave Types from SP:", res.data.value);
-  // console.log("Requested Leave Type:", leaveTypeName);
-
   const match = res.data.value.find(
     (lt) => lt.Title.trim() === leaveTypeName.trim(),
   );
@@ -217,8 +206,6 @@ export async function getLeavesForManagerApproval(accessToken) {
       Accept: "application/json;odata=nometadata",
     },
   });
-
-  // console.log(response);
 
   return response.data.value;
 }
@@ -568,9 +555,7 @@ export async function getTeamTasksForPeriod(token, period, members) {
     start = new Date(now.getFullYear(), now.getMonth(), 1);
     end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
   }
-  ////console.log("The members are", members);
   const employeeIds = members.map((m) => (m.Employee ? m.Employee.Id : m.Id));
-  //console.log("The Emoployeeids are", employeeIds);
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Task_Records')/items` +
     `?$select=EstimatedHours,BillableHours,ProductiveHours,Employee/Id,TaskDate` +
@@ -586,8 +571,6 @@ export async function getTeamTasksForPeriod(token, period, members) {
   });
 
   const rows = res.data.value || [];
-
-  // console.log(rows);
 
   let estimated = 0;
   let billed = 0;
@@ -644,8 +627,6 @@ export async function getAllTasksForPeriod(token, period) {
   });
 
   const rows = res.data.value || [];
-
-  // console.log(rows);
 
   let estimated = 0;
   let billed = 0;
@@ -819,8 +800,6 @@ export async function getTasksForDate2(accessToken, date) {
     },
   });
 
-  console.log(res.data.value);
-
   return res.data.value;
 }
 
@@ -928,8 +907,6 @@ export async function updateEmployeeHierarchy(token, itemId, payload) {
    =============================== */
 export async function submitTimesheet(accessToken, data) {
   const user = await getCurrentUser(accessToken);
-
-  console.log("Pankaj Data is---", data);
 
   // 2️⃣ Resolve EmployeeHierarchy by email
   const ehRes = await axios.get(
@@ -1240,8 +1217,6 @@ export async function markTimesheetInvoiced(
 }
 
 export async function getEmployeeClientAssignment(token, employeeId, clientId) {
-  console.log("Employee ID is", employeeId);
-  console.log("Employee ID is", clientId);
   //  const url =
   //    `${SITE_URL}/_api/web/lists/getbytitle('Employee_Client_Assignment')/items` +
   //    `?$select=ID,RateType,RateValue,Employee/Id,Client/Id,Active` +
@@ -1262,7 +1237,6 @@ export async function getEmployeeClientAssignment(token, employeeId, clientId) {
   });
 
   const data = await res.json();
-  console.log("The Entire Employee data without filter is---", data);
   return data.value?.[0]; // assume one active assignment
 }
 

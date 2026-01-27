@@ -17,8 +17,6 @@ export default function EditLeaveModal({ leave, onClose, onSuccess }) {
   useEffect(() => {
     if (!leave) return;
 
-    // console.log(leave);
-
     setForm({
       leaveType: leave.LeaveType?.Title || "",
       startDate: leave.StartDate?.split("T")[0],

@@ -15,7 +15,6 @@ export default function EditTimesheetModal({
   /* ============================
      SAME FORM MODEL AS SUBMIT
      ============================ */
-  console.log(timesheet);
   const [form, setForm] = useState(null);
 
   /*  const [form, setForm] = useState({
@@ -35,15 +34,13 @@ export default function EditTimesheetModal({
   const [existingAttachments, setExistingAttachments] = useState([]);
   const [saving, setSaving] = useState(false);
 
-  console.log("EDIT TIMESHEET:", timesheet);
-
   /* ============================
      PREFILL FROM SHAREPOINT
      ============================ */
   useEffect(() => {
     if (!timesheet?.Id || !token) {
       console.warn(
-        "EditTimesheetModal: Waiting for token or timesheet data..."
+        "EditTimesheetModal: Waiting for token or timesheet data...",
       );
       return;
     }
@@ -65,7 +62,6 @@ export default function EditTimesheetModal({
     // Fetch Attachments
     getTimesheetAttachments(token, timesheet.Id)
       .then((files) => {
-        console.log("Fetched Attachments:", files);
         // Ensure we are setting an array [cite: 28, 195]
         setExistingAttachments(Array.isArray(files) ? files : []);
       })

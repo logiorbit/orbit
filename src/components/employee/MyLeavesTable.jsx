@@ -27,7 +27,6 @@ export default function MyLeavesTable({ leaves = [], onRefresh }) {
   }));
 
   async function handleDelete(leave) {
-    // console.log(leave);
     const start = new Date(leave.StartDate);
     const today = new Date();
 

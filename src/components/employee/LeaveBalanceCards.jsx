@@ -9,8 +9,6 @@ export default function LeaveBalanceCards() {
   const { userProfile } = useUserContext();
   const [balances, setBalances] = useState([]);
 
-  //console.log("User profile:", userProfile);
-
   useEffect(() => {
     async function load() {
       const token = await getAccessToken(instance, accounts[0]);

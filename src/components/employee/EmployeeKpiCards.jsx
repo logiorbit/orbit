@@ -27,21 +27,11 @@ export default function EmployeeKpiCards() {
       const teamSize = teamMembers.length;
       const capacityPerDay = teamSize * 9;
 
-      console.log(teamSize);
-      console.log(capacityPerDay);
-
       const today = await getTeamTasksForPeriod(token, "today", teamMembers);
 
       const week = await getTeamTasksForPeriod(token, "week", teamMembers);
 
       const month = await getTeamTasksForPeriod(token, "month", teamMembers);
-
-      // console.log("teamMembers", teamMembers);
-      //  console.log(teamSize);
-      //  console.log(capacityPerDay);
-      //  console.log(today);
-      //  console.log(week);
-      //  console.log(month);
 
       setKpis({
         capacityPerDay,

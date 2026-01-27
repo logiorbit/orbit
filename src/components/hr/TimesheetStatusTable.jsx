@@ -42,8 +42,6 @@ export default function TimesheetStatusTable({
   onEdit,
   onDelete,
 }) {
-  console.log("Pankaj the timesheets are", timesheets);
-  console.log("Pankaj the assignments are", assignments);
   function findTimesheet(a) {
     return timesheets.find(
       (ts) =>
@@ -53,7 +51,6 @@ export default function TimesheetStatusTable({
   }
 
   function resolveFlags(status) {
-    console.log("Pankaj Status is--" + status);
     return {
       submitted:
         status === "Submitted" ||

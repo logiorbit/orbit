@@ -8,8 +8,6 @@ export default function TLActionModal({ leave, onClose, onSuccess }) {
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
 
-  console.log(leave);
-
   const act = async (status) => {
     if (!comment) {
       alert("Comment is mandatory");

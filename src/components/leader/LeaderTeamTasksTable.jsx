@@ -23,11 +23,9 @@ export default function LeaderTeamTasksTable() {
 
       let filtered = tasks;
 
-      console.log(filtered);
-
       if (employeeEmail !== "ALL") {
         filtered = tasks.filter(
-          (t) => t.Employee?.EMail?.toLowerCase() === employeeEmail
+          (t) => t.Employee?.EMail?.toLowerCase() === employeeEmail,
         );
       }
 

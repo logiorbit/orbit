@@ -23,8 +23,6 @@ export default function EmployeeTaskCards() {
         const today = new Date();
         const todayTasks = await getMyTasksForDate(token, user.Id, today);
 
-        //console.log("Today tasks from SP:", todayTasks);
-
         setTasks(todayTasks);
       } catch (err) {
         console.error("EmployeeTaskCards error", err);
