@@ -232,7 +232,8 @@ h3 {
 
 .btn-div {
   width: 60%;
-  align-items: right;
+  display: flex;
+  justify-content: flex-end; /* aligns buttons to right */
 }
 
 button,
