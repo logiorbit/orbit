@@ -1488,7 +1488,7 @@ export async function getEmployeeClientAssignments(accessToken) {
     `${SITE_URL}/_api/web/lists/getbytitle('Employee_Client_Assignment')/items` +
     `?$select=` +
     `Id,Active,BillingStartDate,BillingEndDate,` +
-    `Employee/Id,Employee/Title,Employee/EmployeeEmail` +
+    `Employee/Id,Employee/Title,Employee/EmployeeEmail,` +
     `Client/Id,Client/Title` +
     `&$expand=Employee,Client`;
 
