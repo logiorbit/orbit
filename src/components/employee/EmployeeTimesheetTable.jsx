@@ -8,9 +8,7 @@ export default function EmployeeTimesheetTable({
   }
 
   return (
-    <div className="card">
-      <h3>My Timesheets</h3>
-
+    <div className="table-card">
       <table className="data-table">
         <thead>
           <tr>
@@ -19,7 +17,6 @@ export default function EmployeeTimesheetTable({
             <th>Hours</th>
             <th>Days</th>
             <th>Status</th>
-            <th>Edit</th>
             <th>Delete</th>
           </tr>
         </thead>
@@ -43,21 +40,6 @@ export default function EmployeeTimesheetTable({
                     <span className={`status-badge ${ts.Status}`}>
                       {ts.Status}
                     </span>
-                  </td>
-
-                  <td>
-                    <button
-                      className="icon-btn"
-                      disabled={!editable}
-                      title={
-                        editable
-                          ? "Edit Timesheet"
-                          : "Timesheet locked after HR approval"
-                      }
-                      onClick={() => onEdit(ts)}
-                    >
-                      ✏️
-                    </button>
                   </td>
 
                   <td>
