@@ -237,6 +237,7 @@ h3 {
 button,
 .btn,
 .primary-btn {
+  right: 0%;
   background-color: #d9f99d;
   color: #000;
   border: none;
