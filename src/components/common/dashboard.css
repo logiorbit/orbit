@@ -56,7 +56,9 @@ h3 {
   border-radius: 6px;
   padding: 18px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .leave-card:hover {
@@ -229,7 +231,7 @@ h3 {
 }
 
 .btn-div {
-  width: 30%;
+  width: 60%;
 }
 
 button,

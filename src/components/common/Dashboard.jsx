@@ -169,14 +169,12 @@ function EmployeeDashboard() {
             Edit Profile
           </button>
 
-          <div className="btn-div">
-            <button
-              className="primary-btn"
-              onClick={() => setShowSubmitTimesheet(true)}
-            >
-              + Submit Timesheet
-            </button>
-          </div>
+          <button
+            className="primary-btn"
+            onClick={() => setShowSubmitTimesheet(true)}
+          >
+            + Submit Timesheet
+          </button>
         </div>
       </div>
 

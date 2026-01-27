@@ -49,7 +49,7 @@ export default function EmployeeTimesheetTable({
                       title={
                         editable
                           ? "Delete Timesheet"
-                          : "Timesheet locked after HR approval"
+                          : "Timesheet locked Can't Delete"
                       }
                       onClick={() => onDelete(ts)}
                     >
