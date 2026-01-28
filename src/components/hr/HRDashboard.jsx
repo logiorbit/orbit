@@ -151,7 +151,7 @@ export default function HRDashboard() {
     await updateInvoiceStatus(token, invoice.ID, {
       InvoiceStatus: "HR Approved",
       ApprovedOnHR: new Date().toISOString(),
-      ApprovedByHR: currentUser.Id,
+      ApprovedByHR: currentUser.ID,
     });
     refreshInvoices();
   };
@@ -161,7 +161,7 @@ export default function HRDashboard() {
       InvoiceStatus: "HOD Approved",
       IsLocked: true,
       ApprovedOnHOD: new Date().toISOString(),
-      ApprovedByHOD: currentUser.Id,
+      ApprovedByHOD: currentUser.ID,
     });
     refreshInvoices();
   };
@@ -228,15 +228,6 @@ export default function HRDashboard() {
           <div className="hr-card">Loading Timesheet Status…</div>
         ) : (
           <>
-            <div className="btn-div">
-              <button
-                className="primary-btn"
-                onClick={() => setShowSubmitTimesheet(true)}
-              >
-                + Submit Timesheet
-              </button>
-            </div>
-
             <div className="manager-grid-1">
               <div className="card">
                 <TimesheetStatusTable
