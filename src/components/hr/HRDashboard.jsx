@@ -148,6 +148,7 @@ export default function HRDashboard() {
   };
 
   const handleHRApprove = async (invoice) => {
+    console.log("Pankaj the current user is----", currentUser);
     await updateInvoiceStatus(token, invoice.ID, {
       InvoiceStatus: "HR Approved",
       ApprovedOnHR: new Date().toISOString(),
