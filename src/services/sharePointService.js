@@ -1225,8 +1225,8 @@ export async function getEmployeeClientAssignment(token, employeeId, clientId) {
 
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Employee_Client_Assignment')/items` +
-    `?$select=ID,RateType,RateValue,Employee/Id,Client/Id,Active` +
-    `&$filter=Employee/Id eq ${employeeId} and Client/Id eq ${clientId} and Active eq true` +
+    `?$select=ID,RateType,RateValue,Employee/ID,Client/ID,Active` +
+    `&$filter=Employee/ID eq ${employeeId} and Client/ID eq ${clientId} and Active eq true` +
     `&$expand=Employee,Client`;
 
   const res = await fetch(url, {
