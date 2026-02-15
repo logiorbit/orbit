@@ -1226,7 +1226,7 @@ export async function getEmployeeClientAssignment(token, employeeId, clientId) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Employee_Client_Assignment')/items` +
     `?$select=ID,RateType,RateValue,Employee/ID,Client/ID,Active` +
-    `&$filter=Employee/ID eq ${employeeId} and Client/ID eq ${clientId} and Active eq true` +
+    `&$filter=EmployeeId eq ${employeeId} and ClientId eq ${clientId} and Active eq 1` +
     `&$expand=Employee,Client`;
   console.log("Pankaj the Employee ID is ---", employeeId);
   console.log("Pankaj the Client ID is---", clientId);
