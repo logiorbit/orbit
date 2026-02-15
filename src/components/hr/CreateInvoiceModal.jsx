@@ -40,9 +40,13 @@ export default function CreateInvoiceModal({
      2️⃣ HELPER — LINE CALCULATION
      ========================= */
   function calculateLine(ts, assignment, client) {
+    console.log("ts", ts);
+    console.log("assignment", assignment);
+    console.log("client", client);
     const { RateType, RateValue } = assignment;
 
     if (RateType === "Hour") {
+      console.log("I am in Hour Slot");
       return {
         units: ts.TotalBillingHours,
         amount: ts.TotalBillingHours * RateValue,
@@ -50,10 +54,11 @@ export default function CreateInvoiceModal({
     }
 
     if (RateType === "Day") {
+      console.log("I am in Day Slot");
       const days =
         client?.FixedWorkingDays != null
           ? client.FixedWorkingDays
-          : ts.WorkingDays;
+          : ts.TotalBillingDays;
 
       return {
         units: days,
