@@ -1228,9 +1228,6 @@ export async function getEmployeeClientAssignment(token, employeeId, clientId) {
     `?$select=ID,RateType,RateValue,Employee/ID,Client/ID,Active` +
     `&$filter=EmployeeId eq ${employeeId} and ClientId eq ${clientId} and Active eq 1` +
     `&$expand=Employee,Client`;
-  console.log("Pankaj the Employee ID is ---", employeeId);
-  console.log("Pankaj the Client ID is---", clientId);
-  console.log("Pankaj the TOtal URL is---", url);
 
   const res = await fetch(url, {
     method: "GET",

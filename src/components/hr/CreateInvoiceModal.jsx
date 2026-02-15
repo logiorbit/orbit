@@ -134,9 +134,12 @@ export default function CreateInvoiceModal({
           throw new Error(
             `Rate not found for Employee ${ts.EmployeeHierarchy.ID}`,
           );
+        } else {
+          console.log("Your Rate is----", assignment);
         }
 
         const { units, amount } = calculateLine(ts, assignment, clientMeta);
+        console.log("Your Calculated Line is----", amount);
         subTotal += amount;
 
         /* Create mapping snapshot */
