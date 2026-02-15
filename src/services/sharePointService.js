@@ -303,7 +303,7 @@ export async function finalizeLeaveApproval(accessToken, leave) {
 export async function getClients(accessToken) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Client_Master')/items` +
-    `?$select=Id,Title&$filter=IsActive eq 1`;
+    `?$select=Id,Title,ClientLocation&$filter=IsActive eq 1`;
 
   const res = await fetch(url, {
     headers: {
