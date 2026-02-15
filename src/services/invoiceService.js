@@ -14,6 +14,8 @@ export async function updateInvoiceTotals(
   subTotal,
   clientMeta,
 ) {
+  console.log("Valid Valid Valid----", subTotal);
+  console.log("Valid Valid Valid----", clientMeta);
   /* =========================
      1️⃣ TAX CALCULATION
      ========================= */

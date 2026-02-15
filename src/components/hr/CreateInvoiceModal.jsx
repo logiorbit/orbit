@@ -40,13 +40,9 @@ export default function CreateInvoiceModal({
      2️⃣ HELPER — LINE CALCULATION
      ========================= */
   function calculateLine(ts, assignment, client) {
-    console.log("ts", ts);
-    console.log("assignment", assignment);
-    console.log("client", client);
     const { RateType, RateValue } = assignment;
 
     if (RateType === "Hour") {
-      console.log("I am in Hour Slot");
       return {
         units: ts.TotalBillingHours,
         amount: ts.TotalBillingHours * RateValue,
@@ -54,7 +50,6 @@ export default function CreateInvoiceModal({
     }
 
     if (RateType === "Day") {
-      console.log("I am in Day Slot");
       const days =
         client?.FixedWorkingDays != null
           ? client.FixedWorkingDays
@@ -139,12 +134,9 @@ export default function CreateInvoiceModal({
           throw new Error(
             `Rate not found for Employee ${ts.EmployeeHierarchy.ID}`,
           );
-        } else {
-          console.log("Your Rate is----", assignment);
         }
 
         const { units, amount } = calculateLine(ts, assignment, clientMeta);
-        console.log("Your Calculated Line is----", amount);
         subTotal += amount;
 
         /* Create mapping snapshot */
