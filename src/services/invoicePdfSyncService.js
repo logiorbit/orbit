@@ -4,6 +4,7 @@ import {
   getInvoiceLineItems,
   uploadInvoicePDF,
   updateInvoiceStatus,
+  getClientById,
 } from "./sharePointService";
 
 /**
@@ -23,11 +24,15 @@ export async function syncInvoicePDF(token, invoiceId) {
   // 3️⃣ Load latest line items (snapshot table)
   const lineItems = await getInvoiceLineItems(token, invoiceId);
 
+  const totalClient = getClientById(token, invoice.Client.Id);
+
+  console.log("Total Client is---", totalClient);
+
   // 4️⃣ Generate PDF from latest data
   const doc = await generateInvoicePDF({
     invoice,
     lineItems,
-    client: invoice.Client,
+    client: totalClient,
   });
 
   const pdfBlob = doc.output("blob");

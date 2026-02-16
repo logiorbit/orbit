@@ -315,6 +315,21 @@ export async function getClients(accessToken) {
   return (await res.json()).value;
 }
 
+export async function getClientById(accessToken, clientId) {
+  const url =
+    `${SITE_URL}/_api/web/lists/getbytitle('Client_Master')/items` +
+    `?$select=Id,Title,ClientLocation,ClientName,Address,Currency,GSTIN&$filter=Id eq ${clientId} && IsActive eq 1`;
+
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json;odata=nometadata",
+    },
+  });
+
+  return (await res.json()).value;
+}
+
 export async function getSkills(accessToken) {
   const url =
     `${SITE_URL}/_api/web/lists/getbytitle('Skills')/items` +
@@ -1246,8 +1261,8 @@ export async function getInvoiceById(token, invoiceId) {
     `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoiceId})` +
     `?$select=` +
     `ID,InvoiceID,InvoiceMonth,InvoiceYear,InvoiceStatus,IsLocked,` +
-    `SubTotal,TaxTotal,GrandTotal,PDFUrl,Client/ID,Client/ClientName,` +
-    `Client/Address,Client/GSTIN,Client/Currency` +
+    `SubTotal,TaxTotal,CGST,IGST,SGST,VAT,GrandTotal,PDFUrl,Client/ID,Client/ClientName,` +
+    `Client/GSTIN,` +
     `&$expand=Client`;
 
   const response = await fetch(url, {
