@@ -334,7 +334,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
     y + 20,
   );
 
-  drawWatermark(doc, invoice.InvoiceStatus);
+  //drawWatermark(doc, invoice.InvoiceStatus);
 
   return doc;
 }
