@@ -333,10 +333,10 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
       "   SWIFT CODE: HDFCINBB",
     ],
     10,
-    y + 20,
+    y + 30,
   );
   doc.setFont("helvetica", "bold");
-  doc.text(["For Logivention Technologies Pvt. Ltd."], 10, y + 20);
+  doc.text(["For Logivention Technologies Pvt. Ltd."], 10, y + 80);
 
   //drawWatermark(doc, invoice.InvoiceStatus);
 
