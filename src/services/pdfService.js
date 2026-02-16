@@ -157,7 +157,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
   /* ===============================
    COMPANY LOGO
    =============================== */
-  doc.addImage({ companyLogo }, "PNG", 10, 12, 35, 12);
+  doc.addImage(companyLogo, "PNG", 10, 12, 35, 12);
 
   /* ===============================
      HEADER STRIP
