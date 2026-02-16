@@ -212,11 +212,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
 
   doc.setFont("helvetica", "normal");
   doc.text(
-    [
-      client?.ClientName || "",
-      client?.Address || "",
-      `GSTIN: ${client?.GSTIN || "-"}`,
-    ],
+    [`${client.ClientName}`, `${client.Address}`, `GSTIN: ${client?.GSTI}`],
     12,
     73,
   );
