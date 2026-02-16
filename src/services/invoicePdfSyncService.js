@@ -14,6 +14,7 @@ import {
 export async function syncInvoicePDF(token, invoiceId) {
   // 1️⃣ Load latest invoice header
   const invoice = await getInvoiceById(token, invoiceId);
+  console.log("Client ID is---", invoice);
 
   // 2️⃣ Guard: Do NOT regenerate after lock
   if (invoice.IsLocked === true) {
