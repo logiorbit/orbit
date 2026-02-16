@@ -212,7 +212,11 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
 
   doc.setFont("helvetica", "normal");
   doc.text(
-    [`${client.ClientName}`, `${client.Address}`, `GSTIN: ${client?.GSTI}`],
+    [
+      client[0]?.ClientName || "",
+      client[0]?.Address || "",
+      `GSTIN: ${client[0]?.GSTIN || "-"}`,
+    ],
     12,
     73,
   );
@@ -305,7 +309,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.text(
-    `Total Amount (${client.Currency} - In Words): ${numberToWordsINR(invoice.GrandTotal)}`,
+    `Total Amount (${client[0].Currency} - In Words): ${numberToWordsINR(invoice.GrandTotal)}`,
     10,
     y + 10,
   );
