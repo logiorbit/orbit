@@ -60,7 +60,7 @@ function numberToWordsINR(amount) {
   const num = Math.floor(Number(amount));
 
   if (isNaN(num) || num === 0) {
-    return "Rupees Zero Only";
+    return "Zero Only";
   }
 
   const ones = [
@@ -147,7 +147,7 @@ function numberToWordsINR(amount) {
     words += convertBelowThousand(remainder) + " ";
   }
 
-  return `Rupees ${words.trim()} Only`;
+  return `${words.trim()} Only`;
 }
 
 export async function generateInvoicePDF({ invoice, lineItems, client }) {
