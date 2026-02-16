@@ -157,7 +157,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
   /* ===============================
    COMPANY LOGO
    =============================== */
-  doc.addImage(companyLogo, "PNG", 10, 12, 35, 12);
+  doc.addImage({ companyLogo }, "PNG", 10, 12, 35, 12);
 
   /* ===============================
      HEADER STRIP
@@ -205,7 +205,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
      CLIENT BLOCK
      =============================== */
   doc.setDrawColor(0);
-  doc.rect(10, 62, 90, 26);
+  doc.rect(10, 62, 180, 26);
 
   doc.setFont("helvetica", "bold");
   doc.text("To,", 12, 68);
@@ -306,10 +306,10 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
   /* ===============================
      AMOUNT IN WORDS
      =============================== */
-  doc.setFont("helvetica", "normal");
+  doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
   doc.text(
-    `Total Amount (${client[0].Currency} - In Words): ${numberToWordsINR(invoice.GrandTotal)}`,
+    `Total Amount (${client[0].Currency} - In Words): ${client[0].Currency} - ${numberToWordsINR(invoice.GrandTotal)}`,
     10,
     y + 10,
   );
@@ -317,9 +317,11 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
   /* ===============================
      FOOTER (STATIC)
      =============================== */
+  doc.setFont("helvetica", "bold");
+  doc.text(["Related Terms & Conditions:"], 10, y + 20);
+  doc.setFont("helvetica", "normal");
   doc.text(
     [
-      "Related Terms & Conditions:",
       "1. Payment term 30 days",
       "2. This is a digital invoice and does not require a physical signature.",
       "3. Details for payment:",
@@ -329,11 +331,12 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
       "   Bank Name: HDFC Bank",
       "   MICR:  411240086",
       "   SWIFT CODE: HDFCINBB",
-      "For Logivention Technologies Pvt. Ltd.",
     ],
     10,
     y + 20,
   );
+  doc.setFont("helvetica", "bold");
+  doc.text(["For Logivention Technologies Pvt. Ltd."], 10, y + 20);
 
   //drawWatermark(doc, invoice.InvoiceStatus);
 
