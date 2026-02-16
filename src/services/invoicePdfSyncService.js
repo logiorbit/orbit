@@ -24,7 +24,7 @@ export async function syncInvoicePDF(token, invoiceId) {
   // 3️⃣ Load latest line items (snapshot table)
   const lineItems = await getInvoiceLineItems(token, invoiceId);
 
-  const totalClient = getClientById(token, invoice.Client.Id);
+  const totalClient = await getClientById(token, invoice.ClientId);
 
   console.log("Total Client is---", totalClient);
 
