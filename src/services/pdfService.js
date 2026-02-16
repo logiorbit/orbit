@@ -151,6 +151,7 @@ function numberToWordsINR(amount) {
 }
 
 export async function generateInvoicePDF({ invoice, lineItems, client }) {
+  console.log("The Client Is---", client);
   const doc = new jsPDF("p", "mm", "a4");
 
   /* ===============================
@@ -224,8 +225,8 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
      LINE ITEMS TABLE
      =============================== */
   const tableRows = lineItems.map((l) => [
-    l.Description || "Salesforce Development",
-    l.HSNSAC || "998314",
+    l.Description,
+    l.HSNSAC,
     l.WorkingUnits,
     safeAmount(l.RateValue),
     safeAmount(l.LineTotal),

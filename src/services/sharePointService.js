@@ -1029,6 +1029,43 @@ export async function getTimesheetsForMonth(accessToken, month, year) {
   return response.data.value;
 }
 
+export async function getTimesheetsById(accessToken, Id) {
+  const url =
+    `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items(${id})` +
+    `?$select=` +
+    [
+      "Id",
+      "Month",
+      "Year",
+      "Status",
+      "TotalWorkingDays",
+      "TotalLeaves",
+      "LeaveDates",
+      "TotalHolidays",
+      "HolidayDates",
+      "TotalBillingDays",
+      "TotalBillingHours",
+      "Client/Id",
+      "Client/Title",
+      "Employee/Id",
+      "Employee/EMail",
+      "Employee/Title",
+      "EmployeeHierarchy/Id",
+      "EmployeeHierarchy/EmployeeEmail",
+      "EmployeeHierarchy/Title",
+    ].join(",") +
+    `&$expand=Client,Employee,EmployeeHierarchy`;
+
+  const response = await axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json;odata=nometadata",
+    },
+  });
+
+  return response.data.value;
+}
+
 export async function updateTimesheetRecord(token, id, payload) {
   return fetch(
     `${SITE_URL}/_api/web/lists/getbytitle('Timesheets')/items(${id})`,
