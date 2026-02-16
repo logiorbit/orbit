@@ -1246,7 +1246,7 @@ export async function getInvoiceById(token, invoiceId) {
     `${SITE_URL}/_api/web/lists/getbytitle('Invoice_Header')/items(${invoiceId})` +
     `?$select=` +
     `ID,InvoiceID,InvoiceMonth,InvoiceYear,InvoiceStatus,IsLocked,` +
-    `SubTotal,TaxTotal,GrandTotal,PDFUrl,Client/ID,Client/ClientName` +
+    `SubTotal,TaxTotal,GrandTotal,PDFUrl,Client/ID,Client/ClientName,Client/Address,Client/GSTIN,Client/Currency` +
     `&$expand=Client`;
 
   const response = await fetch(url, {

@@ -166,7 +166,9 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
 
   doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
-  doc.text("TAX INVOICE", 105, 19, { align: "center" });
+  doc.text(`TAX INVOICE - ${invoice.InvoiceStatus}`, 105, 19, {
+    align: "center",
+  });
 
   doc.setFontSize(9);
   doc.text(`INVOICE NO: ${invoice.InvoiceID}`, 140, 17);
@@ -187,9 +189,9 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
   doc.setFontSize(8);
   doc.text(
     [
-      "Office No: 408, Pride Icon, MH SH27,",
-      "Pune Nashik Highway, Kharadi,",
-      "Pune, Maharashtra, 411014",
+      "Office No: D 605-610, The Atrium,",
+      "BG Shirke Rd, Jahangir Nagar, Mundhwa,",
+      "Pune, Maharastra - 411036",
       "Phone: 8888744254 | support@logivention.in",
       "GSTIN: 27AAECL6024G1ZN",
       "PAN: AAECL6024G",
@@ -272,28 +274,16 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
 
   const gstRows = [];
 
-  if (invoice.CGSTPercent && invoice.CGSTAmount) {
-    gstRows.push([
-      "CGST",
-      `${invoice.CGSTPercent}%`,
-      safeAmount(invoice.CGSTAmount),
-    ]);
+  if (invoice.CGST) {
+    gstRows.push(["CGST", `9%`, safeAmount(invoice.CGST)]);
   }
 
-  if (invoice.SGSTPercent && invoice.SGSTAmount) {
-    gstRows.push([
-      "SGST",
-      `${invoice.SGSTPercent}%`,
-      safeAmount(invoice.SGSTAmount),
-    ]);
+  if (invoice.SGST) {
+    gstRows.push(["SGST", `9%`, safeAmount(invoice.SGST)]);
   }
 
-  if (invoice.IGSTPercent && invoice.IGSTAmount) {
-    gstRows.push([
-      "IGST",
-      `${invoice.IGSTPercent}%`,
-      safeAmount(invoice.IGSTAmount),
-    ]);
+  if (invoice.IGST) {
+    gstRows.push(["IGST", `18%`, safeAmount(invoice.IGST)]);
   }
 
   gstRows.push(["Grand Total", "", safeAmount(invoice.GrandTotal)]);
@@ -318,7 +308,7 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.text(
-    `Total Amount (INR - In Words): ${numberToWordsINR(invoice.GrandTotal)}`,
+    `Total Amount (${client.Currency} - In Words): ${numberToWordsINR(invoice.GrandTotal)}`,
     10,
     y + 10,
   );
@@ -328,10 +318,16 @@ export async function generateInvoicePDF({ invoice, lineItems, client }) {
      =============================== */
   doc.text(
     [
-      "Payment Terms:",
-      "1. Payment within 35 days",
-      "2. This is a digital invoice",
-      "",
+      "Related Terms & Conditions:",
+      "1. Payment term 30 days",
+      "2. This is a digital invoice and does not require a physical signature.",
+      "3. Details for payment:",
+      "   Account Name: LOGIVENTION TECHNOLOGIES PVT LTD",
+      "   Account Number: 50200058253880",
+      "   IFSC Code: HDFC0005974",
+      "   Bank Name: HDFC Bank",
+      "   MICR:  411240086",
+      "   SWIFT CODE: HDFCINBB",
       "For Logivention Technologies Pvt. Ltd.",
     ],
     10,
