@@ -185,10 +185,21 @@ export default function ApplyLeaveModal({ onClose }) {
     /* ======================
      SUBMIT (ALL VALID)
      ====================== */
+
+    //  const utcDate = new Date(form.startDate + "T00:00:00");
+    //   const isoDate = utcDate.toISOString();
+    //  const utcDate2 = new Date(form.endDate + "T00:00:00");
+    //   const isoDate2 = utcDate2.toISOString();
+
+    const [year, month, day] = form.startDate.split("-");
+    const isoDate = new Date(Date.UTC(year, month - 1, day)).toISOString();
+    const [year2, month2, day2] = form.endDate.split("-");
+    const isoDate2 = new Date(Date.UTC(year2, month2 - 1, day2)).toISOString();
+
     await submitLeaveRequest(token, {
       leaveType: form.leaveType,
-      startDate: form.startDate,
-      endDate: form.endDate,
+      startDate: isoDate,
+      endDate: isoDate2,
       days,
       reason: form.reason,
     });

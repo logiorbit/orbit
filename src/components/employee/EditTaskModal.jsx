@@ -71,9 +71,14 @@ export default function EditTaskModal({ task, onClose, onSuccess }) {
 
     const token = await getAccessToken(instance, accounts[0]);
 
+    //const utcDate = new Date(form.date + "T00:00:00");
+    //const isoDate = utcDate.toISOString();
+    const [year, month, day] = form.date.split("-");
+    const isoDate = new Date(Date.UTC(year, month - 1, day)).toISOString();
+
     await updateTask(token, task.Id, {
       Title: form.title,
-      TaskDate: form.date,
+      TaskDate: isoDate,
       Status: form.status,
       EstimatedHours: Number(form.estimated),
       ProductiveHours: form.productive ? Number(form.productive) : null,

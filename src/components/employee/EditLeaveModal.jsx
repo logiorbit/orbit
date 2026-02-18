@@ -28,9 +28,19 @@ export default function EditLeaveModal({ leave, onClose, onSuccess }) {
   async function submit() {
     const token = await getAccessToken(instance, accounts[0]);
 
+    // const utcDate = new Date(form.startDate + "T00:00:00");
+    // const isoDate = utcDate.toISOString();
+    // const utcDate2 = new Date(form.endDate + "T00:00:00");
+    // const isoDate2 = utcDate2.toISOString();
+
+    const [year, month, day] = form.startDate.split("-");
+    const isoDate = new Date(Date.UTC(year, month - 1, day)).toISOString();
+    const [year2, month2, day2] = form.endDate.split("-");
+    const isoDate2 = new Date(Date.UTC(year2, month2 - 1, day2)).toISOString();
+
     await updateLeaveRequest(token, leave.Id, {
-      StartDate: form.startDate,
-      EndDate: form.endDate,
+      StartDate: isoDate,
+      EndDate: isoDate2,
       Reason: form.reason,
     });
 
