@@ -48,7 +48,8 @@ export default function TLActionModal({ leave, onClose, onSuccess }) {
             <div className="review-item">
               <span>Leave Dates</span>
               <strong>
-                {leave.StartDate} → {leave.EndDate}
+                {new Date(leave.StartDate).toLocaleDateString("en-GB")} →{" "}
+                {new Date(leave.EndDate).toLocaleDateString("en-GB")}
               </strong>
             </div>
             <div className="review-item">
