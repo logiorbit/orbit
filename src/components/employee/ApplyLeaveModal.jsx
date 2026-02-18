@@ -112,10 +112,10 @@ export default function ApplyLeaveModal({ onClose }) {
     /* ======================
      R3 – Past date block
      ====================== */
-    if (start < today) {
-      alert("You cannot apply leave for past dates.");
-      return;
-    }
+    // if (start < today) {
+    //   alert("You cannot apply leave for past dates.");
+    //   return;
+    // }
 
     /* ======================
      R4 – Half-day rule
@@ -159,7 +159,7 @@ export default function ApplyLeaveModal({ onClose }) {
      R6 – Leave balance
      ====================== */
     const entitlement = entitlements.find(
-      (e) => e.LeaveType.Title === form.leaveType
+      (e) => e.LeaveType.Title === form.leaveType,
     );
 
     if (!entitlement) {
@@ -170,7 +170,7 @@ export default function ApplyLeaveModal({ onClose }) {
 
     if (days > entitlement.RemainingLeaves) {
       alert(
-        `Insufficient leave balance. Remaining: ${entitlement.RemainingLeaves}`
+        `Insufficient leave balance. Remaining: ${entitlement.RemainingLeaves}`,
       );
       setLoading(false);
       return;
