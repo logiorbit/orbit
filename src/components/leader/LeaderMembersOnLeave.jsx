@@ -14,13 +14,14 @@ export default function LeaderMembersOnLeave() {
   const { instance, accounts } = useMsal();
   const { employeeHierarchy, userProfile } = useUserContext();
 
+  const today = new Date();
+
   // ---------------- DATE ----------------
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState(today.toISOString().split("T")[0]);
   const [dateRows, setDateRows] = useState([]);
 
   // ---------------- MONTH ----------------
-  const today = new Date();
-  const [month, setMonth] = useState(today.getMonth() + 1); // 1-12
+  const [month, setMonth] = useState(today.getMonth() + 1);
   const [monthYear, setMonthYear] = useState(today.getFullYear());
   const [monthRows, setMonthRows] = useState([]);
 
@@ -28,13 +29,43 @@ export default function LeaderMembersOnLeave() {
   const [year, setYear] = useState(today.getFullYear());
   const [yearRows, setYearRows] = useState([]);
 
+  // ---------------- COLUMNS ----------------
   const columns = [
     { key: "Employee", label: "Employee" },
     { key: "LeaveType", label: "Leave Type" },
+    { key: "StartDate", label: "Start Date" },
+    { key: "EndDate", label: "End Date" },
+    { key: "NoOfDays", label: "No. of Days" },
     { key: "Status", label: "Status" },
   ];
 
-  // ---------------- LOAD DATE ----------------
+  // ---------------- HELPERS ----------------
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString("en-IN");
+  };
+
+  const calculateDays = (start, end) => {
+    if (!start || !end) return 0;
+    const s = new Date(start);
+    const e = new Date(end);
+
+    const diff = e - s;
+    return Math.floor(diff / (1000 * 60 * 60 * 24)) + 1; // inclusive
+  };
+
+  const mapData = (rows) =>
+    rows.map((l) => ({
+      Id: l.Id,
+      Employee: l.Employee?.Title,
+      LeaveType: l.LeaveType?.Title,
+      StartDate: formatDate(l.StartDate),
+      EndDate: formatDate(l.EndDate),
+      NoOfDays: calculateDays(l.StartDate, l.EndDate),
+      Status: l.Status,
+    }));
+
+  // ---------------- LOADERS ----------------
   useEffect(() => {
     if (!employeeHierarchy || !userProfile) return;
 
@@ -47,7 +78,6 @@ export default function LeaderMembersOnLeave() {
     loadDate();
   }, [date, employeeHierarchy, userProfile]);
 
-  // ---------------- LOAD MONTH ----------------
   useEffect(() => {
     if (!employeeHierarchy || !userProfile) return;
 
@@ -60,7 +90,6 @@ export default function LeaderMembersOnLeave() {
     loadMonth();
   }, [month, monthYear, employeeHierarchy, userProfile]);
 
-  // ---------------- LOAD YEAR ----------------
   useEffect(() => {
     if (!employeeHierarchy || !userProfile) return;
 
@@ -73,17 +102,9 @@ export default function LeaderMembersOnLeave() {
     loadYear();
   }, [year, employeeHierarchy, userProfile]);
 
-  const mapData = (rows) =>
-    rows.map((l) => ({
-      Id: l.Id,
-      Employee: l.Employee?.Title,
-      LeaveType: l.LeaveType?.Title,
-      Status: l.Status,
-    }));
-
   return (
     <>
-      {/* ---------------- DATE TABLE ---------------- */}
+      {/* DATE */}
       <div className="card">
         <div className="table-header">
           <h3>Members on Leave (By Date)</h3>
@@ -100,7 +121,7 @@ export default function LeaderMembersOnLeave() {
         <DataTable columns={columns} data={mapData(dateRows)} />
       </div>
 
-      {/* ---------------- MONTH TABLE ---------------- */}
+      {/* MONTH */}
       <div className="card">
         <div className="table-header">
           <h3>Members on Leave (By Month)</h3>
@@ -112,7 +133,9 @@ export default function LeaderMembersOnLeave() {
             >
               {[...Array(12)].map((_, i) => (
                 <option key={i + 1} value={i + 1}>
-                  {new Date(0, i).toLocaleString("default", { month: "long" })}
+                  {new Date(0, i).toLocaleString("default", {
+                    month: "long",
+                  })}
                 </option>
               ))}
             </select>
@@ -121,7 +144,6 @@ export default function LeaderMembersOnLeave() {
               type="number"
               value={monthYear}
               onChange={(e) => setMonthYear(Number(e.target.value))}
-              placeholder="Year"
             />
           </div>
         </div>
@@ -129,7 +151,7 @@ export default function LeaderMembersOnLeave() {
         <DataTable columns={columns} data={mapData(monthRows)} />
       </div>
 
-      {/* ---------------- YEAR TABLE ---------------- */}
+      {/* YEAR */}
       <div className="card">
         <div className="table-header">
           <h3>Members on Leave (By Year)</h3>
@@ -139,7 +161,6 @@ export default function LeaderMembersOnLeave() {
               type="number"
               value={year}
               onChange={(e) => setYear(Number(e.target.value))}
-              placeholder="Year"
             />
           </div>
         </div>
