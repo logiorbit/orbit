@@ -676,6 +676,35 @@ export async function getLeavesForDate(accessToken, date) {
   return res.data.value;
 }
 
+async function getLeavesByRange(accessToken, start, end) {
+  const url =
+    `${SITE_URL}/_api/web/lists/getbytitle('Leave_Requests')/items` +
+    `?$select=Id,StartDate,EndDate,Status,Employee/Title,Employee/EMail,LeaveType/Title` +
+    `&$expand=Employee,LeaveType` +
+    `&$filter=StartDate le datetime'${end}' and EndDate ge datetime'${start}'`;
+
+  const res = await axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json;odata=nometadata",
+    },
+  });
+
+  return res.data.value;
+}
+
+export async function getLeavesForMonth(accessToken, year, month) {
+  const start = new Date(Date.UTC(year, month - 1, 1)).toISOString();
+  const end = new Date(Date.UTC(year, month, 0, 23, 59, 59)).toISOString();
+  return getLeavesByRange(accessToken, start, end);
+}
+
+export async function getLeavesForYear(accessToken, year) {
+  const start = new Date(Date.UTC(year, 0, 1)).toISOString();
+  const end = new Date(Date.UTC(year, 11, 31, 23, 59, 59)).toISOString();
+  return getLeavesByRange(accessToken, start, end);
+}
+
 export async function getTasksForDate(accessToken, date) {
   const start = `${date}T00:00:00Z`;
   const end = `${date}T23:59:59Z`;
